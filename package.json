@@ -1,0 +1,67 @@
+{
+  "name": "chatty-client",
+  "version": "1.2.0",
+  "description": "Easy application client for a chatting solution",
+  "type": "commonjs",
+  "main": "./build/cjs/index.js",
+  "module": "./build/esm/index.js",
+  "exports": {
+    "./package.json": "./package.json",
+    "./dist/chatty-client.js": "./dist/chatty-client.js",
+    "./dist/chatty-client.js.map": "./dist/chatty-client.js.map",
+    ".": {
+      "import": {
+        "node": "./build/esm-debug/index.js",
+        "default": "./build/esm/index.js"
+      },
+      "require": "./build/cjs/index.js",
+      "types": "./build/esm/index.d.ts"
+    }
+  },
+  "types": "./build/esm/index.d.ts",
+  "scripts": {
+    "compile": "rm -rf ./build && tsc && tsc -p tsconfig.esm.json && ./postcompile.sh",
+    "build": "rollup -c support/rollup.config.umd.js && rollup -c support/rollup.config.esm.js",
+    "prettier": "prettier --check \"lib/**/*.ts\" \"support/**/*.js\"",
+    "prettier.fix": "prettier --write \"lib/**/*.ts\" \"support/**/*.js\"",
+    "prepack": "npm run compile"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chatty-cloud/chatty-cloud-sdk.git"
+  },
+  "bugs": {
+    "url": "https://github.com/chatty-cloud/chatty-cloud-sdk/issues",
+    "email": "nunonam@gmail.com"
+  },
+  "homepage": "https://www.chatty-cloud.com",
+  "keywords": [],
+  "files": [
+    "dist/",
+    "build/"
+  ],
+  "author": "chatty-cloud<administrator@chatty-cloud.com>",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.27.2",
+    "form-data": "^4.0.0",
+    "socket.io-client": "^4.1.3"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.21.3",
+    "@babel/plugin-transform-object-assign": "^7.18.6",
+    "@babel/preset-env": "^7.20.2",
+    "@babel/register": "^7.21.0",
+    "@rollup/plugin-alias": "^4.0.3",
+    "@rollup/plugin-babel": "^6.0.3",
+    "@rollup/plugin-commonjs": "^24.0.1",
+    "@rollup/plugin-node-resolve": "^15.0.1",
+    "@types/node": "^16.6.0",
+    "prettier": "^2.8.4",
+    "rollup": "^2.79.1",
+    "rollup-plugin-terser": "^7.0.2",
+    "ts-loader": "^9.2.5",
+    "ts-node": "^10.2.0",
+    "typescript": "^4.3.5"
+  }
+}
