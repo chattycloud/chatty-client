@@ -16,10 +16,6 @@ import {
   onChatLeaveResponseType,
 } from "./type";
 
-declare const MODE: string;
-
-const dev = MODE === "development" ? "dev" : "";
-
 export class Channel {
   private socket: Socket | undefined;
 
@@ -42,12 +38,7 @@ export class Channel {
   }
 
   connect() {
-    const url: string =
-      MODE === "none"
-        ? "ws://localhost:4400"
-        : `wss://${dev}socket.chatty-cloud.com`;
-
-    this.socket = io(`${url}/channel.${Chatty.app?.name}`, {
+    this.socket = io(`wss://${process.env.DEV}socket.chatty-cloud.com/channel.${Chatty.app?.name}`, {
       // transports: ["polling", "websocket"],
       transports: ["websocket"],
       query: {

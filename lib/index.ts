@@ -13,16 +13,10 @@ import {
   iUpdateChatPayload,
   iCreateAdminMessagePayload,
 } from "./type";
-// import { version } from "../package.json"; // 사용하면 안됨
 import axios, { AxiosInstance } from "axios";
 import { Chat } from "./chat";
 import { Channel } from "./channel";
 
-declare const MODE: string;
-
-console.debug(":: ChattyClient MODE", MODE);
-
-const dev = MODE === "development" ? "dev" : "";
 
 class Chatty {
   static apiKey: string | undefined;
@@ -45,7 +39,7 @@ class Chatty {
         language: navigator.language,
         product: navigator.product,
         userAgent: navigator.userAgent,
-        // sdkVersion: version,
+        sdkVersion: process.env.VERSION,
       };
 
       this.app = await this.getApp();
@@ -939,10 +933,7 @@ class Chatty {
 
 function configAxios(ApiKey?: string) {
   const axiosInstance = axios.create();
-  axiosInstance.defaults.baseURL =
-    MODE === "none"
-      ? "http://localhost:3300"
-      : `https://${dev}api.chatty-cloud.com`;
+  axiosInstance.defaults.baseURL = `https://${process.env.DEV}api.chatty-cloud.com`;
   axiosInstance.defaults.headers.common["ApiKey"] = ApiKey || "";
   axiosInstance.defaults.headers.common["Content-Type"] = "application/json";
 

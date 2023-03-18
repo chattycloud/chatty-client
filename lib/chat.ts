@@ -31,10 +31,6 @@ import {
   SupportedVideoFormat,
 } from "./type";
 
-declare const MODE: string;
-
-const dev = MODE === "development" ? "dev" : "";
-
 export type ChatParams = {
   channel?: Channel;
   onChatConnect?: onChatConnect;
@@ -106,15 +102,10 @@ export class Chat {
       return;
     }
 
-    const url: string =
-      MODE === "none"
-        ? "ws://localhost:4400"
-        : `wss://${dev}socket.chatty-cloud.com`;
-
     // payload checker
     Object.keys(payload).forEach((key) => !payload[key] && delete payload[key]);
 
-    this.socket = io(`${url}/chat.${Chatty.app?.name}`, {
+    this.socket = io(`wss://${process.env.DEV}socket.chatty-cloud.com/chat.${Chatty.app?.name}`, {
       // transports: ["polling", "websocket"],
       transports: ["websocket"],
       query: {
