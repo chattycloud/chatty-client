@@ -1,0 +1,142 @@
+# Install and Initialize
+
+## 1. Client SDK installation
+
+with npm
+```npm
+npm install chatty-client
+```
+
+with yarn
+```yarn
+yarn add chatty-client
+```
+
+
+## 2. Cloud Setup
+
+### 1). Create dashboard account
+- Go to [`dashboard`](https://dashboard.chatty-cloud.com)
+
+### 2). Create new application
+- Create new application by clicking the button '+ New App' at [`dashboard app`](https://dashboard.chatty-cloud.com/apps)
+
+### 3). Get API key
+
+![API key at dashboard app tab](/img/docs/dashboard-apikey.png)
+
+
+## 3. Initialize
+
+### 1). What to initialize
+
+To use chatty-client sdk properly, need to initialize two things as below
+
+- API key (generated at dashboard)
+- Chat Member (user unique id and name of your service platform)
+
+
+### 2). Where to initialize
+- Place where can specify the member identification during application booting up
+- And after member signin or login
+
+
+<InfoBlock type="note">
+• Even if init function is called multiple time, the member is not registered as a duplicate (member is always unique)
+</InfoBlock>
+<InfoBlock type="note">
+• If member signout and signin again, the member id should be different with previous member id. especially, in case of third party oauth login, don't use provider's id as member id
+</InfoBlock>
+
+
+Below code is a part of App.tsx
+```javascript
+App.tsx
+
+import Chatty from 'chatty-client';
+
+...
+
+const App = () => {
+  const [ready, setReady] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!ready) {
+      bootstrap().finally(() => {
+        setReady(true);
+      });
+    }
+  }, []);
+
+  /*
+   *
+  When user id is specific, call init function
+  Ex) 
+  1. during application bootup process, 
+  2. after user join or login
+  */
+
+  if (ready && user) {
+    const missedCount = await Chatty.init({
+      apiKey: CHATTY_API_KEY,     // API Key of your app that created in dashboard 
+      member: {
+        id: user.id,
+        name: user.name,
+        language: 'en',
+        country: 'US',
+        avatar: user.avatar,
+        deviceToken: 'xxxxxxxxxx',
+        group: '',
+        data: {
+          extraInfo: '',
+        }
+      },
+    });
+
+    // init method returns missedCount to use badge count in chat button
+    // store the result to global state and use it
+    store.dispatch(setChat({ missedCount: missedCount }));
+  }
+
+  return (
+    <View>
+    /* App Root Component*/
+    </View>
+  );
+
+  ...
+
+}
+```
+
+### InitPayloadType
+```typescript
+export interface InitPayloadType {
+  apiKey: string;
+  member: {
+    id: string;
+    name: string;
+    language?: string;
+    country?: string;
+    avatar?: string;
+    deviceToken?: string;
+    group?: string;
+    data?: any | null;
+  };
+}
+```
+
+<InfoBlock type="warning">
+  Please manage API Key securely.
+</InfoBlock>
+
+<NextBlock
+  steps={[
+    {
+      text: 'Starting Chat',
+      link: '/getting-started/starting-chat.en',
+    },
+  ]}
+></NextBlock>
+
+

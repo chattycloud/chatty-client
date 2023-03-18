@@ -1,0 +1,43 @@
+{
+  "order": [
+    {
+      "id": "getting-started",
+      "name": "Getting Started",
+      "description": "Tutorial guide of the chatty sdk and cloud",
+      "pages": [
+        {
+          "route": "install-initialize",
+          "display": "Install and Initialize",
+          "desc": "bootup과정에서 chat.init을 사용하는 방법 가이드, 소스"
+        },
+        {
+          "route": "starting-chat",
+          "display": "Starting Chat",
+          "desc": "대화상대를 지정하여 chat room을 만들고 채팅하는 방법에 대한 소개"
+        },
+        {
+          "route": "listing-chats",
+          "display": "Listing Chats",
+          "desc": "내가 참여한 채팅의 목록을 불러오는 방법"
+        },
+        {
+          "route": "push-notifications",
+          "display": "Push Notifications",
+          "desc": "firebase를 통해 어떻게 push를 받을수 잇는지 missed count는 어떤식으로 받아서 표시해주는지"
+        }
+      ]
+    },
+    {
+      "id": "reference",
+      "name": "Reference",
+      "description": "References of ChattyCloud service",
+      "pages": [
+        {
+          "route": "static-methods",
+          "display": "Static Methods",
+          "desc": "Chatty class static methods"
+        }
+      ]
+    }
+  ]
+}

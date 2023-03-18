@@ -1,0 +1,122 @@
+# Push Notifications and Missed count badge
+
+
+## 1. Register firebase credentials
+- Registering your firebase credential is required to send fcm messages when a new message was sent
+
+- Connect to <b>[`firebase console`](https://console.firebase.google.com)</b> → project settings → service accounts → generate a new private key
+
+- Download the generated key and then upload the file at the dashboard 'Apps' menu (refer to below a part of the dashboard screenshot)
+
+That's it. now you can receive push notifications 
+
+![dashboard-firebase-credentials](/img/docs/dashboard-fcm-credentials.png)
+
+<InfoBlock type="warning">
+  If remote message does not received, Check 'deviceToken' of the member is registered or not. It can be confirmed at payloads of your Chatty.init()
+</InfoBlock>
+
+
+## 2. Receiving remote message
+
+Below code is a part of App.tsx
+```typescript
+App.tsx
+
+...
+
+React.useEffect(() => {
+  // Receiving when Foreground State
+  const unsubscribe = messaging().onMessage((message: FirebaseMessagingTypes.RemoteMessage) => {
+    console.debug('Receiving Notification Message:', message);
+    /*
+     * Remote meesage type
+      message = {
+        title: string, // sender member name
+        body: string, // text message
+        data: {
+          type: 'CHATTY_USER_MESSAGE' | 'CHATTY_ADMIN_MESSAGE' | 'CHATTY_SYSTEM_MESSAGE',
+          ChatId: string, // chat id
+          missedCount: {
+            total: number,
+            group: Array<{name: string, count: number}>
+          },
+        }
+      }
+     */
+
+    const activeScreen = navigation.getCurrentRoute().name;
+    if (activeScreen !== 'Chat') {
+      if (message.notification) {
+        displayNotification({
+          title: message.notification.title,
+          body: message.notification.body,
+          data: message.data,
+        });
+      }
+    }
+
+    // store missedCount to global redux state
+    dispatch(setChat({ missedCount: JSON.parse(message.data.missedCount) }));
+    
+  });
+});
+
+...
+
+```
+
+## 3. How to show missed count badge
+
+Below type show MissedCountType. can be used as ChattyTypes.MissedCountType
+```typescript
+Types.d.ts
+
+...
+
+export interface MissedCountType {
+  total: number;
+  group: Array<{
+    name: string;
+    count: number;
+  }>;
+}
+
+...
+
+```
+
+Below code is a part of ChatButton.tsx
+```typescript
+ChatButton.tsx
+
+import * as React from 'react';
+import { View } from 'react-native';
+
+const ChatButton = (props: ChatButtonProps) => {
+  // global redux state for missed message count
+  // Can access missed count using chat.missedCount
+  // chat.missedCount should be updated in below 4 cases
+  // 1. when Chatty.init() is called, if it success, then missedCount is returned
+  // 2. when receive a new message push notification (refer to data of push notification)
+  // 3. when AppState is changed, if AppState become foreground from others, then call Chatty.getMissedCount()
+  // 4. when Chat connect or disconnect, it dismiss missed count.
+  const chat = useChat();  
+
+  return (
+    <View>
+      /* Button UI components*/
+      /* Use chat.missedCount.total or chat.missedCount.group */
+    </View>
+  )
+}
+```
+
+<NextBlock
+  steps={[
+    {
+      text: 'Static Methods',
+      link: '/reference/static-methods.en',
+    },
+  ]}
+></NextBlock>

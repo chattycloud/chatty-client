@@ -1,0 +1,129 @@
+# Push Notifications and Missed count badge
+
+
+## 1. firebase credentials 등록
+
+- ChattyCloud에서 새 메세지에 대한 push notification을 자동으로 발송하기 위해서는 대시보드에서 firebase credential을 등록해야합니다.
+- [`firebase console`](https://console.firebase.google.com) 에 연결 → project settings → service accounts → generate a new private key → 여기서 생성된 카를 다운로드한다.
+- [`대시보드의 App 메뉴`](https://dashboard.chatty-cloud.com/apps) 에서 다운받은 credential 키를 등록한다. (첨부 스크린샷 참조)
+- 등록이 완료되면 코드작성없이 자동으로 새메세지에 대한 push notification을 받을수 있습니다.
+
+![dashboard-firebase-credentials](/img/docs/dashboard-fcm-credentials.png)
+
+<InfoBlock type="warning">
+  만약 push notification이 수신되지 않는다면 init 함수를 호출시에 deviceToken에 값이 있는지 확인이 필요합니다.
+</InfoBlock>
+
+
+## 2. 수신된 Remote Message Handling
+
+Below code is a part of App.tsx
+```typescript
+App.tsx
+
+...
+
+React.useEffect(() => {
+  // Receiving when Foreground State
+  const unsubscribe = messaging().onMessage((message: FirebaseMessagingTypes.RemoteMessage) => {
+    console.debug('Receiving Notification Message:', message);
+    /*
+     * Remote meesage type
+      message = {
+        title: string, // sender member name
+        body: string, // text message
+        data: {
+          type: 'CHATTY_USER_MESSAGE' | 'CHATTY_ADMIN_MESSAGE' | 'CHATTY_SYSTEM_MESSAGE',
+          ChatId: string, // chat id
+          missedCount: {
+            total: number,
+            group: Array<{name: string, count: number}>
+          },
+        }
+      }
+     */
+
+    const activeScreen = navigation.getCurrentRoute().name;
+    if (activeScreen !== 'Chat') {
+      if (message.notification) {
+        displayNotification({
+          title: message.notification.title,
+          body: message.notification.body,
+          data: message.data,
+        });
+      }
+    }
+
+    // store missedCount to global redux state
+    dispatch(setChat({ missedCount: JSON.parse(message.data.missedCount) }));
+    
+  });
+});
+
+...
+
+```
+
+## 3. Missed count Handling
+
+- redux state를 사용하여 missedCount를 최신으로 업데이트하고 필요한곳에서 사용하자
+- 아래 4가지의 경우에 redux의 missedCount를 업데이트 해야합니다.
+
+### missedCount 업데이트 시점
+- Chatty.init() 가 성공적으로 끝났을때 (init 이 성공적이면 missedCount가 return 된다)
+- 새로운 메세지 notification 이 수신되었을때 (remote message의 data에 missedCount가 들어있다)
+- AppState가 변경될때 (AppState가 foreground상태가 되면 Chatty.getMissedCount()를 호출해야한다)
+- 채팅화면에서 나갈때 (ChattyChat의 disconnect() 메소드가 호출될때 Chatty.getMissedCount()를 호출해야한다)
+
+
+Below type show MissedCountType. can be used as ChattyTypes.MissedCountType
+```typescript
+Types.d.ts
+
+...
+
+export interface MissedCountType {
+  total: number;
+  group: Array<{
+    name: string;
+    count: number;
+  }>;
+}
+
+...
+
+```
+
+Below code is a part of ChatButton.tsx
+```typescript
+ChatButton.tsx
+
+import * as React from 'react';
+import { View } from 'react-native';
+
+const ChatButton = (props: ChatButtonProps) => {
+  // redux state를 사용하여 missedCount를 최신으로 업데이트하고 필요한곳에서 사용하자
+  // 아래 4가지의 경우에 redux의 badge count를 업데이트 해야합니다.
+  // 1. Chatty.init() 가 성공적으로 끝났을때 (init 이 성공적이면 missedCount가 return 된다)
+  // 2. 새로운 메세지 notification 이 수신되었을때 (remote message의 data에 missedCount가 들어있다)
+  // 3. AppState가 변경될때 (AppState가 foreground상태가 되면 Chatty.getMissedCount()를 호출해야한다)
+  // 4. 채팅화면에서 나갈때 (ChattyChat의 disconnect() 메소드가 호출될때 Chatty.getMissedCount()를 호출해야한다)
+  const chat = useChat();   // use redux store state
+
+  return (
+    <View>
+      /* Button UI components*/
+      /* Use chat.missedCount.total or chat.missedCount.group */
+    </View>
+  )
+}
+```
+
+<NextBlock
+  steps={[
+    {
+      text: 'Static Methods',
+      link: '/reference/static-methods.ko',
+    },
+  ]}
+></NextBlock>

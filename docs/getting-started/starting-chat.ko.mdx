@@ -1,0 +1,550 @@
+# Starting Chat
+
+- 메세지를 주고 받는 일반적인 채팅화면을 구현하는 방법에 관한 문서입니다. 
+- cloud와 socket으로 연결되어 동작합니다. 
+- 아래 예제의 code들은 Chat.tsx 라고 하는 react native 화면의 일부입니다. 
+
+
+## 1. 채팅을 시작하는 두가지 방법
+
+### 1). 멤버 id 를 지정하여 시작하기
+- 어떤 멤버의 id만 알고 있는경우 member id 를 통해 새로운 채팅을 시작하거나 또는 기존의 채팅을 이어 할수 있습니다.
+- 이때 connect 메소드의 "with" 라는 parameter에 MemberId를 할당해야 합니다.
+
+### 2). 채팅 id 를 지정하여 시작하기
+- 채팅목록에서 특정 채팅을 선택하여 채팅을 이어 하는 방법이 있습니다.
+- 이때 connect 메소드의 "at" 이라는 parameter에 ChatId를 할당해야 합니다.
+
+
+
+
+## 2. 소켓에 연결하는 방법
+
+- 소켓에 연결하기 위해서는 ChattyChat 클래스의 인스턴스를 사용해야 합니다.
+- ChattyChat 클래스의 인스턴스를 생성할때 생성자에 7개의 chat handler를 지정해야합니다.
+- ChattyChat 클래스의 생성자중 chattyList 는 선택사항으로 ChattyList의 인스턴스입니다. 채팅화면에서 변경된 상태가 채팅목록에서도 자동적으로 반영이 되도록하기 위해서 필요합니다. (예를들어 채팅목록에서의 missed count를 업데이트한다거나 last message를 업데이트하는경우에 해당됩니다)
+
+
+Below code is a part of Chat.tsx
+```typescript
+Chat.tsx
+
+import * as React from 'react';
+import { View } from 'react-native';
+import Chatty, { ChattyChat, ChattyTypes } from 'chatty-client';
+
+const Chat = (props: ChatProps) => {
+  const [chatty, setChatty] = React.useState(); // state for ChattyChat instance that used in this screen
+
+  ...
+
+  React.useEffect(() => {
+    const chattychat = new ChattyChat({
+      chattyList: props.chattylist,       // Instance of ChattyList. It will help to update this chat of chatlist (In case of navigating from ChatList)
+      onChatConnect: onChatConnect,       // refer to below handlers section
+      onChatRefresh: onChatRefresh,       // refer to below handlers section
+      onChatLeave: onChatLeave,           // refer to below handlers section
+      onMessagesFetch: onMessagesFetch,   // refer to below handlers section
+      onMessageReceive: onMessageReceive, // refer to below handlers section
+      onMessagesUpdate: onMessagesUpdate, // refer to below handlers section
+      onMessageSend: onMessageSend,       // refer to below handlers section
+    });
+
+    chattychat.connect({
+      at: props.at,
+      with: props.with,
+      distinctKey: props.distinctKey,
+      group: props.group,
+      name: props.name,
+      image: props.image,
+      data: props.data
+    });
+
+    setChatty(chattychat);
+    
+    // When unmount, disconnect chatlist socket
+    return () => {
+      Chatty.getMissedCount();
+      chattychat.disconnect();
+    }
+  }, []);
+
+  return (
+    <View>
+    /* Render UI Component */
+    </View>
+  );
+
+}
+
+
+```
+
+### ConnectChatPayloadType
+```typescript
+export interface ConnectChatPayloadType {
+  /**
+   * Required in case of navigating from ChatList
+   * It should be a chat id
+   */
+  at?: string;
+
+  /**
+   * Required in case of starting chat by selecting member id not chat id
+   * It shoud be an array of member ids
+   */
+  with?: Array<string>;
+
+  /**
+   * This key makes the chat unique
+   * When trying to connect with a same distinctKey. always same chat is connected.
+   * Whereas, if connect without distinctKey, always new chat is created.
+   * Create your own custom key or use generateDistinctKey, static method of Chatty class which returns md5 hashed value. 
+   * If using generateDistinctKey method, use member ids as parameters
+   */
+  distinctKey?: string;
+
+  /**
+   * Group name for grouping(filtering) chat at chatlist
+   * Used only when creating a new chat
+   */
+  group?: string;
+
+  /**
+   * Chat name
+   * Used only when creating a new chat
+   */
+  name?: string;
+
+  /**
+   * Image uri for chat image
+   * Used only when creating a new chat
+   */
+  image?: string;
+
+  /**
+   * Extra custom information for chat
+   * Size can't exceed 2K
+   * Used only when creating a new chat
+   */
+  data?: any;
+}
+```
+
+
+<InfoBlock type="note">
+- 채팅의 멤버는 최대 30명까지 동시에 참여할수 있습니다.
+</InfoBlock>
+
+
+## 3. 메세지를 가져오는 방법
+- 소켓이 연결이 되면, sdk 가 자동으로 메세지들을 가져옵니다. 따라서 fetchMessages method를 호출할 필요가 없습니다. 
+- onMessagesFetch handler 에서 fetch된 메세지들을 볼수 있습니다.
+- 만약 fetchMessages 를 직접사용하여 호출하고자 할때는 아래와 같이 사용할 수 있습니다. (예: 메세지 더보기 위해 사용하는 경우)
+
+### fetchMessages method
+```typescript
+export interface FetchMessagesPayloadType {
+  /**
+   * if it's true, fetch messages as refresh. (page === 1)
+   * if it's false, fetch messages as loadmore. (page > 1)
+   */
+  refresh: boolean;
+}
+
+chattyInstance.fetchMessages({refresh: true});
+
+// to load messages more
+hasNext && chattyInstance.fetchMessages({refresh: false});
+
+```
+
+
+
+## 4. 소켓 handlers
+
+### 1). onChatConnect
+This is called when chat socket is connected successfuly.
+
+
+Below code is a part of Chat.tsx
+```typescript
+Chat.tsx
+
+...
+
+const Chat = (props: ChatProps) => {
+  const [chatty, setChatty] = React.useState();
+  const [chat, setChat] = React.useState();
+  
+  ...
+
+  const onChatConnect = (data: ChattyTypes.onChatConnectResponseType) => {
+    if (data.error) {
+      return;
+    }
+
+    /**
+     * Response data type.
+    data: {
+      id: string,     // (uuid type)
+      image: string,  // (url type)
+      name: string,
+      public: boolean,
+      distinctKey: string,
+      group: string,
+      data: any,
+      lastMessage: {
+        text: string, 
+        files: string[], 
+        type: 'TEXT' | 'FILE' | 'JSON', 
+        by: 'USER' | 'ADMIN', 
+        createdAt: Date,
+        translation: {
+          [key: string]: string
+        }
+      },
+      updatedAt: Date,
+      Members: [
+        id: string,
+        name: string,
+        avatar: string,   // (url type)
+        group: string,
+        data: any,
+        language: string, // (ex: "en")
+        country: string,  // (ex: "US")
+        missedCount: number,
+        permission: "WRITE" | "READ",
+        role: "MEMBER" | "ADMIN"
+      ]
+    }
+    */
+
+    setChat(data);
+  };
+
+  ...
+
+}
+```
+
+### 2). onChatRefresh
+Callback function called when chat is refreshed. mainly called when chat member changed
+
+Below code is a part of Chat.tsx
+```typescript
+Chat.tsx
+
+...
+
+const Chat = (props: ChatProps) => {
+  const [chatty, setChatty] = React.useState();
+  const [chat, setChat] = React.useState();
+  const [messages, setMessages] = React.useState(new Map());
+  const [hasNext, setHasNext] = React.useState(true);
+  
+  ...
+
+  const onChatRefresh = (data: ChattyTypes.onChatRefreshResponseType) => {
+    if (data.error) {
+      return;
+    }
+  
+    setChat(data);
+  }
+
+  ...
+
+}
+```
+
+### 3). onChatLeave
+Callback function called when a member of the chat was left.
+
+Below code is a part of Chat.tsx
+```typescript
+Chat.tsx
+
+...
+
+const Chat = (props: ChatProps) => {
+  const [chatty, setChatty] = React.useState();
+  const [chat, setChat] = React.useState();
+  const [messages, setMessages] = React.useState(new Map());
+  const [hasNext, setHasNext] = React.useState(true);
+  
+  ...
+
+  const onChatLeave = (data: ChattyTypes.onChatLeaveResponseType) => {
+    if (data.error) {
+      return;
+    }
+    setChat(data.chat);
+  }
+
+  ...
+
+}
+```
+
+### 4). onMessagesFetch
+Callback function called after fetching messages
+
+Below code is a part of Chat.tsx
+```typescript
+Chat.tsx
+
+...
+
+const Chat = (props: ChatProps) => {
+  const [chatty, setChatty] = React.useState();
+  const [chat, setChat] = React.useState();
+  const [messages, setMessages] = React.useState(new Map());
+  const [hasNext, setHasNext] = React.useState(true);
+  
+  ...
+
+  const onMessagesFetch = (data: ChattyTypes.onMessagesFetchResponseType) => {
+    if (data.error) {
+      return;
+    }
+
+    /**
+     * Response data type.
+    data: {
+      hasNext: true,
+      refresh: true,
+      messages: [
+        id: string,
+        text: string,
+        files: string[] | null,
+        json: any
+        type: 'TEXT' | 'FILE' | 'JSON', 
+        by: 'USER' | 'ADMIN', 
+        createdAt: Date,
+        readReceipt: number,
+        translation: {
+          [key: string]: string
+        },
+        Sender: {
+          id: string, 
+          name: string, 
+          avatar: string, 
+          group: string, 
+          data: any
+        }
+      ]
+    }
+    */
+    if (data.refresh) {
+      const messagesMap = new Map(data.messages.map((e) => [e['id'], e]));
+      setMessages(messagesMap);
+    } else {
+      setMessages((oldMessages) => {
+        const messagesMap = new Map(data.messages.map((e) => [e['id'], e]));
+        return new Map([...Array.from(oldMessages), ...Array.from(messagesMap)]);
+      });
+    }
+
+    setHasNext(data.hasNext);
+  };
+
+  ...
+
+}
+```
+
+
+### 5). onMessageReceive
+Callback function called when receive new message.
+
+Below code is a part of Chat.tsx
+```typescript
+Chat.tsx
+
+...
+
+const Chat = (props: ChatProps) => {
+  const [chatty, setChatty] = React.useState();
+  const [chat, setChat] = React.useState();
+  const [messages, setMessages] = React.useState(new Map());
+  const [hasNext, setHasNext] = React.useState(true);
+  
+  ...
+
+  /**
+    * Response data type.
+  data: {
+    id: string,
+    text: string,
+    files: string[] | null,
+    json: any
+    type: 'TEXT' | 'FILE' | 'JSON', 
+    by: 'USER' | 'ADMIN', 
+    createdAt: Date,
+    readReceipt: number,
+    translation: {
+      [key: string]: string
+    },
+    Sender: {
+      id: string, 
+      name: string, 
+      avatar: string, 
+      group: string, 
+      data: any
+    }
+  }
+  */
+  const onMessageReceive = (data: ChattyTypes.onMessageReceiveResponseType) => {
+    if (data.error) {
+      return;
+    }
+
+    setMessages((oldMessages) => {
+      const messageMap = new Map([[data['id'], data]]);
+      return new Map([...Array.from(messageMap), ...Array.from(oldMessages)]);
+    });
+  };
+
+  ...
+
+}
+```
+
+
+
+### 6). onMessagesUpdate
+Callback function called when messages are updated. mainly used when readReceipt updated.
+
+Below code is a part of Chat.tsx
+```typescript
+Chat.tsx
+
+...
+
+const Chat = (props: ChatProps) => {
+  const [chatty, setChatty] = React.useState();
+  const [chat, setChat] = React.useState();
+  const [messages, setMessages] = React.useState(new Map());
+  const [hasNext, setHasNext] = React.useState(true);
+  
+  ...
+
+  const onMessagesUpdate = (data: ChattyTypes.onMessagesUpdateResponseType) => {
+    if (data.error) {
+      return;
+    }
+
+    setMessages((oldMessages) => {
+      const messagesMap = new Map(data.map((e) => [e['id'], e]));
+      return new Map([...Array.from(oldMessages), ...Array.from(messagesMap)]);
+    });
+  };
+
+  ...
+
+}
+```
+
+
+### 7). onMessageSend
+Callback function called after message is sent
+
+Below code is a part of Chat.tsx
+```typescript
+Chat.tsx
+
+...
+
+const Chat = (props: ChatProps) => {
+  const [chatty, setChatty] = React.useState();
+  const [chat, setChat] = React.useState();
+  const [messages, setMessages] = React.useState(new Map());
+  const [hasNext, setHasNext] = React.useState(true);
+  
+  ...
+
+  const onMessageSend = (data: ChattyTypes.onMessageSendResponseType) => {
+    if (data.error) {
+      return;
+    }
+
+    setMessages((oldMessages) => {
+      const messageMap = new Map([[data['id'], data]]);
+      return new Map([...Array.from(oldMessages), ...Array.from(messageMap)]);
+    });
+  };
+
+  ...
+
+}
+```
+
+
+
+
+
+
+
+
+## 5. Send text or file message
+
+The result of sending message can be confirmed in onMessageSend handlers.
+sendTextMessage and sendFileMessage methods returns a temporary message syncronously.
+
+Below code is a part of Chat.tsx
+```typescript
+Chat.tsx
+
+...
+
+const Chat = (props: ChatProps) => {
+  const [chatty, setChatty] = React.useState();
+  const [chat, setChat] = React.useState();
+  const [messages, setMessages] = React.useState(new Map());
+  const [hasNext, setHasNext] = React.useState(true);
+  
+  ...
+
+  const sendTextMessage = (message: string) => {
+    const newMessage = chatty?.sendTextMessage(message);
+    if (newMessage) {
+      setMessages((oldMessages) => {
+        const messageMap = new Map([[newMessage['id'], newMessage]]);
+        return new Map([...Array.from(messageMap), ...Array.from(oldMessages)]);
+      });
+      toTop();
+    } else {
+      console.debug('sendTextMessage fail');
+    }
+  }
+
+  const sendFileMessage = (message: Array<ChattyTypes.FileType>) => {
+    const newMessage = chatty?.sendFileMessage(message);
+
+    if (newMessage) {
+      setMessages((oldMessages) => {
+        const messageMap = new Map([[newMessage['id'], newMessage]]);
+        return new Map([...Array.from(messageMap), ...Array.from(oldMessages)]);
+      });
+      toTop();
+    } else {
+      console.debug('sendFileMessage fail');
+    }
+  }
+
+  ...
+
+}
+```
+
+
+
+<NextBlock
+  steps={[
+    {
+      text: 'Listing Chats',
+      link: '/getting-started/listing-chats.ko',
+    },
+  ]}
+></NextBlock>

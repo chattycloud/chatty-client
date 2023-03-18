@@ -1,0 +1,146 @@
+# Install and Initialize
+
+## 1. Client SDK installation
+
+with npm
+```npm
+npm install chatty-client
+```
+
+with yarn
+```yarn
+yarn add chatty-client
+```
+
+
+## 2. Cloud Setup
+
+### 1). 대시보드에서 계정 생성하기
+- [`대시보드 바로가기`](https://dashboard.chatty-cloud.com)
+
+### 2). 새 앱 생성하기
+- [`대시보드의 App 메뉴`](https://dashboard.chatty-cloud.com/apps)에서 "+ New App" 버튼을 눌러 새로운 앱을 생성
+
+### 3). API key 생성하기
+- [`대시보드의 App 메뉴`](https://dashboard.chatty-cloud.com/apps)에서 "Create New Key" 버튼을 눌러서 API key 를 생성하고 복사
+
+![API key at dashboard app tab](/img/docs/dashboard-apikey.png)
+
+
+## 3. Initialize
+
+### 1). 무엇을 초기화 해야하나
+
+앱에서 정상적으로 chatty-client 를 사용하기 위해서는 init() 함수를 사용합니다. 이때 init() 함수의 parameter로 아래 두가지가 초기화 되어야 합니다.
+
+- apiKey: 대시보드에서 생성 후 복사한 API key
+- member: 채팅을 사용할 애플리케이션의 사용자로 ChattyCloud App의 member로 등록됨, 다른사용자와 구별되는 unique한 값과 채팅시 멤버이름으로 사용될 값이 필수로 필요합니다
+
+
+### 2). 어디에서 초기화 해야하나
+- 앱이 booting up 하는 동안 사용자의 id가 식별이 되는 때
+- 사용자가 join 또는 login 하고 난 후
+
+
+<InfoBlock type="note">
+• 편의상, "사용자(User)" 는 여러분이 개발중인 애플리케이션에 로그인된 사용자, "멤버(member)" 는 그러한 사용자가 init 함수를 통해 ChattyCloud App에 등록된 채팅멤버로 차별하여 구분합니다.
+</InfoBlock>
+<InfoBlock type="note">
+• init함수가 여러번 호출이 되더라도 member가 중복으로 등록 되지 않음
+</InfoBlock>
+<InfoBlock type="warning">
+• 사용자가 여러분의 앱에서 회원탈퇴하고 재가입시 init()을 통해 등록되는 member id는 이전의 member와 달라야 합니다. 특히 third party Oauth 인증을 사용하는 경우 provider가 제공하는 uid 값은 항상 같기 때문에 member id로 사용하기 적절하지 않습니다.
+</InfoBlock>
+
+
+Below code is a part of App.tsx
+```javascript
+App.tsx
+
+import Chatty from 'chatty-client';
+
+...
+
+const App = () => {
+  const [ready, setReady] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!ready) {
+      bootstrap().finally(() => {
+        setReady(true);
+      });
+    }
+  }, []);
+
+  /*
+   *
+  사용자가 식별이 될때 init 함수를 호출한다
+  Ex) 
+  1. 앱이 booting up 하는 동안 사용자의 id가 식별이 되는 때
+  2. 사용자가 join 또는 login 하고 난 후
+  */
+
+  if (ready && user) {
+    const missedCount = await Chatty.init({
+      apiKey: CHATTY_API_KEY,     
+      member: {
+        id: user.id,
+        name: user.name,
+        language: 'en',
+        country: 'US',
+        avatar: user.avatar,
+        deviceToken: 'xxxxxxxxxx',
+        group: '',
+        data: {
+          extraInfo: '',
+        }
+      },
+    });
+
+    // init 함수는 읽지않은 메세지의 개수를 return 합니다. 
+    // 이 값을 redux store같은 곳에 저장하고 초기 badge count를 표시하기위해 사용될수 있습니다.
+    store.dispatch(setChat({ missedCount: missedCount }));
+  }
+
+  return (
+    <View>
+    /* App Root Component*/
+    </View>
+  );
+
+  ...
+
+}
+```
+
+### InitPayloadType
+```typescript
+export interface InitPayloadType {
+  apiKey: string;
+  member: {
+    id: string;
+    name: string;
+    language?: string;
+    country?: string;
+    avatar?: string;
+    deviceToken?: string;
+    group?: string;
+    data?: any | null;
+  };
+}
+```
+
+<InfoBlock type="warning">
+  API Key는 안전하게 관리하고 대시보드에서 새 API key를 주기적으로 새로 생성해서 사용하기를 권장합니다
+</InfoBlock>
+
+<NextBlock
+  steps={[
+    {
+      text: 'Starting Chat',
+      link: '/getting-started/starting-chat.ko',
+    },
+  ]}
+></NextBlock>
+
+

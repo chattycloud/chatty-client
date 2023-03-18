@@ -1,0 +1,282 @@
+# Listing Chats
+
+- 일반적인 채팅목록 화면을 구현하는 방법에 관한 문서입니다. 
+- cloud와 socket으로 연결되어 동작합니다. 
+- 아래 예제의 code들은 ChatList.tsx 라고 하는 react native 화면의 일부입니다. 
+
+
+## 1. 소켓에 연결하는 방법
+
+- 소켓에 연결하기 위해서는 ChattyList 클래스의 인스턴스를 사용해야 합니다.
+- ChattyList 클래스의 인스턴스를 생성할때 생성자에 4개의 chatlist handler를 지정해야합니다.
+
+
+Below code is a part of ChatList.tsx
+```typescript
+ChatList.tsx
+
+import * as React from 'react';
+import { View } from 'react-native';
+import { ChattyList, ChattyTypes } from 'chatty-client';
+
+const ChatList = (props: ChatListProps) => {
+  const [chatty, setChatty] = React.useState(); // state for ChattyList instance that used in this screen
+  
+  ...
+
+  /**
+   * Create ChatList instance And connect
+   */
+  React.useEffect(() => {
+    const chattylist = new ChattyList({
+      filter: {
+        group: <GROUP-NAME>,  // to get chats filtered by this group name
+        MemberId: <USER-ID>   // to get chats this MemberId is included
+      },
+      onChatListConnect: onChatListConnect, // refer to below handlers section
+      onChatListFetch: onChatListFetch,     // refer to below handlers section
+      onChatRefresh: onChatRefresh,         // refer to below handlers section
+      onChatLeave: onChatLeave              // refer to below handlers section
+    });
+
+    chattylist.connect();
+    setChatty(chattylist);
+
+    // When unmount, disconnect chatlist socket
+    return () => {
+      chattylist.disconnect();
+    }
+  }, []);
+
+  return (
+    <View>
+    /* Render UI Component */
+    </View>
+  );
+}
+
+```
+
+## 2. 채팅목록을 가져오는 방법
+
+- 소켓이 연결이 되면, sdk 가 자동으로 채팅목록을 가져옵니다. 따라서 fetchChatList method를 호출할 필요가 없습니다. 
+- onChatListFetch handler 에서 fetch된 목록들을 볼수 있습니다.
+- 만약 fetchChatList 를 직접사용하여 호출하고자 할때는 아래와 같이 사용할 수 있습니다. (예: 채팅목록 더보기 위해 사용하는 경우)
+
+
+### fetchChatList payloads
+
+```typescript
+
+export interface FetchChatListPayloadType {
+  /**
+   * if it's true, fetch chatlist as refresh. (page === 1)
+   * if it's false, fetch chatlist as loadmore. (page > 1)
+   */
+  refresh?: boolean;
+}
+
+chattyInstance.fetchChatList({refresh: true});
+
+// to load chatlist more
+hasNext && chattyInstance.fetchChatList({refresh: false});
+
+
+```
+
+
+## 3. 소켓 handlers
+
+### 1). onChatListConnect
+This is called when chatlist socket is connected successfuly.
+
+
+Below code is a part of ChatList.tsx
+```typescript
+ChatList.tsx
+
+...
+
+const ChatList = (props: ChatListProps) => {
+  const [chatty, setChatty] = React.useState();
+  const [chatlist, setChatList] = React.useState(new Map());
+  
+  ...
+
+  const onChatListConnect = (data: ChattyTypes.ChatListConnectResponseType) => {
+    if (data.error) {
+      console.warn('onChatListConnect error', data.error.message);
+      return;
+    }
+  }
+
+  ...
+
+}
+```
+
+### 2). onChatListFetch
+This is called when fetchChatList is success
+
+Below code is a part of ChatList.tsx
+```typescript
+ChatList.tsx
+
+...
+
+const ChatList = (props: ChatListProps) => {
+  const [chatty, setChatty] = React.useState();
+  const [chatlist, setChatList] = React.useState(new Map());
+  const [hasNext, setHasNext] = React.useState(true);
+
+  ...
+
+  const onChatListFetch = (data: ChattyTypes.ChatListFetchResponseType) => {
+    if (data.error) {
+      console.warn('onChatListFetch error', data.error.message);
+      return;
+    }
+
+    /**
+     * Response data type.
+    data: {
+      chats: [
+        id: string,     // (uuid type)
+        image: string,  // (url type)
+        name: string,
+        public: boolean,
+        distinctKey: string,
+        group: string,
+        data: any,
+        lastMessage: {
+          text: string, 
+          files: string[] | null, 
+          type: 'TEXT' | 'FILE' | 'JSON', 
+          by: 'USER' | 'ADMIN', 
+          createdAt: Date,
+          translation: {
+            [key: string]: string
+          }
+        },
+        updatedAt: Date,
+        Members: [
+          id: string,
+          name: string,
+          avatar: string,   // (url type)
+          group: string,
+          data: any,
+          language: string, // (ex: "en")
+          country: string,  // (ex: "US")
+          missedCount: number,
+          permission: "WRITE" | "READ",
+          role: "MEMBER" | "ADMIN"
+        ]
+      ],
+      hasNext: false,
+      refresh: true
+    }
+    */
+
+    
+    if (data.refresh) {
+      const messagesMap = new Map(data.chats.map((e) => [e['id'], e]));
+      setChatList(messagesMap);
+    } else {
+      setChatList((oldChats) => {
+        const chatsMap = new Map(data.chats.map((e) => [e['id'], e]));
+        return new Map([...Array.from(oldChats), ...Array.from(chatsMap)]);
+      });
+    }
+
+    setHasNext(data.hasNext);
+  };
+
+  ...
+
+}
+```
+
+### 3). onChatRefresh
+This is called when need to update a specific chat of ChatList in case of navigating to Chat screen through ChatList.
+
+
+### In cases of updating a specific chat of ChatList
+* when lastMessage updated
+* when unread messages are marked as read
+
+Below code is a part of ChatList.tsx
+```typescript
+ChatList.tsx
+
+...
+
+const ChatList = (props: ChatListProps) => {
+
+  ...
+
+  const onChatRefresh = (data: ChattyTypes.onChatRefreshResponseType) => {
+    if (data.error) {
+      console.warn('onChatRefresh error', data.error.message);
+      return;
+    }
+
+    setChatList((oldChats) => {
+      const chatMap = new Map([[data['id'], data]]);
+
+      // When lastMessage was updated, this chat should go to top of the list
+      // Delete and add to ahead of the array
+      if (data.updatedAt !== oldChats.get(data['id'])?.updatedAt) {
+        oldChats.delete(data['id']);
+        return new Map([...Array.from(chatMap), ...Array.from(oldChats)]);
+      } else {
+        return new Map([...Array.from(oldChats), ...Array.from(chatMap)]);
+      }
+    });
+  };
+
+  ...
+
+}
+```
+
+### 4). onChatLeave
+This is called when need to leave from a specific chat of ChatList by user action.
+
+
+Below code is a part of ChatList.tsx
+```typescript
+ChatList.tsx
+
+...
+
+const ChatList = (props: ChatListProps) => {
+
+  ...
+
+  const onChatLeave = (data: ChattyTypes.onChatLeaveResponseType) => {
+    if (data.error) {
+      console.warn('onChatLeave error', data.error.message);
+      return;
+    }
+
+    setChats((oldChats) => {
+      oldChats.delete(data.chat?.id);
+      return new Map([...Array.from(oldChats)]);
+    });
+  }
+
+  ...
+
+}
+```
+
+
+
+<NextBlock
+  steps={[
+    {
+      text: 'Push Notifications',
+      link: '/getting-started/push-notifications.ko',
+    },
+  ]}
+></NextBlock>

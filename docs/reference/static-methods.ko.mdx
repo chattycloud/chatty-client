@@ -1,0 +1,149 @@
+# Static Methods
+Chatty class static methods. These are async and non-socket methods
+
+
+## init()
+
+static method init is for initialize chatty client. it will initialize apiKey and chat member
+
+### InitPayloadType
+```typescript
+export interface InitPayloadType {
+  apiKey: string;
+  member: {
+    id: string
+    name: string
+    language: string
+    country: string
+    avatar: string
+    deviceToken: string
+    device: DeviceType | null
+    group: string
+    permission: MemberPermissionType
+    data: any | null
+  };
+}
+
+
+await Chatty.init(payload: InitPayloadType);
+```
+
+## exit()
+
+- static method exit is for terminate chatty client. 
+- when App user sign out, it will destroy apiKey and chat member
+- To delete a member, set deleteMember to true. If it's true, the member will be deleted, and excluded from associated all chat.
+
+### ExitPayloadType
+```typescript
+export interface ExitPayloadType {
+  deleteMember?: boolean;
+}
+
+await Chatty.exit(payload: ExitPayloadType);
+```
+
+## generateDistinctKey()
+
+- distinctKey of chat schema is used for making the chat unique and this function helps you to make your own key.
+- This method returns md5 hashed value using parameters and an order of parameters does not effect the return value.
+
+```typescript
+await Chatty.generateDistinctKey(param1, param2, ..., paramN);
+
+```
+
+## createChat()
+
+Creating a new chat.
+
+```typescript
+export interface CreateChatPayloadType {
+    distinctKey?: string;
+    name?: string;
+    image?: string;
+    group?: string;
+    data?: any;
+    Members?: Array<string>;
+    adminMessage?: {
+        text?: string;
+        json?: object;
+    };
+}
+
+await Chatty.createChat(payload: CreateChatPayloadType);
+
+```
+
+## updateChat()
+
+Updating a chat
+
+```typescript
+export interface UpdateChatPayloadType {
+    id: string;
+    distinctKey?: string;
+    name?: string;
+    image?: string;
+    group?: string;
+    data?: any;
+    Members?: Array<string>;
+    adminMessage?: {
+        text?: string;
+        json?: object;
+    };
+}
+
+await Chatty.updateChat(payload: UpdateChatPayloadType);
+
+```
+
+## createAdminMessage()
+
+Creating a admin message. 
+
+Used only when being aware of a chat's distinctKey not a chat's id. if there is no matched chat, new chat with the distinctKey is created,
+
+```typescript
+export interface CreateAdminMessagePayloadType {
+    distinctKey: string;
+    name?: string;
+    image?: string;
+    group?: string;
+    data?: any;
+    Members?: Array<string>;
+    adminMessage?: {
+        text?: string;
+        json?: object;
+    };
+}
+
+const chat = await Chatty.createAdminMessage(payload: CreateAdminMessagePayloadType);
+
+```
+
+## getMissedCount()
+
+commonly used for show badge count on chat button
+
+```typescript
+await Chatty.getMissedCount();
+
+```
+
+## getMembers()
+
+this is for getting members with filter
+
+```typescript
+export interface MembersFilterType {
+    group?: string;
+    ChatId?: string;
+}
+
+await Chatty.getMembers(filter: MembersFilterType);
+
+```
+
+
+
