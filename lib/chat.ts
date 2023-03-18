@@ -105,7 +105,7 @@ export class Chat {
     // payload checker
     Object.keys(payload).forEach((key) => !payload[key] && delete payload[key]);
 
-    this.socket = io(`wss://${process.env.DEV}socket.chatty-cloud.com/chat.${Chatty.app?.name}`, {
+    this.socket = io(process.env.SOCKET_URL + `/chat.${Chatty.app?.name}`, {
       // transports: ["polling", "websocket"],
       transports: ["websocket"],
       query: {

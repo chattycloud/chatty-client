@@ -11,6 +11,9 @@ const banner = `/*!
  * Released under the MIT License.
  */`;
 
+const API_URL = `https://${process.env.NODE_ENV}api.chatty-cloud.com`;
+const SOCKET_URL = `wss://${process.env.NODE_ENV}socket.chatty-cloud.com`;
+
 
 module.exports = {
   input: "./build/esm/index.js",
@@ -44,7 +47,8 @@ module.exports = {
     replace({
       preventAssignment: true,
       values: {
-        'process.env.DEV': JSON.stringify(process.env.NODE_ENV === 'development' ? 'dev' : ''),
+        'process.env.API_URL': JSON.stringify(API_URL),
+        'process.env.SOCKET_URL': JSON.stringify(SOCKET_URL),
         'process.env.VERSION': JSON.stringify(version),
       },
     })

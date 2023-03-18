@@ -38,7 +38,7 @@ export class Channel {
   }
 
   connect() {
-    this.socket = io(`wss://${process.env.DEV}socket.chatty-cloud.com/channel.${Chatty.app?.name}`, {
+    this.socket = io(process.env.SOCKET_URL + `/channel.${Chatty.app?.name}`, {
       // transports: ["polling", "websocket"],
       transports: ["websocket"],
       query: {

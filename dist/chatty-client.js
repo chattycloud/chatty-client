@@ -6616,7 +6616,7 @@
         Object.keys(payload).forEach(function (key) {
           return !payload[key] && delete payload[key];
         });
-        this.socket = lookup("wss://".concat("dev", "socket.chatty-cloud.com/chat.").concat((_b = Chatty.app) === null || _b === void 0 ? void 0 : _b.name), {
+        this.socket = lookup("wss://devsocket.chatty-cloud.com" + "/chat.".concat((_b = Chatty.app) === null || _b === void 0 ? void 0 : _b.name), {
           // transports: ["polling", "websocket"],
           transports: ["websocket"],
           query: {
@@ -6645,7 +6645,6 @@
         var _a;
         (_a = this.socket) === null || _a === void 0 ? void 0 : _a.disconnect();
         this.removeListener();
-        console.debug(":: ChattyChat disconnected");
       }
     }, {
       key: "fetchMessages",
@@ -6777,7 +6776,6 @@
           SenderId: (_a = Chatty.member) === null || _a === void 0 ? void 0 : _a.id
         };
         this.uploadFiles(files).then(function (files) {
-          console.debug(":: ChattyChat uploadFiles success", files);
           _this.sendMessage(_objectSpread2(_objectSpread2({}, message), {}, {
             files: files
           }));
@@ -6914,7 +6912,6 @@
         }
         this.socket.on(ChattyEvent.CONNECT_DONE, function (data) {
           var _a;
-          console.debug(":: ChattyChat CONNECT_DONE", data);
           _this2.id = (_a = data.chat) === null || _a === void 0 ? void 0 : _a.id; // 연결된 ChatId를 Chat instance에 저장 > 필요한 경우 다시 enable
           _this2.onChatConnect && _this2.onChatConnect(data);
           _this2.fetchMessages({
@@ -6928,7 +6925,6 @@
           });
         });
         this.socket.on(ChattyEvent.FETCH_MESSAGES_DONE, function (data) {
-          console.debug(":: ChattyChat FETCH_MESSAGES_DONE", data);
           _this2.onMessagesFetch && _this2.onMessagesFetch(data);
           _this2.markAsRead();
         });
@@ -6939,7 +6935,6 @@
           });
         });
         this.socket.on(ChattyEvent.SEND_MESSAGE_DONE, function (data) {
-          console.debug(":: ChattyChat SEND_MESSAGE_DONE", data);
           _this2.onMessageSend && _this2.onMessageSend(data);
           // 내가 메시지를 보낸게 성공하면 Channel 에서 REFRESH_CHAT 해야한다.
           if (_this2.channel && _this2.id) {
@@ -6954,16 +6949,13 @@
         });
         this.socket.on(ChattyEvent.SEND_MESSAGE_RETRY, function (data) {
           var _a;
-          console.debug(":: ChattyChat SEND_MESSAGE_RETRY", data);
           (_a = _this2.socket) === null || _a === void 0 ? void 0 : _a.emit(ChattyEvent.SEND_MESSAGE, data);
         });
         this.socket.on(ChattyEvent.RECEIVE_MESSAGE, function (data) {
-          console.debug(":: ChattyChat RECEIVE_MESSAGE", data);
           _this2.onMessageReceive && _this2.onMessageReceive(data);
           _this2.markAsRead();
         });
         this.socket.on(ChattyEvent.MARK_AS_READ_DONE, function (data) {
-          console.debug(":: ChattyChat MARK_AS_READ_DONE", data);
           // Channel 로부터 왔다면 REFRESH_CHAT 해야한다
           if (_this2.channel && _this2.id) {
             _this2.channel.refreshChat(_this2.id);
@@ -6975,7 +6967,6 @@
         this.socket.on(ChattyEvent.MARK_AS_READ_BYPASS, function () {
           // MARK_AS_READ_DONE의 응답으로  data가 MARK_AS_READ_BYPASS 인경우가 있다.
           // member 가 SUPER인경우에 해당되며 MARK_AS_READ 요청에대해 서버가 bypass로 동작한다
-          console.debug(":: ChattyChat MARK_AS_READ_BYPASS");
         });
         /**
          * UPDATE_MESSAGES 는 Server로부터 Emit
@@ -6987,11 +6978,9 @@
          * 2. Server에서 DELETE_MESSAGE가 성공적으로 이루어진후 > Chat Message의 삭제내용을 업데이트
          */
         this.socket.on(ChattyEvent.UPDATE_MESSAGES, function (data) {
-          console.debug(":: ChattyChat UPDATE_MESSAGES", data);
           _this2.onMessagesUpdate && _this2.onMessagesUpdate(data);
         });
         this.socket.on(ChattyEvent.REFRESH_CHAT_DONE, function (data) {
-          console.debug(":: ChattyChat REFRESH_CHAT_DONE", data);
           _this2.onChatRefresh && _this2.onChatRefresh(data);
         });
         this.socket.on(ChattyEvent.REFRESH_CHAT_FAIL, function (error) {
@@ -7001,7 +6990,6 @@
           });
         });
         this.socket.on(ChattyEvent.LEAVE_CHAT_DONE, function (data) {
-          console.debug(":: ChattyChat LEAVE_CHAT_DONE", data);
           _this2.onChatLeave && _this2.onChatLeave(data);
         });
         this.socket.on(ChattyEvent.LEAVE_CHAT_FAIL, function (error) {
@@ -7095,7 +7083,7 @@
       key: "connect",
       value: function connect() {
         var _a, _b, _c;
-        this.socket = lookup("wss://".concat("dev", "socket.chatty-cloud.com/channel.").concat((_a = Chatty.app) === null || _a === void 0 ? void 0 : _a.name), {
+        this.socket = lookup("wss://devsocket.chatty-cloud.com" + "/channel.".concat((_a = Chatty.app) === null || _a === void 0 ? void 0 : _a.name), {
           // transports: ["polling", "websocket"],
           transports: ["websocket"],
           query: {
@@ -7116,7 +7104,6 @@
         var _a;
         (_a = this.socket) === null || _a === void 0 ? void 0 : _a.disconnect();
         this.removeListener();
-        console.debug(":: Channel disconnected");
       }
     }, {
       key: "fetchChats",
@@ -7149,7 +7136,6 @@
           return;
         }
         this.socket.on(ChattyEvent.CONNECT_DONE, function (data) {
-          console.debug(":: Channel CONNECT_DONE", data);
           _this.onChannelConnect && _this.onChannelConnect(data);
           _this.fetchChats({
             refresh: true
@@ -7162,7 +7148,6 @@
           });
         });
         this.socket.on(ChattyEvent.FETCH_CHATS_DONE, function (data) {
-          console.debug(":: Channel FETCH_CHATS_DONE", data);
           _this.onChatsFetch && _this.onChatsFetch(data);
         });
         this.socket.on(ChattyEvent.FETCH_CHATS_FAIL, function (error) {
@@ -7172,7 +7157,6 @@
           });
         });
         this.socket.on(ChattyEvent.REFRESH_CHAT_DONE, function (data) {
-          console.debug(":: Channel REFRESH_CHAT_DONE", data);
           _this.onChatRefresh && _this.onChatRefresh(data);
         });
         this.socket.on(ChattyEvent.REFRESH_CHAT_FAIL, function (error) {
@@ -7182,7 +7166,6 @@
           });
         });
         this.socket.on(ChattyEvent.LEAVE_CHAT_DONE, function (data) {
-          console.debug(":: Channel LEAVE_CHAT_DONE", data);
           _this.onChatLeave && _this.onChatLeave(data);
         });
         this.socket.on(ChattyEvent.LEAVE_CHAT_FAIL, function (error) {
@@ -7317,18 +7300,17 @@
                 this.app = undefined;
                 this.member = undefined;
                 this.axiosInstance = undefined;
-                console.debug(":: ChattyClient exit success");
-                _context2.next = 19;
+                _context2.next = 18;
                 break;
-              case 16:
-                _context2.prev = 16;
+              case 15:
+                _context2.prev = 15;
                 _context2.t0 = _context2["catch"](0);
                 console.warn(":: ChattyClient exit fail ", _context2.t0.message);
-              case 19:
+              case 18:
               case "end":
                 return _context2.stop();
             }
-          }, _callee2, this, [[0, 16]]);
+          }, _callee2, this, [[0, 15]]);
         }));
         function exit(_x2) {
           return _exit.apply(this, arguments);
@@ -7362,7 +7344,7 @@
                   return Promise.resolve(res.data);
                 })["catch"](function (message) {
                   return Promise.reject({
-                    message: "Chatty.getApp error - " + message
+                    message: "getApp error - " + message
                   });
                 });
               case 5:
@@ -7863,7 +7845,7 @@
   }();
   function configAxios(ApiKey) {
     var axiosInstance = axios.create();
-    axiosInstance.defaults.baseURL = "https://".concat("dev", "api.chatty-cloud.com");
+    axiosInstance.defaults.baseURL = "https://devapi.chatty-cloud.com";
     axiosInstance.defaults.headers.common["ApiKey"] = ApiKey || "";
     axiosInstance.defaults.headers.common["Content-Type"] = "application/json";
     axiosInstance.interceptors.request.use(function (request) {

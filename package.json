@@ -22,7 +22,7 @@
   "scripts": {
     "compile": "rm -rf ./build && tsc -p tsconfig.cjs.json && tsc -p tsconfig.esm.json && ./postcompile.sh",
     "build": "rollup -c support/rollup.config.umd.js && rollup -c support/rollup.config.esm.js",
-    "build.dev": "NODE_ENV=development rollup -c support/rollup.config.umd.js && NODE_ENV=development rollup -c support/rollup.config.esm.js",
+    "build.dev": "NODE_ENV=dev rollup -c support/rollup.config.umd.js && NODE_ENV=dev rollup -c support/rollup.config.esm.js",
     "prettier": "prettier --check \"lib/**/*.ts\" \"support/**/*.js\"",
     "prettier.fix": "prettier --write \"lib/**/*.ts\" \"support/**/*.js\"",
     "prepack": "npm run compile"
