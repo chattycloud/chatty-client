@@ -703,49 +703,49 @@
                                 |__/|_|
 
     */
-  var ChattyEvent;
-  (function (ChattyEvent) {
-    ChattyEvent["CONNECT"] = "connection";
-    ChattyEvent["CONNECT_DONE"] = "connect_done";
-    ChattyEvent["CONNECT_FAIL"] = "connect_fail";
-    ChattyEvent["DISCONNECT"] = "disconnect";
-    ChattyEvent["DISCONNECT_DONE"] = "disconnect_done";
-    ChattyEvent["DISCONNECT_FAIL"] = "disconnect_fail";
-    ChattyEvent["REFRESH_CHAT"] = "refresh_chat";
-    ChattyEvent["REFRESH_CHAT_DONE"] = "refresh_chat_done";
-    ChattyEvent["REFRESH_CHAT_FAIL"] = "refresh_chat_fail";
-    ChattyEvent["RECEIVE_MESSAGE"] = "receive_message";
-    ChattyEvent["FETCH_MESSAGES"] = "fetch_messages";
-    ChattyEvent["FETCH_MESSAGES_DONE"] = "fetch_messages_done";
-    ChattyEvent["FETCH_MESSAGES_FAIL"] = "fetch_messages_fail";
-    ChattyEvent["UPDATE_MESSAGES"] = "update_message";
-    ChattyEvent["FETCH_CHATS"] = "fetch_chats";
-    ChattyEvent["FETCH_CHATS_DONE"] = "fetch_chats_done";
-    ChattyEvent["FETCH_CHATS_FAIL"] = "fetch_chats_fail";
-    ChattyEvent["SEND_MESSAGE"] = "send_message";
-    ChattyEvent["SEND_MESSAGE_DONE"] = "send_message_done";
-    ChattyEvent["SEND_MESSAGE_FAIL"] = "send_message_fail";
-    ChattyEvent["SEND_MESSAGE_RETRY"] = "send_message_retry";
-    ChattyEvent["DELETE_MESSAGE"] = "delete_message";
-    ChattyEvent["DELETE_MESSAGE_DONE"] = "delete_message_done";
-    ChattyEvent["DELETE_MESSAGE_FAIL"] = "delete_message_fail";
-    ChattyEvent["MARK_AS_READ"] = "mark_as_read";
-    ChattyEvent["MARK_AS_READ_DONE"] = "mark_as_read_done";
-    ChattyEvent["MARK_AS_READ_FAIL"] = "mark_as_read_fail";
-    ChattyEvent["MARK_AS_READ_BYPASS"] = "mark_as_read_bypass";
-    ChattyEvent["INVITE_MEMBERS"] = "invite_members";
-    ChattyEvent["INVITE_MEMBERS_DONE"] = "invite_members_done";
-    ChattyEvent["INVITE_MEMBERS_FAIL"] = "invite_members_fail";
-    ChattyEvent["EXCLUDE_MEMBERS"] = "exclude_members";
-    ChattyEvent["EXCLUDE_MEMBERS_DONE"] = "exclude_members_done";
-    ChattyEvent["EXCLUDE_MEMBERS_FAIL"] = "exclude_members_fail";
-    ChattyEvent["JOIN_CHAT"] = "join_chat";
-    ChattyEvent["JOIN_CHAT_DONE"] = "join_chat_done";
-    ChattyEvent["JOIN_CHAT_FAIL"] = "join_chat_fail";
-    ChattyEvent["LEAVE_CHAT"] = "leave_chat";
-    ChattyEvent["LEAVE_CHAT_DONE"] = "leave_chat_done";
-    ChattyEvent["LEAVE_CHAT_FAIL"] = "leave_chat_fail";
-  })(ChattyEvent || (ChattyEvent = {}));
+  var eChattyEvent;
+  (function (eChattyEvent) {
+    eChattyEvent["CONNECT"] = "connection";
+    eChattyEvent["CONNECT_DONE"] = "connect_done";
+    eChattyEvent["CONNECT_FAIL"] = "connect_fail";
+    eChattyEvent["DISCONNECT"] = "disconnect";
+    eChattyEvent["DISCONNECT_DONE"] = "disconnect_done";
+    eChattyEvent["DISCONNECT_FAIL"] = "disconnect_fail";
+    eChattyEvent["REFRESH_CHAT"] = "refresh_chat";
+    eChattyEvent["REFRESH_CHAT_DONE"] = "refresh_chat_done";
+    eChattyEvent["REFRESH_CHAT_FAIL"] = "refresh_chat_fail";
+    eChattyEvent["RECEIVE_MESSAGE"] = "receive_message";
+    eChattyEvent["FETCH_MESSAGES"] = "fetch_messages";
+    eChattyEvent["FETCH_MESSAGES_DONE"] = "fetch_messages_done";
+    eChattyEvent["FETCH_MESSAGES_FAIL"] = "fetch_messages_fail";
+    eChattyEvent["UPDATE_MESSAGES"] = "update_message";
+    eChattyEvent["FETCH_CHATS"] = "fetch_chats";
+    eChattyEvent["FETCH_CHATS_DONE"] = "fetch_chats_done";
+    eChattyEvent["FETCH_CHATS_FAIL"] = "fetch_chats_fail";
+    eChattyEvent["SEND_MESSAGE"] = "send_message";
+    eChattyEvent["SEND_MESSAGE_DONE"] = "send_message_done";
+    eChattyEvent["SEND_MESSAGE_FAIL"] = "send_message_fail";
+    eChattyEvent["SEND_MESSAGE_RETRY"] = "send_message_retry";
+    eChattyEvent["DELETE_MESSAGE"] = "delete_message";
+    eChattyEvent["DELETE_MESSAGE_DONE"] = "delete_message_done";
+    eChattyEvent["DELETE_MESSAGE_FAIL"] = "delete_message_fail";
+    eChattyEvent["MARK_AS_READ"] = "mark_as_read";
+    eChattyEvent["MARK_AS_READ_DONE"] = "mark_as_read_done";
+    eChattyEvent["MARK_AS_READ_FAIL"] = "mark_as_read_fail";
+    eChattyEvent["MARK_AS_READ_BYPASS"] = "mark_as_read_bypass";
+    eChattyEvent["INVITE_MEMBERS"] = "invite_members";
+    eChattyEvent["INVITE_MEMBERS_DONE"] = "invite_members_done";
+    eChattyEvent["INVITE_MEMBERS_FAIL"] = "invite_members_fail";
+    eChattyEvent["EXCLUDE_MEMBERS"] = "exclude_members";
+    eChattyEvent["EXCLUDE_MEMBERS_DONE"] = "exclude_members_done";
+    eChattyEvent["EXCLUDE_MEMBERS_FAIL"] = "exclude_members_fail";
+    eChattyEvent["JOIN_CHAT"] = "join_chat";
+    eChattyEvent["JOIN_CHAT_DONE"] = "join_chat_done";
+    eChattyEvent["JOIN_CHAT_FAIL"] = "join_chat_fail";
+    eChattyEvent["LEAVE_CHAT"] = "leave_chat";
+    eChattyEvent["LEAVE_CHAT_DONE"] = "leave_chat_done";
+    eChattyEvent["LEAVE_CHAT_FAIL"] = "leave_chat_fail";
+  })(eChattyEvent || (eChattyEvent = {}));
 
   var type = /*#__PURE__*/Object.freeze({
     __proto__: null,
@@ -760,7 +760,7 @@
     SupportedVideoFormat: SupportedVideoFormat,
     SupportedUploadSize: SupportedUploadSize,
     get eChattyNotification () { return eChattyNotification; },
-    get ChattyEvent () { return ChattyEvent; }
+    get eChattyEvent () { return eChattyEvent; }
   });
 
   function getDefaultExportFromCjs (x) {
@@ -6650,7 +6650,7 @@
       key: "fetchMessages",
       value: function fetchMessages(payload) {
         var _a;
-        (_a = this.socket) === null || _a === void 0 ? void 0 : _a.emit(ChattyEvent.FETCH_MESSAGES, {
+        (_a = this.socket) === null || _a === void 0 ? void 0 : _a.emit(eChattyEvent.FETCH_MESSAGES, {
           refresh: payload.refresh
         });
       }
@@ -6658,7 +6658,7 @@
       key: "sendMessage",
       value: function sendMessage(data) {
         var _a;
-        (_a = this.socket) === null || _a === void 0 ? void 0 : _a.emit(ChattyEvent.SEND_MESSAGE, _objectSpread2(_objectSpread2({}, data), {}, {
+        (_a = this.socket) === null || _a === void 0 ? void 0 : _a.emit(eChattyEvent.SEND_MESSAGE, _objectSpread2(_objectSpread2({}, data), {}, {
           retry: 5
         }));
       }
@@ -6666,7 +6666,7 @@
       key: "deleteMessage",
       value: function deleteMessage(id) {
         var _a;
-        (_a = this.socket) === null || _a === void 0 ? void 0 : _a.emit(ChattyEvent.DELETE_MESSAGE, {
+        (_a = this.socket) === null || _a === void 0 ? void 0 : _a.emit(eChattyEvent.DELETE_MESSAGE, {
           id: id
         });
       }
@@ -6675,7 +6675,7 @@
       value: function refreshChat(ChatId) {
         var _a;
         // chat 화면의 정보 및 참여멤버정보등이 바뀔때 호출이되어야 함
-        (_a = this.socket) === null || _a === void 0 ? void 0 : _a.emit(ChattyEvent.REFRESH_CHAT, {
+        (_a = this.socket) === null || _a === void 0 ? void 0 : _a.emit(eChattyEvent.REFRESH_CHAT, {
           ChatId: ChatId
         });
       }
@@ -6683,7 +6683,7 @@
       key: "leaveChat",
       value: function leaveChat(ChatId) {
         var _a;
-        (_a = this.socket) === null || _a === void 0 ? void 0 : _a.emit(ChattyEvent.LEAVE_CHAT, {
+        (_a = this.socket) === null || _a === void 0 ? void 0 : _a.emit(eChattyEvent.LEAVE_CHAT, {
           ChatId: ChatId
         });
       }
@@ -6691,7 +6691,7 @@
       key: "inviteMembers",
       value: function inviteMembers(MemberIds) {
         var _a;
-        (_a = this.socket) === null || _a === void 0 ? void 0 : _a.emit(ChattyEvent.INVITE_MEMBERS, {
+        (_a = this.socket) === null || _a === void 0 ? void 0 : _a.emit(eChattyEvent.INVITE_MEMBERS, {
           MemberIds: MemberIds
         });
       }
@@ -6699,7 +6699,7 @@
       key: "excludeMembers",
       value: function excludeMembers(MemberIds) {
         var _a;
-        (_a = this.socket) === null || _a === void 0 ? void 0 : _a.emit(ChattyEvent.EXCLUDE_MEMBERS, {
+        (_a = this.socket) === null || _a === void 0 ? void 0 : _a.emit(eChattyEvent.EXCLUDE_MEMBERS, {
           MemberIds: MemberIds
         });
       }
@@ -6707,7 +6707,7 @@
       key: "markAsRead",
       value: function markAsRead() {
         var _a;
-        (_a = this.socket) === null || _a === void 0 ? void 0 : _a.emit(ChattyEvent.MARK_AS_READ);
+        (_a = this.socket) === null || _a === void 0 ? void 0 : _a.emit(eChattyEvent.MARK_AS_READ);
       }
       /**
        *
@@ -6910,7 +6910,7 @@
           console.warn(":: ChattyChat socket is not connected");
           return;
         }
-        this.socket.on(ChattyEvent.CONNECT_DONE, function (data) {
+        this.socket.on(eChattyEvent.CONNECT_DONE, function (data) {
           var _a;
           _this2.id = (_a = data.chat) === null || _a === void 0 ? void 0 : _a.id; // 연결된 ChatId를 Chat instance에 저장 > 필요한 경우 다시 enable
           _this2.onChatConnect && _this2.onChatConnect(data);
@@ -6918,53 +6918,53 @@
             refresh: true
           });
         });
-        this.socket.on(ChattyEvent.CONNECT_FAIL, function (error) {
+        this.socket.on(eChattyEvent.CONNECT_FAIL, function (error) {
           console.warn(":: ChattyChat CONNECT_FAIL", error.message);
           _this2.onChatConnect && _this2.onChatConnect({
             error: error
           });
         });
-        this.socket.on(ChattyEvent.FETCH_MESSAGES_DONE, function (data) {
+        this.socket.on(eChattyEvent.FETCH_MESSAGES_DONE, function (data) {
           _this2.onMessagesFetch && _this2.onMessagesFetch(data);
           _this2.markAsRead();
         });
-        this.socket.on(ChattyEvent.FETCH_MESSAGES_FAIL, function (error) {
+        this.socket.on(eChattyEvent.FETCH_MESSAGES_FAIL, function (error) {
           console.warn(":: ChattyChat FETCH_MESSAGES_FAIL", error.message);
           _this2.onMessagesFetch && _this2.onMessagesFetch({
             error: error
           });
         });
-        this.socket.on(ChattyEvent.SEND_MESSAGE_DONE, function (data) {
+        this.socket.on(eChattyEvent.SEND_MESSAGE_DONE, function (data) {
           _this2.onMessageSend && _this2.onMessageSend(data);
           // 내가 메시지를 보낸게 성공하면 Channel 에서 REFRESH_CHAT 해야한다.
           if (_this2.channel && _this2.id) {
             _this2.channel.refreshChat(_this2.id);
           }
         });
-        this.socket.on(ChattyEvent.SEND_MESSAGE_FAIL, function (error) {
+        this.socket.on(eChattyEvent.SEND_MESSAGE_FAIL, function (error) {
           console.warn(":: ChattyChat SEND_MESSAGE_FAIL", error.message);
           _this2.onMessageSend && _this2.onMessageSend({
             error: error
           });
         });
-        this.socket.on(ChattyEvent.SEND_MESSAGE_RETRY, function (data) {
+        this.socket.on(eChattyEvent.SEND_MESSAGE_RETRY, function (data) {
           var _a;
-          (_a = _this2.socket) === null || _a === void 0 ? void 0 : _a.emit(ChattyEvent.SEND_MESSAGE, data);
+          (_a = _this2.socket) === null || _a === void 0 ? void 0 : _a.emit(eChattyEvent.SEND_MESSAGE, data);
         });
-        this.socket.on(ChattyEvent.RECEIVE_MESSAGE, function (data) {
+        this.socket.on(eChattyEvent.RECEIVE_MESSAGE, function (data) {
           _this2.onMessageReceive && _this2.onMessageReceive(data);
           _this2.markAsRead();
         });
-        this.socket.on(ChattyEvent.MARK_AS_READ_DONE, function (data) {
+        this.socket.on(eChattyEvent.MARK_AS_READ_DONE, function (data) {
           // Channel 로부터 왔다면 REFRESH_CHAT 해야한다
           if (_this2.channel && _this2.id) {
             _this2.channel.refreshChat(_this2.id);
           }
         });
-        this.socket.on(ChattyEvent.MARK_AS_READ_FAIL, function (error) {
+        this.socket.on(eChattyEvent.MARK_AS_READ_FAIL, function (error) {
           console.warn(":: ChattyChat MARK_AS_READ_FAIL", error.message);
         });
-        this.socket.on(ChattyEvent.MARK_AS_READ_BYPASS, function () {
+        this.socket.on(eChattyEvent.MARK_AS_READ_BYPASS, function () {
           // MARK_AS_READ_DONE의 응답으로  data가 MARK_AS_READ_BYPASS 인경우가 있다.
           // member 가 SUPER인경우에 해당되며 MARK_AS_READ 요청에대해 서버가 bypass로 동작한다
         });
@@ -6977,28 +6977,28 @@
          *
          * 2. Server에서 DELETE_MESSAGE가 성공적으로 이루어진후 > Chat Message의 삭제내용을 업데이트
          */
-        this.socket.on(ChattyEvent.UPDATE_MESSAGES, function (data) {
+        this.socket.on(eChattyEvent.UPDATE_MESSAGES, function (data) {
           _this2.onMessagesUpdate && _this2.onMessagesUpdate(data);
         });
-        this.socket.on(ChattyEvent.REFRESH_CHAT_DONE, function (data) {
+        this.socket.on(eChattyEvent.REFRESH_CHAT_DONE, function (data) {
           _this2.onChatRefresh && _this2.onChatRefresh(data);
         });
-        this.socket.on(ChattyEvent.REFRESH_CHAT_FAIL, function (error) {
+        this.socket.on(eChattyEvent.REFRESH_CHAT_FAIL, function (error) {
           console.warn(":: ChattyChat REFRESH_CHAT_FAIL", error.message);
           _this2.onChatRefresh && _this2.onChatRefresh({
             error: error
           });
         });
-        this.socket.on(ChattyEvent.LEAVE_CHAT_DONE, function (data) {
+        this.socket.on(eChattyEvent.LEAVE_CHAT_DONE, function (data) {
           _this2.onChatLeave && _this2.onChatLeave(data);
         });
-        this.socket.on(ChattyEvent.LEAVE_CHAT_FAIL, function (error) {
+        this.socket.on(eChattyEvent.LEAVE_CHAT_FAIL, function (error) {
           console.warn(":: ChattyChat LEAVE_CHAT_FAIL", error.message);
           _this2.onChatLeave && _this2.onChatLeave({
             error: error
           });
         });
-        this.socket.on(ChattyEvent.DELETE_MESSAGE_FAIL, function (error) {
+        this.socket.on(eChattyEvent.DELETE_MESSAGE_FAIL, function (error) {
           console.warn(":: ChattyChat DELETE_MESSAGE_FAIL", error.message);
           _this2.onMessagesUpdate && _this2.onMessagesUpdate({
             error: error
@@ -7012,23 +7012,23 @@
           console.warn(":: ChattyChat socket is not connected");
           return;
         }
-        this.socket.off(ChattyEvent.CONNECT_DONE);
-        this.socket.off(ChattyEvent.CONNECT_FAIL);
-        this.socket.off(ChattyEvent.FETCH_MESSAGES_DONE);
-        this.socket.off(ChattyEvent.FETCH_MESSAGES_FAIL);
-        this.socket.off(ChattyEvent.SEND_MESSAGE_DONE);
-        this.socket.off(ChattyEvent.SEND_MESSAGE_FAIL);
-        this.socket.off(ChattyEvent.SEND_MESSAGE_RETRY);
-        this.socket.off(ChattyEvent.RECEIVE_MESSAGE);
-        this.socket.off(ChattyEvent.MARK_AS_READ_DONE);
-        this.socket.off(ChattyEvent.MARK_AS_READ_FAIL);
-        this.socket.off(ChattyEvent.MARK_AS_READ_BYPASS);
-        this.socket.off(ChattyEvent.UPDATE_MESSAGES);
-        this.socket.off(ChattyEvent.REFRESH_CHAT_DONE);
-        this.socket.off(ChattyEvent.REFRESH_CHAT_FAIL);
-        this.socket.off(ChattyEvent.LEAVE_CHAT_DONE);
-        this.socket.off(ChattyEvent.LEAVE_CHAT_FAIL);
-        this.socket.off(ChattyEvent.DELETE_MESSAGE_FAIL);
+        this.socket.off(eChattyEvent.CONNECT_DONE);
+        this.socket.off(eChattyEvent.CONNECT_FAIL);
+        this.socket.off(eChattyEvent.FETCH_MESSAGES_DONE);
+        this.socket.off(eChattyEvent.FETCH_MESSAGES_FAIL);
+        this.socket.off(eChattyEvent.SEND_MESSAGE_DONE);
+        this.socket.off(eChattyEvent.SEND_MESSAGE_FAIL);
+        this.socket.off(eChattyEvent.SEND_MESSAGE_RETRY);
+        this.socket.off(eChattyEvent.RECEIVE_MESSAGE);
+        this.socket.off(eChattyEvent.MARK_AS_READ_DONE);
+        this.socket.off(eChattyEvent.MARK_AS_READ_FAIL);
+        this.socket.off(eChattyEvent.MARK_AS_READ_BYPASS);
+        this.socket.off(eChattyEvent.UPDATE_MESSAGES);
+        this.socket.off(eChattyEvent.REFRESH_CHAT_DONE);
+        this.socket.off(eChattyEvent.REFRESH_CHAT_FAIL);
+        this.socket.off(eChattyEvent.LEAVE_CHAT_DONE);
+        this.socket.off(eChattyEvent.LEAVE_CHAT_FAIL);
+        this.socket.off(eChattyEvent.DELETE_MESSAGE_FAIL);
         this.socket = undefined;
         this.channel = undefined;
         this.id = undefined;
@@ -7109,13 +7109,13 @@
       key: "fetchChats",
       value: function fetchChats(payload) {
         var _a;
-        (_a = this.socket) === null || _a === void 0 ? void 0 : _a.emit(ChattyEvent.FETCH_CHATS, payload);
+        (_a = this.socket) === null || _a === void 0 ? void 0 : _a.emit(eChattyEvent.FETCH_CHATS, payload);
       }
     }, {
       key: "refreshChat",
       value: function refreshChat(ChatId) {
         var _a;
-        (_a = this.socket) === null || _a === void 0 ? void 0 : _a.emit(ChattyEvent.REFRESH_CHAT, {
+        (_a = this.socket) === null || _a === void 0 ? void 0 : _a.emit(eChattyEvent.REFRESH_CHAT, {
           ChatId: ChatId
         });
       }
@@ -7123,7 +7123,7 @@
       key: "leaveChat",
       value: function leaveChat(ChatId) {
         var _a;
-        (_a = this.socket) === null || _a === void 0 ? void 0 : _a.emit(ChattyEvent.LEAVE_CHAT, {
+        (_a = this.socket) === null || _a === void 0 ? void 0 : _a.emit(eChattyEvent.LEAVE_CHAT, {
           ChatId: ChatId
         });
       }
@@ -7135,40 +7135,40 @@
           console.warn(":: Channel socket is not connected");
           return;
         }
-        this.socket.on(ChattyEvent.CONNECT_DONE, function (data) {
+        this.socket.on(eChattyEvent.CONNECT_DONE, function (data) {
           _this.onChannelConnect && _this.onChannelConnect(data);
           _this.fetchChats({
             refresh: true
           });
         });
-        this.socket.on(ChattyEvent.CONNECT_FAIL, function (error) {
+        this.socket.on(eChattyEvent.CONNECT_FAIL, function (error) {
           console.warn(":: Channel CONNECT_FAIL", error.message);
           _this.onChannelConnect && _this.onChannelConnect({
             error: error
           });
         });
-        this.socket.on(ChattyEvent.FETCH_CHATS_DONE, function (data) {
+        this.socket.on(eChattyEvent.FETCH_CHATS_DONE, function (data) {
           _this.onChatsFetch && _this.onChatsFetch(data);
         });
-        this.socket.on(ChattyEvent.FETCH_CHATS_FAIL, function (error) {
+        this.socket.on(eChattyEvent.FETCH_CHATS_FAIL, function (error) {
           console.warn(":: Channel FETCH_CHATS_FAIL", error.message);
           _this.onChatsFetch && _this.onChatsFetch({
             error: error
           });
         });
-        this.socket.on(ChattyEvent.REFRESH_CHAT_DONE, function (data) {
+        this.socket.on(eChattyEvent.REFRESH_CHAT_DONE, function (data) {
           _this.onChatRefresh && _this.onChatRefresh(data);
         });
-        this.socket.on(ChattyEvent.REFRESH_CHAT_FAIL, function (error) {
+        this.socket.on(eChattyEvent.REFRESH_CHAT_FAIL, function (error) {
           console.warn(":: Channel REFRESH_CHAT_FAIL", error.message);
           _this.onChatRefresh && _this.onChatRefresh({
             error: error
           });
         });
-        this.socket.on(ChattyEvent.LEAVE_CHAT_DONE, function (data) {
+        this.socket.on(eChattyEvent.LEAVE_CHAT_DONE, function (data) {
           _this.onChatLeave && _this.onChatLeave(data);
         });
-        this.socket.on(ChattyEvent.LEAVE_CHAT_FAIL, function (error) {
+        this.socket.on(eChattyEvent.LEAVE_CHAT_FAIL, function (error) {
           console.warn(":: Channel LEAVE_CHAT_FAIL", error.message);
           _this.onChatLeave && _this.onChatLeave({
             error: error
@@ -7182,14 +7182,14 @@
           console.warn(":: Channel socket is not connected");
           return;
         }
-        this.socket.off(ChattyEvent.CONNECT_DONE);
-        this.socket.off(ChattyEvent.CONNECT_FAIL);
-        this.socket.off(ChattyEvent.FETCH_CHATS_DONE);
-        this.socket.off(ChattyEvent.FETCH_CHATS_FAIL);
-        this.socket.off(ChattyEvent.REFRESH_CHAT_DONE);
-        this.socket.off(ChattyEvent.REFRESH_CHAT_FAIL);
-        this.socket.off(ChattyEvent.LEAVE_CHAT_DONE);
-        this.socket.off(ChattyEvent.LEAVE_CHAT_FAIL);
+        this.socket.off(eChattyEvent.CONNECT_DONE);
+        this.socket.off(eChattyEvent.CONNECT_FAIL);
+        this.socket.off(eChattyEvent.FETCH_CHATS_DONE);
+        this.socket.off(eChattyEvent.FETCH_CHATS_FAIL);
+        this.socket.off(eChattyEvent.REFRESH_CHAT_DONE);
+        this.socket.off(eChattyEvent.REFRESH_CHAT_FAIL);
+        this.socket.off(eChattyEvent.LEAVE_CHAT_DONE);
+        this.socket.off(eChattyEvent.LEAVE_CHAT_FAIL);
         this.socket = undefined;
       }
     }]);
