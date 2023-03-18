@@ -1,7 +1,7 @@
 import io, { Socket } from "socket.io-client";
 import Chatty from ".";
 import {
-  ChattyEvent,
+  eChattyEvent,
   iFetchChatsPayload,
   onChatsFetchResponseType,
   onChannelConnectResponseType,
@@ -61,15 +61,15 @@ export class Channel {
   }
 
   fetchChats(payload: iFetchChatsPayload) {
-    this.socket?.emit(ChattyEvent.FETCH_CHATS, payload);
+    this.socket?.emit(eChattyEvent.FETCH_CHATS, payload);
   }
 
   refreshChat(ChatId: string) {
-    this.socket?.emit(ChattyEvent.REFRESH_CHAT, { ChatId: ChatId });
+    this.socket?.emit(eChattyEvent.REFRESH_CHAT, { ChatId: ChatId });
   }
 
   leaveChat(ChatId: string) {
-    this.socket?.emit(ChattyEvent.LEAVE_CHAT, { ChatId: ChatId });
+    this.socket?.emit(eChattyEvent.LEAVE_CHAT, { ChatId: ChatId });
   }
 
   private addListener() {
@@ -79,7 +79,7 @@ export class Channel {
     }
 
     this.socket.on(
-      ChattyEvent.CONNECT_DONE,
+      eChattyEvent.CONNECT_DONE,
       (data: onChannelConnectResponseType) => {
         console.debug(":: Channel CONNECT_DONE", data);
         this.onChannelConnect && this.onChannelConnect(data);
@@ -88,26 +88,26 @@ export class Channel {
       }
     );
 
-    this.socket.on(ChattyEvent.CONNECT_FAIL, (error: ErrorResponseType) => {
+    this.socket.on(eChattyEvent.CONNECT_FAIL, (error: ErrorResponseType) => {
       console.warn(":: Channel CONNECT_FAIL", error.message);
       this.onChannelConnect && this.onChannelConnect({ error });
     });
 
     this.socket.on(
-      ChattyEvent.FETCH_CHATS_DONE,
+      eChattyEvent.FETCH_CHATS_DONE,
       (data: onChatsFetchResponseType) => {
         console.debug(":: Channel FETCH_CHATS_DONE", data);
         this.onChatsFetch && this.onChatsFetch(data);
       }
     );
 
-    this.socket.on(ChattyEvent.FETCH_CHATS_FAIL, (error: ErrorResponseType) => {
+    this.socket.on(eChattyEvent.FETCH_CHATS_FAIL, (error: ErrorResponseType) => {
       console.warn(":: Channel FETCH_CHATS_FAIL", error.message);
       this.onChatsFetch && this.onChatsFetch({ error });
     });
 
     this.socket.on(
-      ChattyEvent.REFRESH_CHAT_DONE,
+      eChattyEvent.REFRESH_CHAT_DONE,
       (data: onChatRefreshResponseType) => {
         console.debug(`:: Channel REFRESH_CHAT_DONE`, data);
         this.onChatRefresh && this.onChatRefresh(data);
@@ -115,7 +115,7 @@ export class Channel {
     );
 
     this.socket.on(
-      ChattyEvent.REFRESH_CHAT_FAIL,
+      eChattyEvent.REFRESH_CHAT_FAIL,
       (error: ErrorResponseType) => {
         console.warn(":: Channel REFRESH_CHAT_FAIL", error.message);
         this.onChatRefresh && this.onChatRefresh({ error });
@@ -123,14 +123,14 @@ export class Channel {
     );
 
     this.socket.on(
-      ChattyEvent.LEAVE_CHAT_DONE,
+      eChattyEvent.LEAVE_CHAT_DONE,
       (data: onChatLeaveResponseType) => {
         console.debug(`:: Channel LEAVE_CHAT_DONE`, data);
         this.onChatLeave && this.onChatLeave(data);
       }
     );
 
-    this.socket.on(ChattyEvent.LEAVE_CHAT_FAIL, (error: ErrorResponseType) => {
+    this.socket.on(eChattyEvent.LEAVE_CHAT_FAIL, (error: ErrorResponseType) => {
       console.warn(":: Channel LEAVE_CHAT_FAIL", error.message);
       this.onChatLeave && this.onChatLeave({ error });
     });
@@ -142,17 +142,17 @@ export class Channel {
       return;
     }
 
-    this.socket.off(ChattyEvent.CONNECT_DONE);
-    this.socket.off(ChattyEvent.CONNECT_FAIL);
+    this.socket.off(eChattyEvent.CONNECT_DONE);
+    this.socket.off(eChattyEvent.CONNECT_FAIL);
 
-    this.socket.off(ChattyEvent.FETCH_CHATS_DONE);
-    this.socket.off(ChattyEvent.FETCH_CHATS_FAIL);
+    this.socket.off(eChattyEvent.FETCH_CHATS_DONE);
+    this.socket.off(eChattyEvent.FETCH_CHATS_FAIL);
 
-    this.socket.off(ChattyEvent.REFRESH_CHAT_DONE);
-    this.socket.off(ChattyEvent.REFRESH_CHAT_FAIL);
+    this.socket.off(eChattyEvent.REFRESH_CHAT_DONE);
+    this.socket.off(eChattyEvent.REFRESH_CHAT_FAIL);
 
-    this.socket.off(ChattyEvent.LEAVE_CHAT_DONE);
-    this.socket.off(ChattyEvent.LEAVE_CHAT_FAIL);
+    this.socket.off(eChattyEvent.LEAVE_CHAT_DONE);
+    this.socket.off(eChattyEvent.LEAVE_CHAT_FAIL);
 
     this.socket = undefined;
   }

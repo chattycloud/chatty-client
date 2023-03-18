@@ -6,7 +6,7 @@ import FormData from "form-data";
 import {
   iApp,
   iMessage,
-  ChattyEvent,
+  eChattyEvent,
   iConnectChatPayload,
   iFetchMessagesPayload,
   iFile,
@@ -136,36 +136,36 @@ export class Chat {
   }
 
   fetchMessages(payload: iFetchMessagesPayload) {
-    this.socket?.emit(ChattyEvent.FETCH_MESSAGES, { refresh: payload.refresh });
+    this.socket?.emit(eChattyEvent.FETCH_MESSAGES, { refresh: payload.refresh });
   }
 
   private sendMessage(data: Partial<iMessage>) {
-    this.socket?.emit(ChattyEvent.SEND_MESSAGE, { ...data, retry: 5 });
+    this.socket?.emit(eChattyEvent.SEND_MESSAGE, { ...data, retry: 5 });
   }
 
   deleteMessage(id: string) {
-    this.socket?.emit(ChattyEvent.DELETE_MESSAGE, { id: id });
+    this.socket?.emit(eChattyEvent.DELETE_MESSAGE, { id: id });
   }
 
   refreshChat(ChatId: string) {
     // chat 화면의 정보 및 참여멤버정보등이 바뀔때 호출이되어야 함
-    this.socket?.emit(ChattyEvent.REFRESH_CHAT, { ChatId: ChatId });
+    this.socket?.emit(eChattyEvent.REFRESH_CHAT, { ChatId: ChatId });
   }
 
   leaveChat(ChatId: string) {
-    this.socket?.emit(ChattyEvent.LEAVE_CHAT, { ChatId: ChatId });
+    this.socket?.emit(eChattyEvent.LEAVE_CHAT, { ChatId: ChatId });
   }
 
   inviteMembers(MemberIds: string[]) {
-    this.socket?.emit(ChattyEvent.INVITE_MEMBERS, { MemberIds: MemberIds });
+    this.socket?.emit(eChattyEvent.INVITE_MEMBERS, { MemberIds: MemberIds });
   }
 
   excludeMembers(MemberIds: string[]) {
-    this.socket?.emit(ChattyEvent.EXCLUDE_MEMBERS, { MemberIds: MemberIds });
+    this.socket?.emit(eChattyEvent.EXCLUDE_MEMBERS, { MemberIds: MemberIds });
   }
 
   markAsRead() {
-    this.socket?.emit(ChattyEvent.MARK_AS_READ);
+    this.socket?.emit(eChattyEvent.MARK_AS_READ);
   }
 
   /**
@@ -343,7 +343,7 @@ export class Chat {
     }
 
     this.socket.on(
-      ChattyEvent.CONNECT_DONE,
+      eChattyEvent.CONNECT_DONE,
       (data: onChatConnectResponseType) => {
         console.debug(`:: ChattyChat CONNECT_DONE`, data);
         this.id = data.chat?.id; // 연결된 ChatId를 Chat instance에 저장 > 필요한 경우 다시 enable
@@ -352,13 +352,13 @@ export class Chat {
       }
     );
 
-    this.socket.on(ChattyEvent.CONNECT_FAIL, (error: ErrorResponseType) => {
+    this.socket.on(eChattyEvent.CONNECT_FAIL, (error: ErrorResponseType) => {
       console.warn(":: ChattyChat CONNECT_FAIL", error.message);
       this.onChatConnect && this.onChatConnect({ error });
     });
 
     this.socket.on(
-      ChattyEvent.FETCH_MESSAGES_DONE,
+      eChattyEvent.FETCH_MESSAGES_DONE,
       (data: onMessagesFetchResponseType) => {
         console.debug(":: ChattyChat FETCH_MESSAGES_DONE", data);
         this.onMessagesFetch && this.onMessagesFetch(data);
@@ -368,7 +368,7 @@ export class Chat {
     );
 
     this.socket.on(
-      ChattyEvent.FETCH_MESSAGES_FAIL,
+      eChattyEvent.FETCH_MESSAGES_FAIL,
       (error: ErrorResponseType) => {
         console.warn(":: ChattyChat FETCH_MESSAGES_FAIL", error.message);
         this.onMessagesFetch && this.onMessagesFetch({ error });
@@ -376,7 +376,7 @@ export class Chat {
     );
 
     this.socket.on(
-      ChattyEvent.SEND_MESSAGE_DONE,
+      eChattyEvent.SEND_MESSAGE_DONE,
       (data: onMessageSendResponseType) => {
         console.debug(":: ChattyChat SEND_MESSAGE_DONE", data);
         this.onMessageSend && this.onMessageSend(data);
@@ -389,7 +389,7 @@ export class Chat {
     );
 
     this.socket.on(
-      ChattyEvent.SEND_MESSAGE_FAIL,
+      eChattyEvent.SEND_MESSAGE_FAIL,
       (error: ErrorResponseType) => {
         console.warn(":: ChattyChat SEND_MESSAGE_FAIL", error.message);
         this.onMessageSend && this.onMessageSend({ error });
@@ -397,15 +397,15 @@ export class Chat {
     );
 
     this.socket.on(
-      ChattyEvent.SEND_MESSAGE_RETRY,
+      eChattyEvent.SEND_MESSAGE_RETRY,
       (data: { retry: number }) => {
         console.debug(":: ChattyChat SEND_MESSAGE_RETRY", data);
-        this.socket?.emit(ChattyEvent.SEND_MESSAGE, data);
+        this.socket?.emit(eChattyEvent.SEND_MESSAGE, data);
       }
     );
 
     this.socket.on(
-      ChattyEvent.RECEIVE_MESSAGE,
+      eChattyEvent.RECEIVE_MESSAGE,
       (data: onMessageReceiveResponseType) => {
         console.debug(":: ChattyChat RECEIVE_MESSAGE", data);
         this.onMessageReceive && this.onMessageReceive(data);
@@ -415,7 +415,7 @@ export class Chat {
     );
 
     this.socket.on(
-      ChattyEvent.MARK_AS_READ_DONE,
+      eChattyEvent.MARK_AS_READ_DONE,
       (data: { ChatId: string }) => {
         console.debug(":: ChattyChat MARK_AS_READ_DONE", data);
 
@@ -427,13 +427,13 @@ export class Chat {
     );
 
     this.socket.on(
-      ChattyEvent.MARK_AS_READ_FAIL,
+      eChattyEvent.MARK_AS_READ_FAIL,
       (error: ErrorResponseType) => {
         console.warn(":: ChattyChat MARK_AS_READ_FAIL", error.message);
       }
     );
 
-    this.socket.on(ChattyEvent.MARK_AS_READ_BYPASS, () => {
+    this.socket.on(eChattyEvent.MARK_AS_READ_BYPASS, () => {
       // MARK_AS_READ_DONE의 응답으로  data가 MARK_AS_READ_BYPASS 인경우가 있다.
       // member 가 SUPER인경우에 해당되며 MARK_AS_READ 요청에대해 서버가 bypass로 동작한다
       console.debug(":: ChattyChat MARK_AS_READ_BYPASS");
@@ -449,7 +449,7 @@ export class Chat {
      * 2. Server에서 DELETE_MESSAGE가 성공적으로 이루어진후 > Chat Message의 삭제내용을 업데이트
      */
     this.socket.on(
-      ChattyEvent.UPDATE_MESSAGES,
+      eChattyEvent.UPDATE_MESSAGES,
       (data: onMessagesUpdateResponseType) => {
         console.debug(":: ChattyChat UPDATE_MESSAGES", data);
         this.onMessagesUpdate && this.onMessagesUpdate(data);
@@ -457,7 +457,7 @@ export class Chat {
     );
 
     this.socket.on(
-      ChattyEvent.REFRESH_CHAT_DONE,
+      eChattyEvent.REFRESH_CHAT_DONE,
       (data: onChatRefreshResponseType) => {
         console.debug(`:: ChattyChat REFRESH_CHAT_DONE`, data);
         this.onChatRefresh && this.onChatRefresh(data);
@@ -465,7 +465,7 @@ export class Chat {
     );
 
     this.socket.on(
-      ChattyEvent.REFRESH_CHAT_FAIL,
+      eChattyEvent.REFRESH_CHAT_FAIL,
       (error: ErrorResponseType) => {
         console.warn(":: ChattyChat REFRESH_CHAT_FAIL", error.message);
         this.onChatRefresh && this.onChatRefresh({ error });
@@ -473,20 +473,20 @@ export class Chat {
     );
 
     this.socket.on(
-      ChattyEvent.LEAVE_CHAT_DONE,
+      eChattyEvent.LEAVE_CHAT_DONE,
       (data: onChatLeaveResponseType) => {
         console.debug(`:: ChattyChat LEAVE_CHAT_DONE`, data);
         this.onChatLeave && this.onChatLeave(data);
       }
     );
 
-    this.socket.on(ChattyEvent.LEAVE_CHAT_FAIL, (error: ErrorResponseType) => {
+    this.socket.on(eChattyEvent.LEAVE_CHAT_FAIL, (error: ErrorResponseType) => {
       console.warn(":: ChattyChat LEAVE_CHAT_FAIL", error.message);
       this.onChatLeave && this.onChatLeave({ error });
     });
 
     this.socket.on(
-      ChattyEvent.DELETE_MESSAGE_FAIL,
+      eChattyEvent.DELETE_MESSAGE_FAIL,
       (error: ErrorResponseType) => {
         console.warn(":: ChattyChat DELETE_MESSAGE_FAIL", error.message);
         this.onMessagesUpdate && this.onMessagesUpdate({ error });
@@ -500,32 +500,32 @@ export class Chat {
       return;
     }
 
-    this.socket.off(ChattyEvent.CONNECT_DONE);
-    this.socket.off(ChattyEvent.CONNECT_FAIL);
+    this.socket.off(eChattyEvent.CONNECT_DONE);
+    this.socket.off(eChattyEvent.CONNECT_FAIL);
 
-    this.socket.off(ChattyEvent.FETCH_MESSAGES_DONE);
-    this.socket.off(ChattyEvent.FETCH_MESSAGES_FAIL);
+    this.socket.off(eChattyEvent.FETCH_MESSAGES_DONE);
+    this.socket.off(eChattyEvent.FETCH_MESSAGES_FAIL);
 
-    this.socket.off(ChattyEvent.SEND_MESSAGE_DONE);
-    this.socket.off(ChattyEvent.SEND_MESSAGE_FAIL);
+    this.socket.off(eChattyEvent.SEND_MESSAGE_DONE);
+    this.socket.off(eChattyEvent.SEND_MESSAGE_FAIL);
 
-    this.socket.off(ChattyEvent.SEND_MESSAGE_RETRY);
+    this.socket.off(eChattyEvent.SEND_MESSAGE_RETRY);
 
-    this.socket.off(ChattyEvent.RECEIVE_MESSAGE);
+    this.socket.off(eChattyEvent.RECEIVE_MESSAGE);
 
-    this.socket.off(ChattyEvent.MARK_AS_READ_DONE);
-    this.socket.off(ChattyEvent.MARK_AS_READ_FAIL);
-    this.socket.off(ChattyEvent.MARK_AS_READ_BYPASS);
+    this.socket.off(eChattyEvent.MARK_AS_READ_DONE);
+    this.socket.off(eChattyEvent.MARK_AS_READ_FAIL);
+    this.socket.off(eChattyEvent.MARK_AS_READ_BYPASS);
 
-    this.socket.off(ChattyEvent.UPDATE_MESSAGES);
+    this.socket.off(eChattyEvent.UPDATE_MESSAGES);
 
-    this.socket.off(ChattyEvent.REFRESH_CHAT_DONE);
-    this.socket.off(ChattyEvent.REFRESH_CHAT_FAIL);
+    this.socket.off(eChattyEvent.REFRESH_CHAT_DONE);
+    this.socket.off(eChattyEvent.REFRESH_CHAT_FAIL);
 
-    this.socket.off(ChattyEvent.LEAVE_CHAT_DONE);
-    this.socket.off(ChattyEvent.LEAVE_CHAT_FAIL);
+    this.socket.off(eChattyEvent.LEAVE_CHAT_DONE);
+    this.socket.off(eChattyEvent.LEAVE_CHAT_FAIL);
 
-    this.socket.off(ChattyEvent.DELETE_MESSAGE_FAIL);
+    this.socket.off(eChattyEvent.DELETE_MESSAGE_FAIL);
 
     this.socket = undefined;
     this.channel = undefined;

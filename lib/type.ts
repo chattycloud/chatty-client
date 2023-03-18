@@ -493,7 +493,7 @@ export type onChatLeave = (data: onChatLeaveResponseType) => void;
                               |__/|_|           
 
   */
-export enum ChattyEvent {
+export enum eChattyEvent {
   CONNECT = "connection",
   CONNECT_DONE = "connect_done",
   CONNECT_FAIL = "connect_fail",
