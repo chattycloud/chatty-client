@@ -328,7 +328,8 @@ export interface iCreateChatPayload {
   distinctKey?: string;
   name?: string;
   image?: string;
-  group?: string;
+  group?: string; // will be deprecated
+  channel?: string;
   data?: any;
   Members?: Array<string>;
   adminMessage?: {
@@ -342,7 +343,8 @@ export interface iUpdateChatPayload {
   distinctKey?: string;
   name?: string;
   image?: string;
-  group?: string;
+  group?: string; // will be deprecated
+  channel?: string;
   data?: any;
   Members?: Array<string>;
   adminMessage?: {
@@ -355,7 +357,8 @@ export interface iCreateAdminMessagePayload {
   distinctKey: string;
   name?: string;
   image?: string;
-  group?: string;
+  group?: string; // will be deprecated
+  channel?: string;
   data?: any;
   Members?: Array<string>;
   adminMessage?: {
@@ -370,7 +373,8 @@ export interface iMembersFilter {
 }
 
 export interface iChatsFilter {
-  group?: string;
+  group?: string; // will be deprecated
+  channel?: string;
   MemberId?: string; // if MemberId is specified, get chats only MemberId included. if not, get all chats created
 }
 
@@ -390,7 +394,7 @@ export interface iFetchChatsPayload {
   refresh?: boolean;
 
   /**
-   * To filter chats , by group, by MemberId
+   * To filter chats , by channel, by MemberId
    */
   filter?: iChatsFilter;
 }
@@ -414,11 +418,13 @@ export interface iMissedCount {
   /** total missedCount */
   total: number;
 
-  /** missedCount by group name of all groups */
+  /** missedCount by channel name */
   group: Array<{ name: string; count: number }>;
+  byChannel: Array<{ name: string, count: number }>,
 
   /** missedCount of all individual chat */
   chat: Array<{ id: string; count: number }>;
+  byChat: Array<{ id: string, count: number }>
 }
 
 /** Handler Error ResponseType */

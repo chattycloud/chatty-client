@@ -3,21 +3,8 @@
   "version": "1.2.0",
   "description": "Easy application client for a chatting solution",
   "type": "commonjs",
-  "main": "./build/cjs/index.js",
-  "module": "./build/esm/index.js",
-  "exports": {
-    "./package.json": "./package.json",
-    "./dist/chatty-client.js": "./dist/chatty-client.js",
-    "./dist/chatty-client.js.map": "./dist/chatty-client.js.map",
-    ".": {
-      "import": {
-        "node": "./build/esm-debug/index.js",
-        "default": "./build/esm/index.js"
-      },
-      "require": "./build/cjs/index.js",
-      "types": "./build/esm/index.d.ts"
-    }
-  },
+  "main": "./dist/chatty-client.js",
+  "module": "./dist/chatty-client.js",
   "types": "./build/esm/index.d.ts",
   "scripts": {
     "compile": "rm -rf ./build && tsc -p tsconfig.cjs.json && tsc -p tsconfig.esm.json && ./postcompile.sh",
