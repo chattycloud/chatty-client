@@ -6573,7 +6573,7 @@
   var Chat = /*#__PURE__*/function () {
     function Chat(payload) {
       _classCallCheck(this, Chat);
-      this.chatlog = payload.chatlog;
+      this.chatlist = payload.chatlist;
       this.onChatConnect = payload.onChatConnect;
       this.onChatRefresh = payload.onChatRefresh;
       this.onChatLeave = payload.onChatLeave;
@@ -6936,9 +6936,9 @@
         });
         this.socket.on(eChattyEvent.SEND_MESSAGE_DONE, function (data) {
           _this2.onMessageSend && _this2.onMessageSend(data);
-          // 내가 메시지를 보낸게 성공하면 Chatlog 에서 REFRESH_CHAT 해야한다.
-          if (_this2.chatlog && _this2.id) {
-            _this2.chatlog.refreshChat(_this2.id);
+          // 내가 메시지를 보낸게 성공하면 ChatList 에서 REFRESH_CHAT 해야한다.
+          if (_this2.chatlist && _this2.id) {
+            _this2.chatlist.refreshChat(_this2.id);
           }
         });
         this.socket.on(eChattyEvent.SEND_MESSAGE_FAIL, function (error) {
@@ -6956,9 +6956,9 @@
           _this2.markAsRead();
         });
         this.socket.on(eChattyEvent.MARK_AS_READ_DONE, function (data) {
-          // Chatlog 로부터 왔다면 REFRESH_CHAT 해야한다
-          if (_this2.chatlog && _this2.id) {
-            _this2.chatlog.refreshChat(_this2.id);
+          // ChatList 로부터 왔다면 REFRESH_CHAT 해야한다
+          if (_this2.chatlist && _this2.id) {
+            _this2.chatlist.refreshChat(_this2.id);
           }
         });
         this.socket.on(eChattyEvent.MARK_AS_READ_FAIL, function (error) {
@@ -7030,7 +7030,7 @@
         this.socket.off(eChattyEvent.LEAVE_CHAT_FAIL);
         this.socket.off(eChattyEvent.DELETE_MESSAGE_FAIL);
         this.socket = undefined;
-        this.chatlog = undefined;
+        this.chatlist = undefined;
         this.id = undefined;
       }
     }]);
@@ -7070,20 +7070,20 @@
     return true;
   }
 
-  var Chatlog = /*#__PURE__*/function () {
-    function Chatlog(payload) {
-      _classCallCheck(this, Chatlog);
+  var ChatList = /*#__PURE__*/function () {
+    function ChatList(payload) {
+      _classCallCheck(this, ChatList);
       this.filter = payload.filter;
-      this.onChatlogConnect = payload.onChatlogConnect;
+      this.onChatListConnect = payload.onChatListConnect;
       this.onChatsFetch = payload.onChatsFetch;
       this.onChatRefresh = payload.onChatRefresh;
       this.onChatLeave = payload.onChatLeave;
     }
-    _createClass(Chatlog, [{
+    _createClass(ChatList, [{
       key: "connect",
       value: function connect() {
         var _a, _b, _c;
-        this.socket = lookup("wss://devsocket.chatty-cloud.com" + "/chatlog.".concat((_a = Chatty.app) === null || _a === void 0 ? void 0 : _a.name), {
+        this.socket = lookup("wss://devsocket.chatty-cloud.com" + "/chatlist.".concat((_a = Chatty.app) === null || _a === void 0 ? void 0 : _a.name), {
           // transports: ["polling", "websocket"],
           transports: ["websocket"],
           query: {
@@ -7132,18 +7132,17 @@
       value: function addListener() {
         var _this = this;
         if (!this.socket) {
-          console.warn(":: Chatlog socket is not connected");
+          console.warn(":: ChatList socket is not connected");
           return;
         }
         this.socket.on(eChattyEvent.CONNECT_DONE, function (data) {
-          _this.onChatlogConnect && _this.onChatlogConnect(data);
-          _this.fetchChats({
-            refresh: true
-          });
+          _this.onChatListConnect && _this.onChatListConnect(data);
+          // this.fetchChats({ refresh: true }); // server에서 connect와 동시에 fetch가 이루어짐
         });
+
         this.socket.on(eChattyEvent.CONNECT_FAIL, function (error) {
-          console.warn(":: Chatlog CONNECT_FAIL", error.message);
-          _this.onChatlogConnect && _this.onChatlogConnect({
+          console.warn(":: ChatList CONNECT_FAIL", error.message);
+          _this.onChatListConnect && _this.onChatListConnect({
             error: error
           });
         });
@@ -7151,7 +7150,7 @@
           _this.onChatsFetch && _this.onChatsFetch(data);
         });
         this.socket.on(eChattyEvent.FETCH_CHATS_FAIL, function (error) {
-          console.warn(":: Chatlog FETCH_CHATS_FAIL", error.message);
+          console.warn(":: ChatList FETCH_CHATS_FAIL", error.message);
           _this.onChatsFetch && _this.onChatsFetch({
             error: error
           });
@@ -7160,7 +7159,7 @@
           _this.onChatRefresh && _this.onChatRefresh(data);
         });
         this.socket.on(eChattyEvent.REFRESH_CHAT_FAIL, function (error) {
-          console.warn(":: Chatlog REFRESH_CHAT_FAIL", error.message);
+          console.warn(":: ChatList REFRESH_CHAT_FAIL", error.message);
           _this.onChatRefresh && _this.onChatRefresh({
             error: error
           });
@@ -7169,7 +7168,7 @@
           _this.onChatLeave && _this.onChatLeave(data);
         });
         this.socket.on(eChattyEvent.LEAVE_CHAT_FAIL, function (error) {
-          console.warn(":: Chatlog LEAVE_CHAT_FAIL", error.message);
+          console.warn(":: ChatList LEAVE_CHAT_FAIL", error.message);
           _this.onChatLeave && _this.onChatLeave({
             error: error
           });
@@ -7179,7 +7178,7 @@
       key: "removeListener",
       value: function removeListener() {
         if (!this.socket) {
-          console.warn(":: Chatlog socket is not connected");
+          console.warn(":: ChatList socket is not connected");
           return;
         }
         this.socket.off(eChattyEvent.CONNECT_DONE);
@@ -7193,7 +7192,7 @@
         this.socket = undefined;
       }
     }]);
-    return Chatlog;
+    return ChatList;
   }();
 
   var Chatty = /*#__PURE__*/function () {
@@ -7875,7 +7874,7 @@
   }
 
   exports.ChattyChat = Chat;
-  exports.ChattyLog = Chatlog;
+  exports.ChattyLog = ChatList;
   exports.ChattyTypes = type;
   exports["default"] = Chatty;
 

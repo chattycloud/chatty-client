@@ -77,8 +77,7 @@ export interface iApp {
   enableVideoUpload: boolean;
   chatCapacity: number;
   chatPageLimit: number;
-  chatlogPageLimit: number;
-  chatListPageLimit: number; // will be deprecated
+  chatListPageLimit: number;
   thumbnailSize: number;
   notificationSound: string;
   maxImageSize: number;
@@ -123,8 +122,7 @@ export interface iChat {
   lastMessage: iMessage | null;
   data: any | null;
   distinctKey: string | null;
-  chatlog: string;
-  group: string; // will be deprecated
+  group: string;
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date | null;
@@ -271,7 +269,7 @@ export interface iExitPayload {
 
 export interface iConnectChatPayload {
   /**
-   * Required in case of navigating from Chatlog
+   * Required in case of navigating from ChatList
    * It should be a chat id
    */
   at?: string;
@@ -292,17 +290,10 @@ export interface iConnectChatPayload {
   distinctKey?: string;
 
   /**
-   * @deprecated
    * Group name for grouping(filtering) chat
    * Used only when creating a new chat
    */
   group?: string;
-
-  /**
-   * Chatlog name
-   * Used only when creating a new chat
-   */
-  chatlog?: string;
 
   /**
    * Chat name
@@ -328,8 +319,7 @@ export interface iCreateChatPayload {
   distinctKey?: string;
   name?: string;
   image?: string;
-  group?: string; // will be deprecated
-  chatlog?: string;
+  group?: string;
   data?: any;
   Members?: Array<string>;
   adminMessage?: {
@@ -343,8 +333,7 @@ export interface iUpdateChatPayload {
   distinctKey?: string;
   name?: string;
   image?: string;
-  group?: string; // will be deprecated
-  chatlog?: string;
+  group?: string;
   data?: any;
   Members?: Array<string>;
   adminMessage?: {
@@ -357,8 +346,7 @@ export interface iCreateAdminMessagePayload {
   distinctKey: string;
   name?: string;
   image?: string;
-  group?: string; // will be deprecated
-  chatlog?: string;
+  group?: string;
   data?: any;
   Members?: Array<string>;
   adminMessage?: {
@@ -373,14 +361,13 @@ export interface iMembersFilter {
 }
 
 export interface iChatsFilter {
-  group?: string; // will be deprecated
-  chatlog?: string;
+  group?: string;
   MemberId?: string; // if MemberId is specified, get chats only MemberId included. if not, get all chats created
 }
 
-export interface iChatlogConstructorParams {
+export interface iChatListConstructorParams {
   filter: iChatsFilter;
-  onChatlogConnect?: onChatlogConnect;
+  onChatListConnect?: onChatListConnect;
   onChatsFetch?: onChatsFetch;
   onChatRefresh?: onChatRefresh;
   onChatLeave?: onChatLeave;
@@ -394,7 +381,7 @@ export interface iFetchChatsPayload {
   refresh?: boolean;
 
   /**
-   * To filter chats , by chatlog, by MemberId
+   * To filter by group, by MemberId
    */
   filter?: iChatsFilter;
 }
@@ -418,9 +405,9 @@ export interface iMissedCount {
   /** total missedCount */
   total: number;
 
-  /** missedCount by chatlog name */
+  /** missedCount by group name */
   group: Array<{ name: string; count: number }>;
-  byChatlog: Array<{ name: string, count: number }>,
+  byGroup: Array<{ name: string, count: number }>,
 
   /** missedCount of all individual chat */
   chat: Array<{ id: string; count: number }>;
@@ -431,7 +418,12 @@ export interface iMissedCount {
 export type ErrorResponseType = { message: string };
 
 /** Chat Handler ResponseType*/
-export type onChatConnectResponseType = { chat?: iChat } & {
+export type onChatConnectResponseType = {
+  chat?: iChat,
+  refresh?: boolean;
+  hasNext?: boolean;
+  messages?: Array<iMessage>;
+} & {
   error?: ErrorResponseType;
 };
 export type onChatDisconnectResponseType = {} & { error?: ErrorResponseType };
@@ -456,11 +448,14 @@ export type onMessagesUpdateResponseType = { messages?: Array<iMessage> } & {
   error?: ErrorResponseType;
 };
 
-/** Chatlog Handler ResponseType */
-export type onChatlogConnectResponseType = { socketId?: string } & {
-  error?: ErrorResponseType;
-};
-export type onChatlogDisconnectResponseType = {} & {
+/** ChatList Handler ResponseType */
+export type onChatListConnectResponseType = {
+  refresh?: boolean;
+  hasNext?: boolean;
+  chats?: Array<iChat>;
+} & { error?: ErrorResponseType };
+
+export type onChatListDisconnectResponseType = {} & {
   error?: ErrorResponseType;
 };
 export type onChatsFetchResponseType = {
@@ -476,11 +471,11 @@ export type onMessageSend = (data: onMessageSendResponseType) => void;
 export type onMessageReceive = (data: onMessageReceiveResponseType) => void;
 export type onMessagesUpdate = (data: onMessagesUpdateResponseType) => void;
 
-/** Chatlog Handlers */
-export type onChatlogConnect = (data: onChatlogConnectResponseType) => void;
+/** ChatList Handlers */
+export type onChatListConnect = (data: onChatListConnectResponseType) => void;
 export type onChatsFetch = (data: onChatsFetchResponseType) => void;
 
-/** Chat & Chatlog Handlers */
+/** Chat & ChatList Handlers */
 export type onChatRefresh = (data: onChatRefreshResponseType) => void;
 export type onChatLeave = (data: onChatLeaveResponseType) => void;
 

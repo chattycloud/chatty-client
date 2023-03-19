@@ -15,7 +15,7 @@ import {
 } from "./type";
 import axios, { AxiosInstance } from "axios";
 import { Chat } from "./chat";
-import { Chatlog } from "./chatlog";
+import { ChatList } from "./chatlist";
 
 
 class Chatty {
@@ -460,5 +460,5 @@ function configAxios(ApiKey?: string) {
 }
 
 export default Chatty;
-export { Chat as ChattyChat, Chatlog as ChattyLog };
+export { Chat as ChattyChat, ChatList as ChattyLog };
 export * as ChattyTypes from "./type";

@@ -4,11 +4,11 @@ import {
   eChattyEvent,
   iFetchChatsPayload,
   onChatsFetchResponseType,
-  onChatlogConnectResponseType,
-  onChatlogConnect,
+  onChatListConnectResponseType,
+  onChatListConnect,
   onChatsFetch,
   ErrorResponseType,
-  iChatlogConstructorParams,
+  iChatListConstructorParams,
   iChatsFilter,
   onChatRefreshResponseType,
   onChatRefresh,
@@ -16,7 +16,7 @@ import {
   onChatLeaveResponseType,
 } from "./type";
 
-export class Chatlog {
+export class ChatList {
   private socket: Socket | undefined;
 
   /**
@@ -24,21 +24,21 @@ export class Chatlog {
    */
   private filter: iChatsFilter | undefined;
 
-  private onChatlogConnect: onChatlogConnect | undefined;
+  private onChatListConnect: onChatListConnect | undefined;
   private onChatsFetch: onChatsFetch | undefined;
   private onChatRefresh: onChatRefresh | undefined;
   private onChatLeave: onChatLeave | undefined;
 
-  constructor(payload: iChatlogConstructorParams) {
+  constructor(payload: iChatListConstructorParams) {
     this.filter = payload.filter;
-    this.onChatlogConnect = payload.onChatlogConnect;
+    this.onChatListConnect = payload.onChatListConnect;
     this.onChatsFetch = payload.onChatsFetch;
     this.onChatRefresh = payload.onChatRefresh;
     this.onChatLeave = payload.onChatLeave;
   }
 
   connect() {
-    this.socket = io(process.env.SOCKET_URL + `/chatlog.${Chatty.app?.name}`, {
+    this.socket = io(process.env.SOCKET_URL + `/chatlist.${Chatty.app?.name}`, {
       // transports: ["polling", "websocket"],
       transports: ["websocket"],
       query: {
@@ -57,7 +57,7 @@ export class Chatlog {
   disconnect() {
     this.socket?.disconnect();
     this.removeListener();
-    console.debug(":: Chatlog disconnected");
+    console.debug(":: ChatList disconnected");
   }
 
   fetchChats(payload: iFetchChatsPayload) {
@@ -74,42 +74,42 @@ export class Chatlog {
 
   private addListener() {
     if (!this.socket) {
-      console.warn(":: Chatlog socket is not connected");
+      console.warn(":: ChatList socket is not connected");
       return;
     }
 
     this.socket.on(
       eChattyEvent.CONNECT_DONE,
-      (data: onChatlogConnectResponseType) => {
-        console.debug(":: Chatlog CONNECT_DONE", data);
-        this.onChatlogConnect && this.onChatlogConnect(data);
+      (data: onChatListConnectResponseType) => {
+        console.debug(":: ChatList CONNECT_DONE", data);
+        this.onChatListConnect && this.onChatListConnect(data);
 
-        this.fetchChats({ refresh: true });
+        // this.fetchChats({ refresh: true }); // server에서 connect와 동시에 fetch가 이루어짐
       }
     );
 
     this.socket.on(eChattyEvent.CONNECT_FAIL, (error: ErrorResponseType) => {
-      console.warn(":: Chatlog CONNECT_FAIL", error.message);
-      this.onChatlogConnect && this.onChatlogConnect({ error });
+      console.warn(":: ChatList CONNECT_FAIL", error.message);
+      this.onChatListConnect && this.onChatListConnect({ error });
     });
 
     this.socket.on(
       eChattyEvent.FETCH_CHATS_DONE,
       (data: onChatsFetchResponseType) => {
-        console.debug(":: Chatlog FETCH_CHATS_DONE", data);
+        console.debug(":: ChatList FETCH_CHATS_DONE", data);
         this.onChatsFetch && this.onChatsFetch(data);
       }
     );
 
     this.socket.on(eChattyEvent.FETCH_CHATS_FAIL, (error: ErrorResponseType) => {
-      console.warn(":: Chatlog FETCH_CHATS_FAIL", error.message);
+      console.warn(":: ChatList FETCH_CHATS_FAIL", error.message);
       this.onChatsFetch && this.onChatsFetch({ error });
     });
 
     this.socket.on(
       eChattyEvent.REFRESH_CHAT_DONE,
       (data: onChatRefreshResponseType) => {
-        console.debug(`:: Chatlog REFRESH_CHAT_DONE`, data);
+        console.debug(`:: ChatList REFRESH_CHAT_DONE`, data);
         this.onChatRefresh && this.onChatRefresh(data);
       }
     );
@@ -117,7 +117,7 @@ export class Chatlog {
     this.socket.on(
       eChattyEvent.REFRESH_CHAT_FAIL,
       (error: ErrorResponseType) => {
-        console.warn(":: Chatlog REFRESH_CHAT_FAIL", error.message);
+        console.warn(":: ChatList REFRESH_CHAT_FAIL", error.message);
         this.onChatRefresh && this.onChatRefresh({ error });
       }
     );
@@ -125,20 +125,20 @@ export class Chatlog {
     this.socket.on(
       eChattyEvent.LEAVE_CHAT_DONE,
       (data: onChatLeaveResponseType) => {
-        console.debug(`:: Chatlog LEAVE_CHAT_DONE`, data);
+        console.debug(`:: ChatList LEAVE_CHAT_DONE`, data);
         this.onChatLeave && this.onChatLeave(data);
       }
     );
 
     this.socket.on(eChattyEvent.LEAVE_CHAT_FAIL, (error: ErrorResponseType) => {
-      console.warn(":: Chatlog LEAVE_CHAT_FAIL", error.message);
+      console.warn(":: ChatList LEAVE_CHAT_FAIL", error.message);
       this.onChatLeave && this.onChatLeave({ error });
     });
   }
 
   private removeListener() {
     if (!this.socket) {
-      console.warn(":: Chatlog socket is not connected");
+      console.warn(":: ChatList socket is not connected");
       return;
     }
 
