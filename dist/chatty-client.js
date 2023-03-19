@@ -7875,7 +7875,7 @@
   }
 
   exports.ChattyChat = Chat;
-  exports.ChattyList = Chatlog;
+  exports.ChattyLog = Chatlog;
   exports.ChattyTypes = type;
   exports["default"] = Chatty;
 
