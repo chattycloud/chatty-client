@@ -460,5 +460,5 @@ function configAxios(ApiKey?: string) {
 }
 
 export default Chatty;
-export { Chat as ChattyChat, ChatList as ChattyLog };
+export { Chat as ChattyChat, ChatList as ChattyList };
 export * as ChattyTypes from "./type";
