@@ -4,11 +4,11 @@ import {
   eChattyEvent,
   iFetchChatsPayload,
   onChatsFetchResponseType,
-  onChannelConnectResponseType,
-  onChannelConnect,
+  onChatlogConnectResponseType,
+  onChatlogConnect,
   onChatsFetch,
   ErrorResponseType,
-  iChannelConstructorParams,
+  iChatlogConstructorParams,
   iChatsFilter,
   onChatRefreshResponseType,
   onChatRefresh,
@@ -16,7 +16,7 @@ import {
   onChatLeaveResponseType,
 } from "./type";
 
-export class Channel {
+export class Chatlog {
   private socket: Socket | undefined;
 
   /**
@@ -24,21 +24,21 @@ export class Channel {
    */
   private filter: iChatsFilter | undefined;
 
-  private onChannelConnect: onChannelConnect | undefined;
+  private onChatlogConnect: onChatlogConnect | undefined;
   private onChatsFetch: onChatsFetch | undefined;
   private onChatRefresh: onChatRefresh | undefined;
   private onChatLeave: onChatLeave | undefined;
 
-  constructor(payload: iChannelConstructorParams) {
+  constructor(payload: iChatlogConstructorParams) {
     this.filter = payload.filter;
-    this.onChannelConnect = payload.onChannelConnect;
+    this.onChatlogConnect = payload.onChatlogConnect;
     this.onChatsFetch = payload.onChatsFetch;
     this.onChatRefresh = payload.onChatRefresh;
     this.onChatLeave = payload.onChatLeave;
   }
 
   connect() {
-    this.socket = io(process.env.SOCKET_URL + `/channel.${Chatty.app?.name}`, {
+    this.socket = io(process.env.SOCKET_URL + `/chatlog.${Chatty.app?.name}`, {
       // transports: ["polling", "websocket"],
       transports: ["websocket"],
       query: {
@@ -57,7 +57,7 @@ export class Channel {
   disconnect() {
     this.socket?.disconnect();
     this.removeListener();
-    console.debug(":: Channel disconnected");
+    console.debug(":: Chatlog disconnected");
   }
 
   fetchChats(payload: iFetchChatsPayload) {
@@ -74,42 +74,42 @@ export class Channel {
 
   private addListener() {
     if (!this.socket) {
-      console.warn(":: Channel socket is not connected");
+      console.warn(":: Chatlog socket is not connected");
       return;
     }
 
     this.socket.on(
       eChattyEvent.CONNECT_DONE,
-      (data: onChannelConnectResponseType) => {
-        console.debug(":: Channel CONNECT_DONE", data);
-        this.onChannelConnect && this.onChannelConnect(data);
+      (data: onChatlogConnectResponseType) => {
+        console.debug(":: Chatlog CONNECT_DONE", data);
+        this.onChatlogConnect && this.onChatlogConnect(data);
 
         this.fetchChats({ refresh: true });
       }
     );
 
     this.socket.on(eChattyEvent.CONNECT_FAIL, (error: ErrorResponseType) => {
-      console.warn(":: Channel CONNECT_FAIL", error.message);
-      this.onChannelConnect && this.onChannelConnect({ error });
+      console.warn(":: Chatlog CONNECT_FAIL", error.message);
+      this.onChatlogConnect && this.onChatlogConnect({ error });
     });
 
     this.socket.on(
       eChattyEvent.FETCH_CHATS_DONE,
       (data: onChatsFetchResponseType) => {
-        console.debug(":: Channel FETCH_CHATS_DONE", data);
+        console.debug(":: Chatlog FETCH_CHATS_DONE", data);
         this.onChatsFetch && this.onChatsFetch(data);
       }
     );
 
     this.socket.on(eChattyEvent.FETCH_CHATS_FAIL, (error: ErrorResponseType) => {
-      console.warn(":: Channel FETCH_CHATS_FAIL", error.message);
+      console.warn(":: Chatlog FETCH_CHATS_FAIL", error.message);
       this.onChatsFetch && this.onChatsFetch({ error });
     });
 
     this.socket.on(
       eChattyEvent.REFRESH_CHAT_DONE,
       (data: onChatRefreshResponseType) => {
-        console.debug(`:: Channel REFRESH_CHAT_DONE`, data);
+        console.debug(`:: Chatlog REFRESH_CHAT_DONE`, data);
         this.onChatRefresh && this.onChatRefresh(data);
       }
     );
@@ -117,7 +117,7 @@ export class Channel {
     this.socket.on(
       eChattyEvent.REFRESH_CHAT_FAIL,
       (error: ErrorResponseType) => {
-        console.warn(":: Channel REFRESH_CHAT_FAIL", error.message);
+        console.warn(":: Chatlog REFRESH_CHAT_FAIL", error.message);
         this.onChatRefresh && this.onChatRefresh({ error });
       }
     );
@@ -125,20 +125,20 @@ export class Channel {
     this.socket.on(
       eChattyEvent.LEAVE_CHAT_DONE,
       (data: onChatLeaveResponseType) => {
-        console.debug(`:: Channel LEAVE_CHAT_DONE`, data);
+        console.debug(`:: Chatlog LEAVE_CHAT_DONE`, data);
         this.onChatLeave && this.onChatLeave(data);
       }
     );
 
     this.socket.on(eChattyEvent.LEAVE_CHAT_FAIL, (error: ErrorResponseType) => {
-      console.warn(":: Channel LEAVE_CHAT_FAIL", error.message);
+      console.warn(":: Chatlog LEAVE_CHAT_FAIL", error.message);
       this.onChatLeave && this.onChatLeave({ error });
     });
   }
 
   private removeListener() {
     if (!this.socket) {
-      console.warn(":: Channel socket is not connected");
+      console.warn(":: Chatlog socket is not connected");
       return;
     }
 

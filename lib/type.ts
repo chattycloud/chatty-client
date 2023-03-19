@@ -77,7 +77,7 @@ export interface iApp {
   enableVideoUpload: boolean;
   chatCapacity: number;
   chatPageLimit: number;
-  channelPageLimit: number;
+  chatlogPageLimit: number;
   chatListPageLimit: number; // will be deprecated
   thumbnailSize: number;
   notificationSound: string;
@@ -123,7 +123,7 @@ export interface iChat {
   lastMessage: iMessage | null;
   data: any | null;
   distinctKey: string | null;
-  channel: string;
+  chatlog: string;
   group: string; // will be deprecated
   createdAt: Date;
   updatedAt: Date;
@@ -271,7 +271,7 @@ export interface iExitPayload {
 
 export interface iConnectChatPayload {
   /**
-   * Required in case of navigating from Channel
+   * Required in case of navigating from Chatlog
    * It should be a chat id
    */
   at?: string;
@@ -299,10 +299,10 @@ export interface iConnectChatPayload {
   group?: string;
 
   /**
-   * Channel name
+   * Chatlog name
    * Used only when creating a new chat
    */
-  channel?: string;
+  chatlog?: string;
 
   /**
    * Chat name
@@ -329,7 +329,7 @@ export interface iCreateChatPayload {
   name?: string;
   image?: string;
   group?: string; // will be deprecated
-  channel?: string;
+  chatlog?: string;
   data?: any;
   Members?: Array<string>;
   adminMessage?: {
@@ -344,7 +344,7 @@ export interface iUpdateChatPayload {
   name?: string;
   image?: string;
   group?: string; // will be deprecated
-  channel?: string;
+  chatlog?: string;
   data?: any;
   Members?: Array<string>;
   adminMessage?: {
@@ -358,7 +358,7 @@ export interface iCreateAdminMessagePayload {
   name?: string;
   image?: string;
   group?: string; // will be deprecated
-  channel?: string;
+  chatlog?: string;
   data?: any;
   Members?: Array<string>;
   adminMessage?: {
@@ -374,13 +374,13 @@ export interface iMembersFilter {
 
 export interface iChatsFilter {
   group?: string; // will be deprecated
-  channel?: string;
+  chatlog?: string;
   MemberId?: string; // if MemberId is specified, get chats only MemberId included. if not, get all chats created
 }
 
-export interface iChannelConstructorParams {
+export interface iChatlogConstructorParams {
   filter: iChatsFilter;
-  onChannelConnect?: onChannelConnect;
+  onChatlogConnect?: onChatlogConnect;
   onChatsFetch?: onChatsFetch;
   onChatRefresh?: onChatRefresh;
   onChatLeave?: onChatLeave;
@@ -394,7 +394,7 @@ export interface iFetchChatsPayload {
   refresh?: boolean;
 
   /**
-   * To filter chats , by channel, by MemberId
+   * To filter chats , by chatlog, by MemberId
    */
   filter?: iChatsFilter;
 }
@@ -418,9 +418,9 @@ export interface iMissedCount {
   /** total missedCount */
   total: number;
 
-  /** missedCount by channel name */
+  /** missedCount by chatlog name */
   group: Array<{ name: string; count: number }>;
-  byChannel: Array<{ name: string, count: number }>,
+  byChatlog: Array<{ name: string, count: number }>,
 
   /** missedCount of all individual chat */
   chat: Array<{ id: string; count: number }>;
@@ -456,11 +456,11 @@ export type onMessagesUpdateResponseType = { messages?: Array<iMessage> } & {
   error?: ErrorResponseType;
 };
 
-/** Channel Handler ResponseType */
-export type onChannelConnectResponseType = { socketId?: string } & {
+/** Chatlog Handler ResponseType */
+export type onChatlogConnectResponseType = { socketId?: string } & {
   error?: ErrorResponseType;
 };
-export type onChannelDisconnectResponseType = {} & {
+export type onChatlogDisconnectResponseType = {} & {
   error?: ErrorResponseType;
 };
 export type onChatsFetchResponseType = {
@@ -476,11 +476,11 @@ export type onMessageSend = (data: onMessageSendResponseType) => void;
 export type onMessageReceive = (data: onMessageReceiveResponseType) => void;
 export type onMessagesUpdate = (data: onMessagesUpdateResponseType) => void;
 
-/** Channel Handlers */
-export type onChannelConnect = (data: onChannelConnectResponseType) => void;
+/** Chatlog Handlers */
+export type onChatlogConnect = (data: onChatlogConnectResponseType) => void;
 export type onChatsFetch = (data: onChatsFetchResponseType) => void;
 
-/** Chat & Channel Handlers */
+/** Chat & Chatlog Handlers */
 export type onChatRefresh = (data: onChatRefreshResponseType) => void;
 export type onChatLeave = (data: onChatLeaveResponseType) => void;
 

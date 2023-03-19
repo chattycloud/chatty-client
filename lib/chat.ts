@@ -1,7 +1,7 @@
 import axios from "axios";
 import io, { Socket } from "socket.io-client";
 import Chatty from ".";
-import { Channel } from "./channel";
+import { Chatlog } from "./chatlog";
 import FormData from "form-data";
 import {
   iApp,
@@ -32,7 +32,7 @@ import {
 } from "./type";
 
 export type ChatParams = {
-  channel?: Channel;
+  chatlog?: Chatlog;
   onChatConnect?: onChatConnect;
   onChatRefresh?: onChatRefresh;
   onChatLeave?: onChatLeave;
@@ -44,7 +44,7 @@ export type ChatParams = {
 
 export class Chat {
   private socket: Socket | undefined;
-  private channel: Channel | undefined;
+  private chatlog: Chatlog | undefined;
   private id: string | undefined; // connected chat id
 
   private onChatConnect: onChatConnect | undefined;
@@ -56,7 +56,7 @@ export class Chat {
   private onMessagesUpdate: onMessagesUpdate | undefined;
 
   constructor(payload: ChatParams) {
-    this.channel = payload.channel;
+    this.chatlog = payload.chatlog;
     this.onChatConnect = payload.onChatConnect;
     this.onChatRefresh = payload.onChatRefresh;
     this.onChatLeave = payload.onChatLeave;
@@ -381,9 +381,9 @@ export class Chat {
         console.debug(":: ChattyChat SEND_MESSAGE_DONE", data);
         this.onMessageSend && this.onMessageSend(data);
 
-        // 내가 메시지를 보낸게 성공하면 Channel 에서 REFRESH_CHAT 해야한다.
-        if (this.channel && this.id) {
-          this.channel.refreshChat(this.id);
+        // 내가 메시지를 보낸게 성공하면 Chatlog 에서 REFRESH_CHAT 해야한다.
+        if (this.chatlog && this.id) {
+          this.chatlog.refreshChat(this.id);
         }
       }
     );
@@ -419,9 +419,9 @@ export class Chat {
       (data: { ChatId: string }) => {
         console.debug(":: ChattyChat MARK_AS_READ_DONE", data);
 
-        // Channel 로부터 왔다면 REFRESH_CHAT 해야한다
-        if (this.channel && this.id) {
-          this.channel.refreshChat(this.id);
+        // Chatlog 로부터 왔다면 REFRESH_CHAT 해야한다
+        if (this.chatlog && this.id) {
+          this.chatlog.refreshChat(this.id);
         }
       }
     );
@@ -528,7 +528,7 @@ export class Chat {
     this.socket.off(eChattyEvent.DELETE_MESSAGE_FAIL);
 
     this.socket = undefined;
-    this.channel = undefined;
+    this.chatlog = undefined;
     this.id = undefined;
   }
 }
