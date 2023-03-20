@@ -357,11 +357,13 @@ export interface iCreateAdminMessagePayload {
 
 export interface iMembersFilter {
   group?: string;
+  keyword?: string; // keyword for searching member name
   ChatId?: string;
 }
 
 export interface iChatsFilter {
   group?: string;
+  keyword?: string; // keyword for searching chat name
   MemberId?: string; // if MemberId is specified, get chats only MemberId included. if not, get all chats created
 }
 

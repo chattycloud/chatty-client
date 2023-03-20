@@ -12,6 +12,7 @@ import {
   iCreateChatPayload,
   iUpdateChatPayload,
   iCreateAdminMessagePayload,
+  iChatsFilter,
 } from "./type";
 import axios, { AxiosInstance } from "axios";
 import { Chat } from "./chat";
@@ -121,6 +122,27 @@ class Chatty {
 \___/_/ /_/\__,_/\__/____/  
                             
    */
+
+  /**
+   * @description Get chats
+   * @param {number} page
+   * @param {iChatsFilter} filter
+   * @returns {Promise<iChat[]>}
+   */
+  static async getChats(page: number, filter?: iChatsFilter): Promise<iChat[]> {
+    if (!this.axiosInstance || !this.app || !this.member) {
+      console.warn(":: ChattyClient was not initailized");
+      return [];
+    }
+
+    return await this.axiosInstance.get("/chats", { params: { AppId: this.app.id, page: page, MemberId: filter.MemberId, group: filter.group, keyword: filter.keyword } })
+      .then((res) => Promise.resolve(res.data))
+      .catch((message) =>
+        Promise.reject({
+          message: ":: ChattyClient getChats error - " + message,
+        })
+      );
+  }
 
   /**
    * @description Create new chat
