@@ -12,7 +12,9 @@
     "build.dev": "NODE_ENV=dev rollup -c support/rollup.config.umd.js && NODE_ENV=dev rollup -c support/rollup.config.esm.js",
     "prettier": "prettier --check \"lib/**/*.ts\" \"support/**/*.js\"",
     "prettier.fix": "prettier --write \"lib/**/*.ts\" \"support/**/*.js\"",
-    "prepack": "npm run compile"
+    "prepack": "npm run compile",
+    "pack": "npm pack",
+    "postpack": "mv ./chatty-client-v1.2.0.tgz ../../freak/freak-app/chatty-client-v1.2.0.tgz"
   },
   "repository": {
     "type": "git",
