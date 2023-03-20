@@ -131,17 +131,14 @@ class Chatty {
    */
   static async getChats(page: number, filter?: iChatsFilter): Promise<iChat[]> {
     if (!this.axiosInstance || !this.app || !this.member) {
-      console.warn(":: ChattyClient was not initailized");
-      return [];
+      // console.warn(":: ChattyClient was not initailized");
+      Promise.reject({
+        message: ":: ChattyClient getChats error - ChattyClient was not initailized",
+      })
     }
 
-    return await this.axiosInstance.get("/chats", { params: { AppId: this.app.id, page: page, MemberId: filter.MemberId, group: filter.group, keyword: filter.keyword } })
-      .then((res) => Promise.resolve(res.data))
-      .catch((message) =>
-        Promise.reject({
-          message: ":: ChattyClient getChats error - " + message,
-        })
-      );
+    const { data } = await this.axiosInstance.get("/chats", { params: { AppId: this.app.id, page: page, MemberId: filter.MemberId, group: filter.group, keyword: filter.keyword } });
+    return data;
   }
 
   /**
