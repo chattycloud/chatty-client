@@ -1,6 +1,6 @@
 /*!
  * ChattyClient v1.2.0
- * Build at 2023.3.20
+ * Build at 2023.3.22
  * Released under the MIT License.
  */
 (function (global, factory) {
@@ -6743,6 +6743,14 @@
         // return temporary message object before inserting to database
         delete message["SenderId"];
         return _objectSpread2(_objectSpread2({}, message), {}, {
+          files: [],
+          json: null,
+          translation: null,
+          readReceipt: 0,
+          updatedAt: new Date(),
+          deletedAt: null,
+          AppId: Chatty.app.id,
+          ChatId: this.id,
           Sender: Chatty.member
         });
       }
@@ -6787,6 +6795,13 @@
         // return temporary message object with SenderId before inserting to database
         delete message["SenderId"];
         return _objectSpread2(_objectSpread2({}, message), {}, {
+          json: null,
+          translation: null,
+          readReceipt: 0,
+          updatedAt: new Date(),
+          deletedAt: null,
+          AppId: Chatty.app.id,
+          ChatId: this.id,
           Sender: Chatty.member
         });
       }
@@ -7387,6 +7402,51 @@
                                 
        */
       /**
+       * @description Get chats
+       * @param {number} page
+       * @param {iChatsFilter} filter
+       * @returns {Promise<iChat[]>}
+       */
+    }, {
+      key: "getChats",
+      value: function () {
+        var _getChats = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4(page, filter) {
+          var _yield$this$axiosInst, data;
+          return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+            while (1) switch (_context4.prev = _context4.next) {
+              case 0:
+                if (!this.axiosInstance || !this.app || !this.member) {
+                  // console.warn(":: ChattyClient was not initailized");
+                  Promise.reject({
+                    message: ":: ChattyClient getChats error - ChattyClient was not initailized"
+                  });
+                }
+                _context4.next = 3;
+                return this.axiosInstance.get("/chats", {
+                  params: {
+                    AppId: this.app.id,
+                    page: page,
+                    MemberId: filter.MemberId,
+                    group: filter.group,
+                    keyword: filter.keyword
+                  }
+                });
+              case 3:
+                _yield$this$axiosInst = _context4.sent;
+                data = _yield$this$axiosInst.data;
+                return _context4.abrupt("return", data);
+              case 6:
+              case "end":
+                return _context4.stop();
+            }
+          }, _callee4, this);
+        }));
+        function getChats(_x3, _x4) {
+          return _getChats.apply(this, arguments);
+        }
+        return getChats;
+      }()
+      /**
        * @description Create new chat
        * @param {iCreateChatPayload} payload
        * @returns {Promise<iChat>}
@@ -7394,29 +7454,29 @@
     }, {
       key: "createChat",
       value: function () {
-        var _createChat = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4(payload) {
+        var _createChat = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5(payload) {
           var _this = this;
           var _a, _b, _c, adminMessage;
-          return _regeneratorRuntime().wrap(function _callee4$(_context4) {
-            while (1) switch (_context4.prev = _context4.next) {
+          return _regeneratorRuntime().wrap(function _callee5$(_context5) {
+            while (1) switch (_context5.prev = _context5.next) {
               case 0:
                 if (!(!this.axiosInstance || !this.app)) {
-                  _context4.next = 3;
+                  _context5.next = 3;
                   break;
                 }
                 console.warn(":: ChattyClient was not initailized");
-                return _context4.abrupt("return");
+                return _context5.abrupt("return");
               case 3:
                 if (!(payload.Members && payload.Members.length > this.app.chatCapacity)) {
-                  _context4.next = 6;
+                  _context5.next = 6;
                   break;
                 }
                 console.warn(":: ChattyClient createChat error - Maximum chat member count exceeded");
-                return _context4.abrupt("return");
+                return _context5.abrupt("return");
               case 6:
                 adminMessage = payload.adminMessage;
                 delete payload["adminMessage"];
-                _context4.next = 10;
+                _context5.next = 10;
                 return this.axiosInstance.post("/chats", _objectSpread2(_objectSpread2({}, payload), {}, {
                   image: payload.image ? {
                     uri: payload.image
@@ -7442,14 +7502,14 @@
                   });
                 });
               case 10:
-                return _context4.abrupt("return", _context4.sent);
+                return _context5.abrupt("return", _context5.sent);
               case 11:
               case "end":
-                return _context4.stop();
+                return _context5.stop();
             }
-          }, _callee4, this);
+          }, _callee5, this);
         }));
-        function createChat(_x3) {
+        function createChat(_x5) {
           return _createChat.apply(this, arguments);
         }
         return createChat;
@@ -7462,29 +7522,29 @@
     }, {
       key: "updateChat",
       value: function () {
-        var _updateChat = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5(payload) {
+        var _updateChat = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee6(payload) {
           var _this2 = this;
           var _a, _b, _c, adminMessage;
-          return _regeneratorRuntime().wrap(function _callee5$(_context5) {
-            while (1) switch (_context5.prev = _context5.next) {
+          return _regeneratorRuntime().wrap(function _callee6$(_context6) {
+            while (1) switch (_context6.prev = _context6.next) {
               case 0:
                 if (!(!this.axiosInstance || !this.app)) {
-                  _context5.next = 3;
+                  _context6.next = 3;
                   break;
                 }
                 console.warn(":: ChattyClient was not initailized");
-                return _context5.abrupt("return");
+                return _context6.abrupt("return");
               case 3:
                 if (!(payload.Members && payload.Members.length > this.app.chatCapacity)) {
-                  _context5.next = 6;
+                  _context6.next = 6;
                   break;
                 }
                 console.warn(":: ChattyClient updateChat error - Maximum chat member count exceeded");
-                return _context5.abrupt("return");
+                return _context6.abrupt("return");
               case 6:
                 adminMessage = payload.adminMessage;
                 delete payload["adminMessage"];
-                _context5.next = 10;
+                _context6.next = 10;
                 return this.axiosInstance.put("/chats", _objectSpread2(_objectSpread2({}, payload), {}, {
                   image: payload.image ? {
                     uri: payload.image
@@ -7510,14 +7570,14 @@
                   });
                 });
               case 10:
-                return _context5.abrupt("return", _context5.sent);
+                return _context6.abrupt("return", _context6.sent);
               case 11:
               case "end":
-                return _context5.stop();
+                return _context6.stop();
             }
-          }, _callee5, this);
+          }, _callee6, this);
         }));
-        function updateChat(_x4) {
+        function updateChat(_x6) {
           return _updateChat.apply(this, arguments);
         }
         return updateChat;
@@ -7538,29 +7598,29 @@
     }, {
       key: "createAdminMessage",
       value: function () {
-        var _createAdminMessage = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee6(payload) {
+        var _createAdminMessage = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee7(payload) {
           var _this3 = this;
           var _a, _b, _c, adminMessage;
-          return _regeneratorRuntime().wrap(function _callee6$(_context6) {
-            while (1) switch (_context6.prev = _context6.next) {
+          return _regeneratorRuntime().wrap(function _callee7$(_context7) {
+            while (1) switch (_context7.prev = _context7.next) {
               case 0:
                 if (!(!this.axiosInstance || !this.app)) {
-                  _context6.next = 3;
+                  _context7.next = 3;
                   break;
                 }
                 console.warn(":: ChattyClient was not initailized");
-                return _context6.abrupt("return");
+                return _context7.abrupt("return");
               case 3:
                 if (!(payload.Members && payload.Members.length > this.app.chatCapacity)) {
-                  _context6.next = 6;
+                  _context7.next = 6;
                   break;
                 }
                 console.warn(":: ChattyClient createAdminMessage error - Maximum chat member count exceeded");
-                return _context6.abrupt("return");
+                return _context7.abrupt("return");
               case 6:
                 adminMessage = payload.adminMessage;
                 delete payload["adminMessage"];
-                _context6.next = 10;
+                _context7.next = 10;
                 return this.axiosInstance.post("/messages", _objectSpread2(_objectSpread2({}, payload), {}, {
                   image: payload.image ? {
                     uri: payload.image
@@ -7586,14 +7646,14 @@
                   });
                 });
               case 10:
-                return _context6.abrupt("return", _context6.sent);
+                return _context7.abrupt("return", _context7.sent);
               case 11:
               case "end":
-                return _context6.stop();
+                return _context7.stop();
             }
-          }, _callee6, this);
+          }, _callee7, this);
         }));
-        function createAdminMessage(_x5) {
+        function createAdminMessage(_x7) {
           return _createAdminMessage.apply(this, arguments);
         }
         return createAdminMessage;
@@ -7615,18 +7675,18 @@
     }, {
       key: "getMembers",
       value: function () {
-        var _getMembers = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee7(filter) {
-          return _regeneratorRuntime().wrap(function _callee7$(_context7) {
-            while (1) switch (_context7.prev = _context7.next) {
+        var _getMembers = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee8(filter) {
+          return _regeneratorRuntime().wrap(function _callee8$(_context8) {
+            while (1) switch (_context8.prev = _context8.next) {
               case 0:
                 if (!(!this.axiosInstance || !this.app)) {
-                  _context7.next = 3;
+                  _context8.next = 3;
                   break;
                 }
                 console.warn(":: ChattyClient was not initailized");
-                return _context7.abrupt("return");
+                return _context8.abrupt("return");
               case 3:
-                _context7.next = 5;
+                _context8.next = 5;
                 return this.axiosInstance.get("/members", {
                   params: {
                     AppId: this.app.id,
@@ -7641,14 +7701,14 @@
                   });
                 });
               case 5:
-                return _context7.abrupt("return", _context7.sent);
+                return _context8.abrupt("return", _context8.sent);
               case 6:
               case "end":
-                return _context7.stop();
+                return _context8.stop();
             }
-          }, _callee7, this);
+          }, _callee8, this);
         }));
-        function getMembers(_x6) {
+        function getMembers(_x8) {
           return _getMembers.apply(this, arguments);
         }
         return getMembers;
@@ -7656,18 +7716,18 @@
     }, {
       key: "upsertMember",
       value: function () {
-        var _upsertMember = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee8(member) {
-          return _regeneratorRuntime().wrap(function _callee8$(_context8) {
-            while (1) switch (_context8.prev = _context8.next) {
+        var _upsertMember = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee9(member) {
+          return _regeneratorRuntime().wrap(function _callee9$(_context9) {
+            while (1) switch (_context9.prev = _context9.next) {
               case 0:
                 if (this.axiosInstance) {
-                  _context8.next = 3;
+                  _context9.next = 3;
                   break;
                 }
                 console.warn(":: ChattyClient was not initailized");
-                return _context8.abrupt("return");
+                return _context9.abrupt("return");
               case 3:
-                _context8.next = 5;
+                _context9.next = 5;
                 return this.axiosInstance.put("/members", member).then(function (res) {
                   return Promise.resolve(res.data);
                 })["catch"](function (message) {
@@ -7676,14 +7736,14 @@
                   });
                 });
               case 5:
-                return _context8.abrupt("return", _context8.sent);
+                return _context9.abrupt("return", _context9.sent);
               case 6:
               case "end":
-                return _context8.stop();
+                return _context9.stop();
             }
-          }, _callee8, this);
+          }, _callee9, this);
         }));
-        function upsertMember(_x7) {
+        function upsertMember(_x9) {
           return _upsertMember.apply(this, arguments);
         }
         return upsertMember;
@@ -7691,18 +7751,18 @@
     }, {
       key: "deleteMember",
       value: function () {
-        var _deleteMember = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee9(id) {
-          return _regeneratorRuntime().wrap(function _callee9$(_context9) {
-            while (1) switch (_context9.prev = _context9.next) {
+        var _deleteMember = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee10(id) {
+          return _regeneratorRuntime().wrap(function _callee10$(_context10) {
+            while (1) switch (_context10.prev = _context10.next) {
               case 0:
                 if (!(!this.axiosInstance || !this.app)) {
-                  _context9.next = 3;
+                  _context10.next = 3;
                   break;
                 }
                 console.warn(":: ChattyClient was not initailized");
-                return _context9.abrupt("return");
+                return _context10.abrupt("return");
               case 3:
-                _context9.next = 5;
+                _context10.next = 5;
                 return this.axiosInstance["delete"]("/members/".concat(id), {
                   params: {
                     AppId: this.app.id
@@ -7715,14 +7775,14 @@
                   });
                 });
               case 5:
-                return _context9.abrupt("return", _context9.sent);
+                return _context10.abrupt("return", _context10.sent);
               case 6:
               case "end":
-                return _context9.stop();
+                return _context10.stop();
             }
-          }, _callee9, this);
+          }, _callee10, this);
         }));
-        function deleteMember(_x8) {
+        function deleteMember(_x10) {
           return _deleteMember.apply(this, arguments);
         }
         return deleteMember;
@@ -7821,18 +7881,18 @@
     }, {
       key: "getMissedCount",
       value: function () {
-        var _getMissedCount = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee10() {
-          return _regeneratorRuntime().wrap(function _callee10$(_context10) {
-            while (1) switch (_context10.prev = _context10.next) {
+        var _getMissedCount = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee11() {
+          return _regeneratorRuntime().wrap(function _callee11$(_context11) {
+            while (1) switch (_context11.prev = _context11.next) {
               case 0:
                 if (!(!this.axiosInstance || !this.member)) {
-                  _context10.next = 3;
+                  _context11.next = 3;
                   break;
                 }
                 console.warn(":: ChattyClient was not initailized (at getMissedCount)");
-                return _context10.abrupt("return");
+                return _context11.abrupt("return");
               case 3:
-                _context10.next = 5;
+                _context11.next = 5;
                 return this.axiosInstance.get("/missed-count", {
                   params: {
                     MemberId: this.member.id
@@ -7845,12 +7905,12 @@
                   });
                 });
               case 5:
-                return _context10.abrupt("return", _context10.sent);
+                return _context11.abrupt("return", _context11.sent);
               case 6:
               case "end":
-                return _context10.stop();
+                return _context11.stop();
             }
-          }, _callee10, this);
+          }, _callee11, this);
         }));
         function getMissedCount() {
           return _getMissedCount.apply(this, arguments);
@@ -7877,15 +7937,23 @@
       if (error.response) {
         if (!error.response.data) {
           // console.warn(':: ChattyClient Error - ', error.response._response);
-          return Promise.reject(error.response._response);
+          return Promise.reject({
+            message: ':: ChattyClient Error - ' + error.response._response
+          });
         }
-        return Promise.reject(error.response.data.message);
+        return Promise.reject({
+          message: ':: ChattyClient Error - ' + error.response.data.message
+        });
       } else if (error.request) {
         // console.warn(':: ChattyClient Error - Please check network state');
-        return Promise.reject("Please check network state");
+        return Promise.reject({
+          message: ':: ChattyClient Error - ' + "Please check network state"
+        });
       } else {
         // console.warn(`:: ChattyClient Error `, error.message);
-        return Promise.reject(error.message);
+        return Promise.reject({
+          message: ':: ChattyClient Error - ' + error.message
+        });
       }
     });
     return axiosInstance;

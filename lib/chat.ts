@@ -173,7 +173,7 @@ export class Chat {
    * @param text {string} message don't be trimeed before sending as it's a frontend logic.
    * @returns
    */
-  sendTextMessage(text: string): Partial<iMessage> | undefined {
+  sendTextMessage(text: string): iMessage {
     if (!text) {
       console.warn(":: ChattyChat sendTextMessage error - text is empty");
       return;
@@ -184,7 +184,7 @@ export class Chat {
       );
       return;
     }
-    const message: Partial<iMessage> = {
+    const message = {
       id: "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
         var r = (Math.random() * 16) | 0,
           v = c == "x" ? r : (r & 0x3) | 0x8;
@@ -200,10 +200,21 @@ export class Chat {
 
     // return temporary message object before inserting to database
     delete message["SenderId"];
-    return { ...message, Sender: Chatty.member };
+    return {
+      ...message,
+      files: [],
+      json: null,
+      translation: null,
+      readReceipt: 0,
+      updatedAt: new Date(),
+      deletedAt: null,
+      AppId: Chatty.app.id,
+      ChatId: this.id,
+      Sender: Chatty.member
+    };
   }
 
-  sendFileMessage(files: Array<iFile>): Partial<iMessage> | undefined {
+  sendFileMessage(files: Array<iFile>): iMessage {
     if (!files) {
       console.warn(
         ":: ChattyChat sendFileMessage function param error: files are undefined"
@@ -225,7 +236,7 @@ export class Chat {
       return;
     }
 
-    const message: Partial<iMessage> = {
+    const message = {
       id: "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
         var r = (Math.random() * 16) | 0,
           v = c == "x" ? r : (r & 0x3) | 0x8;
@@ -250,7 +261,17 @@ export class Chat {
 
     // return temporary message object with SenderId before inserting to database
     delete message["SenderId"];
-    return { ...message, Sender: Chatty.member };
+    return {
+      ...message,
+      json: null,
+      translation: null,
+      readReceipt: 0,
+      updatedAt: new Date(),
+      deletedAt: null,
+      AppId: Chatty.app.id,
+      ChatId: this.id,
+      Sender: Chatty.member
+    };
   }
 
   private uploadFiles(files: Array<iFile>): Promise<Array<{ uri: string }>> {
