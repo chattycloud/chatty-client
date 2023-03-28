@@ -16,7 +16,7 @@ import {
 } from "./type";
 import axios, { AxiosInstance } from "axios";
 import { Chat } from "./chat";
-import { ChatList } from "./chatlist";
+// import { ChatList } from "./chatlist";
 
 
 class Chatty {
@@ -137,7 +137,17 @@ class Chatty {
       })
     }
 
-    const { data } = await this.axiosInstance.get("/chats", { params: { AppId: this.app.id, page: page, MemberId: filter.MemberId, group: filter.group, keyword: filter.keyword } });
+    const { data } = await this.axiosInstance.get("/chats", {
+      params: {
+        AppId: this.app.id,
+        page: page,
+        pageLimit: this.app.chatListPageLimit,
+        MemberId: filter.MemberId,
+        group: filter.group,
+        keyword: filter.keyword,
+        order: 'updatedAt',
+      }
+    });
     return data;
   }
 
@@ -479,5 +489,5 @@ function configAxios(ApiKey?: string) {
 }
 
 export default Chatty;
-export { Chat as ChattyChat, ChatList as ChattyList };
+export { Chat as ChattyChat };
 export * as ChattyTypes from "./type";

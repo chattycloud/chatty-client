@@ -1,6 +1,6 @@
 /*!
  * ChattyClient v1.2.0
- * Build at 2023.3.22
+ * Build at 2023.3.28
  * Released under the MIT License.
  */
 (function (global, factory) {
@@ -7097,136 +7097,7 @@
     return true;
   }
 
-  var ChatList = /*#__PURE__*/function () {
-    function ChatList(payload) {
-      _classCallCheck(this, ChatList);
-      this.filter = payload.filter;
-      this.onChatListConnect = payload.onChatListConnect;
-      this.onChatsFetch = payload.onChatsFetch;
-      this.onChatRefresh = payload.onChatRefresh;
-      this.onChatLeave = payload.onChatLeave;
-    }
-    _createClass(ChatList, [{
-      key: "connect",
-      value: function connect() {
-        var _a, _b, _c;
-        this.socket = lookup("wss://devsocket.chatty-cloud.com" + "/chatlist.".concat((_a = Chatty.app) === null || _a === void 0 ? void 0 : _a.name), {
-          // transports: ["polling", "websocket"],
-          transports: ["websocket"],
-          query: {
-            MemberId: ((_b = Chatty.member) === null || _b === void 0 ? void 0 : _b.id) || "",
-            AppId: ((_c = Chatty.app) === null || _c === void 0 ? void 0 : _c.id) || "",
-            filter: this.filter && JSON.stringify(this.filter) || ""
-          },
-          auth: {
-            apikey: Chatty.apiKey || ""
-          },
-          forceNew: true
-        });
-        this.addListener();
-      }
-    }, {
-      key: "disconnect",
-      value: function disconnect() {
-        var _a;
-        (_a = this.socket) === null || _a === void 0 ? void 0 : _a.disconnect();
-        this.removeListener();
-        console.debug(":: ChatList disconnected");
-      }
-    }, {
-      key: "fetchChats",
-      value: function fetchChats(payload) {
-        var _a;
-        (_a = this.socket) === null || _a === void 0 ? void 0 : _a.emit(eChattyEvent.FETCH_CHATS, payload);
-      }
-    }, {
-      key: "refreshChat",
-      value: function refreshChat(ChatId) {
-        var _a;
-        (_a = this.socket) === null || _a === void 0 ? void 0 : _a.emit(eChattyEvent.REFRESH_CHAT, {
-          ChatId: ChatId
-        });
-      }
-    }, {
-      key: "leaveChat",
-      value: function leaveChat(ChatId) {
-        var _a;
-        (_a = this.socket) === null || _a === void 0 ? void 0 : _a.emit(eChattyEvent.LEAVE_CHAT, {
-          ChatId: ChatId
-        });
-      }
-    }, {
-      key: "addListener",
-      value: function addListener() {
-        var _this = this;
-        if (!this.socket) {
-          console.warn(":: ChatList socket is not connected");
-          return;
-        }
-        this.socket.on(eChattyEvent.CONNECT_DONE, function (data) {
-          console.debug(":: ChatList CONNECT_DONE", data);
-          _this.onChatListConnect && _this.onChatListConnect(data);
-          // this.fetchChats({ refresh: true }); // server에서 connect와 동시에 fetch가 이루어짐
-        });
-
-        this.socket.on(eChattyEvent.CONNECT_FAIL, function (error) {
-          console.warn(":: ChatList CONNECT_FAIL", error.message);
-          _this.onChatListConnect && _this.onChatListConnect({
-            error: error
-          });
-        });
-        this.socket.on(eChattyEvent.FETCH_CHATS_DONE, function (data) {
-          console.debug(":: ChatList FETCH_CHATS_DONE", data);
-          _this.onChatsFetch && _this.onChatsFetch(data);
-        });
-        this.socket.on(eChattyEvent.FETCH_CHATS_FAIL, function (error) {
-          console.warn(":: ChatList FETCH_CHATS_FAIL", error.message);
-          _this.onChatsFetch && _this.onChatsFetch({
-            error: error
-          });
-        });
-        this.socket.on(eChattyEvent.REFRESH_CHAT_DONE, function (data) {
-          console.debug(":: ChatList REFRESH_CHAT_DONE", data);
-          _this.onChatRefresh && _this.onChatRefresh(data);
-        });
-        this.socket.on(eChattyEvent.REFRESH_CHAT_FAIL, function (error) {
-          console.warn(":: ChatList REFRESH_CHAT_FAIL", error.message);
-          _this.onChatRefresh && _this.onChatRefresh({
-            error: error
-          });
-        });
-        this.socket.on(eChattyEvent.LEAVE_CHAT_DONE, function (data) {
-          console.debug(":: ChatList LEAVE_CHAT_DONE", data);
-          _this.onChatLeave && _this.onChatLeave(data);
-        });
-        this.socket.on(eChattyEvent.LEAVE_CHAT_FAIL, function (error) {
-          console.warn(":: ChatList LEAVE_CHAT_FAIL", error.message);
-          _this.onChatLeave && _this.onChatLeave({
-            error: error
-          });
-        });
-      }
-    }, {
-      key: "removeListener",
-      value: function removeListener() {
-        if (!this.socket) {
-          console.warn(":: ChatList socket is not connected");
-          return;
-        }
-        this.socket.off(eChattyEvent.CONNECT_DONE);
-        this.socket.off(eChattyEvent.CONNECT_FAIL);
-        this.socket.off(eChattyEvent.FETCH_CHATS_DONE);
-        this.socket.off(eChattyEvent.FETCH_CHATS_FAIL);
-        this.socket.off(eChattyEvent.REFRESH_CHAT_DONE);
-        this.socket.off(eChattyEvent.REFRESH_CHAT_FAIL);
-        this.socket.off(eChattyEvent.LEAVE_CHAT_DONE);
-        this.socket.off(eChattyEvent.LEAVE_CHAT_FAIL);
-        this.socket = undefined;
-      }
-    }]);
-    return ChatList;
-  }();
-
+  // import { ChatList } from "./chatlist";
   var Chatty = /*#__PURE__*/function () {
     function Chatty() {
       _classCallCheck(this, Chatty);
@@ -7426,9 +7297,11 @@
                   params: {
                     AppId: this.app.id,
                     page: page,
+                    pageLimit: this.app.chatListPageLimit,
                     MemberId: filter.MemberId,
                     group: filter.group,
-                    keyword: filter.keyword
+                    keyword: filter.keyword,
+                    order: 'updatedAt'
                   }
                 });
               case 3:
@@ -7960,7 +7833,6 @@
   }
 
   exports.ChattyChat = Chat;
-  exports.ChattyList = ChatList;
   exports.ChattyTypes = type;
   exports["default"] = Chatty;
 
