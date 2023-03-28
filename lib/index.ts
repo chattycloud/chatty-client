@@ -458,8 +458,7 @@ function configAxios(ApiKey?: string) {
       return request;
     },
     function (error) {
-      // console.warn(`:: ChattyClient Error %O`, error);
-      return Promise.reject(error.message);
+      return Promise.reject({ message: ':: ChattyClient Error 1 - ' + error.message });
     }
   );
 
@@ -470,17 +469,14 @@ function configAxios(ApiKey?: string) {
     function (error) {
       if (error.response) {
         if (!error.response.data) {
-          // console.warn(':: ChattyClient Error - ', error.response._response);
-          return Promise.reject({ message: ':: ChattyClient Error - ' + error.response._response });
+          return Promise.reject({ message: ':: ChattyClient Error 2 - ' + error.response._response });
         }
 
-        return Promise.reject({ message: ':: ChattyClient Error - ' + error.response.data.message });
+        return Promise.reject({ message: ':: ChattyClient Error 3 - ' + error.response.data.message });
       } else if (error.request) {
-        // console.warn(':: ChattyClient Error - Please check network state');
         return Promise.reject({ message: ':: ChattyClient Error - ' + "Please check network state" });
       } else {
-        // console.warn(`:: ChattyClient Error `, error.message);
-        return Promise.reject({ message: ':: ChattyClient Error - ' + error.message });
+        return Promise.reject({ message: ':: ChattyClient Error 4 - ' + error.message });
       }
     }
   );
