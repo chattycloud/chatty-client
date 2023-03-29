@@ -31,6 +31,13 @@ class Chatty {
    */
   static async init(payload: iInitPayload): Promise<iMissedCount | undefined> {
     try {
+      if (!payload.apiKey) {
+        return Promise.reject({ message: ":: ChattyClient init fail - apiKey is required" });
+      }
+      if (!payload.member.id || !payload.member.name) {
+        return Promise.reject({ message: ":: ChattyClient init fail - member id and member name is required" });
+      }
+
       let missedCount: iMissedCount | undefined = undefined;
       this.apiKey = payload.apiKey;
       this.axiosInstance = configAxios(this.apiKey);
@@ -58,7 +65,7 @@ class Chatty {
 
       return missedCount;
     } catch (err: any) {
-      console.warn(`:: ChattyClient init fail`, err.message);
+      return Promise.reject({ message: ":: ChattyClient init fail - " + err.message });
     }
   }
 

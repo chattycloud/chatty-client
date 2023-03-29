@@ -369,7 +369,10 @@ export class Chat {
         console.debug(`:: ChattyChat CONNECT_DONE`, data);
         this.id = data.chat?.id; // 연결된 ChatId를 Chat instance에 저장 > 필요한 경우 다시 enable
         this.onChatConnect && this.onChatConnect(data);
-        this.fetchMessages({ refresh: true });
+        // this.fetchMessages({ refresh: true }); // connect done 되면 응답에 메시지가 포함되어 있음
+
+        // messages fetch 가 되었기때문에 markAsRead 호출
+        this.markAsRead();
       }
     );
 

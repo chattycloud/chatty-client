@@ -1,6 +1,6 @@
 /*!
  * ChattyClient v1.2.0
- * Build at 2023.3.28
+ * Build at 2023.3.29
  * Released under the MIT License.
  */
 (function (global, factory) {
@@ -6932,9 +6932,9 @@
           console.debug(":: ChattyChat CONNECT_DONE", data);
           _this2.id = (_a = data.chat) === null || _a === void 0 ? void 0 : _a.id; // 연결된 ChatId를 Chat instance에 저장 > 필요한 경우 다시 enable
           _this2.onChatConnect && _this2.onChatConnect(data);
-          _this2.fetchMessages({
-            refresh: true
-          });
+          // this.fetchMessages({ refresh: true }); // connect done 되면 응답에 메시지가 포함되어 있음
+          // messages fetch 가 되었기때문에 markAsRead 호출
+          _this2.markAsRead();
         });
         this.socket.on(eChattyEvent.CONNECT_FAIL, function (error) {
           console.warn(":: ChattyChat CONNECT_FAIL", error.message);
@@ -7116,6 +7116,22 @@
             while (1) switch (_context.prev = _context.next) {
               case 0:
                 _context.prev = 0;
+                if (payload.apiKey) {
+                  _context.next = 3;
+                  break;
+                }
+                return _context.abrupt("return", Promise.reject({
+                  message: ":: ChattyClient init fail - apiKey is required"
+                }));
+              case 3:
+                if (!(!payload.member.id || !payload.member.name)) {
+                  _context.next = 5;
+                  break;
+                }
+                return _context.abrupt("return", Promise.reject({
+                  message: ":: ChattyClient init fail - member id and member name is required"
+                }));
+              case 5:
                 missedCount = undefined;
                 this.apiKey = payload.apiKey;
                 this.axiosInstance = configAxios(this.apiKey);
@@ -7126,39 +7142,41 @@
                   userAgent: navigator.userAgent,
                   sdkVersion: "1.2.0"
                 };
-                _context.next = 7;
+                _context.next = 11;
                 return this.getApp();
-              case 7:
+              case 11:
                 this.app = _context.sent;
-                _context.next = 10;
+                _context.next = 14;
                 return this.upsertMember(_objectSpread2(_objectSpread2({}, payload.member), {}, {
                   device: deviceInfo,
                   AppId: (_a = this.app) === null || _a === void 0 ? void 0 : _a.id
                 }));
-              case 10:
+              case 14:
                 this.member = _context.sent;
                 if (!(this.app && this.member)) {
-                  _context.next = 18;
+                  _context.next = 22;
                   break;
                 }
                 console.info(":: ChattyClient init success");
                 console.info(":: ChattyClient [App]", this.app);
                 console.info(":: ChattyClient [Member]", this.member);
-                _context.next = 17;
+                _context.next = 21;
                 return this.getMissedCount();
-              case 17:
-                missedCount = _context.sent;
-              case 18:
-                return _context.abrupt("return", missedCount);
               case 21:
-                _context.prev = 21;
+                missedCount = _context.sent;
+              case 22:
+                return _context.abrupt("return", missedCount);
+              case 25:
+                _context.prev = 25;
                 _context.t0 = _context["catch"](0);
-                console.warn(":: ChattyClient init fail", _context.t0.message);
-              case 24:
+                return _context.abrupt("return", Promise.reject({
+                  message: ":: ChattyClient init fail - " + _context.t0.message
+                }));
+              case 28:
               case "end":
                 return _context.stop();
             }
-          }, _callee, this, [[0, 21]]);
+          }, _callee, this, [[0, 25]]);
         }));
         function init(_x) {
           return _init.apply(this, arguments);
