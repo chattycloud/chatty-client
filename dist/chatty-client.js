@@ -1,13 +1,14 @@
 /*!
  * ChattyClient v1.2.0
- * Build at 2023.3.29
+ * Build at 2023.4.1
  * Released under the MIT License.
  */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
-  typeof define === 'function' && define.amd ? define(['exports'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.io = {}));
-})(this, (function (exports) { 'use strict';
+    typeof define === 'function' && define.amd ? define(['exports'], factory) :
+      (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.io = {}));
+})(this, (function (exports) {
+  'use strict';
 
   function ownKeys(object, enumerableOnly) {
     var keys = Object.keys(object);
@@ -82,9 +83,9 @@
     }
     exports.wrap = wrap;
     var ContinueSentinel = {};
-    function Generator() {}
-    function GeneratorFunction() {}
-    function GeneratorFunctionPrototype() {}
+    function Generator() { }
+    function GeneratorFunction() { }
+    function GeneratorFunctionPrototype() { }
     var IteratorPrototype = {};
     define(IteratorPrototype, iteratorSymbol, function () {
       return this;
@@ -138,7 +139,7 @@
           if ("throw" === method) throw arg;
           return doneResult();
         }
-        for (context.method = method, context.arg = arg;;) {
+        for (context.method = method, context.arg = arg; ;) {
           var delegate = context.delegate;
           if (delegate) {
             var delegateResult = maybeInvokeDelegate(delegate, context);
@@ -147,7 +148,7 @@
               return delegateResult;
             }
           }
-          if ("next" === context.method) context.sent = context._sent = context.arg;else if ("throw" === context.method) {
+          if ("next" === context.method) context.sent = context._sent = context.arg; else if ("throw" === context.method) {
             if ("suspendedStart" === state) throw state = "completed", context.arg;
             context.dispatchException(context.arg);
           } else "return" === context.method && context.abrupt("return", context.arg);
@@ -454,7 +455,7 @@
     if (Reflect.construct.sham) return false;
     if (typeof Proxy === "function") return true;
     try {
-      Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {}));
+      Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () { }));
       return true;
     } catch (e) {
       return false;
@@ -574,7 +575,7 @@
       if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") {
         if (it) o = it;
         var i = 0;
-        var F = function () {};
+        var F = function () { };
         return {
           s: F,
           n: function () {
@@ -749,34 +750,34 @@
 
   var type = /*#__PURE__*/Object.freeze({
     __proto__: null,
-    get eAppState () { return eAppState; },
-    get eAppPricing () { return eAppPricing; },
-    get eSubscriptionPlan () { return eSubscriptionPlan; },
-    get eAppUserRole () { return eAppUserRole; },
-    get eMemberPermission () { return eMemberPermission; },
-    get eMessageType () { return eMessageType; },
-    get eMessageBy () { return eMessageBy; },
+    get eAppState() { return eAppState; },
+    get eAppPricing() { return eAppPricing; },
+    get eSubscriptionPlan() { return eSubscriptionPlan; },
+    get eAppUserRole() { return eAppUserRole; },
+    get eMemberPermission() { return eMemberPermission; },
+    get eMessageType() { return eMessageType; },
+    get eMessageBy() { return eMessageBy; },
     SupportedImageFormat: SupportedImageFormat,
     SupportedVideoFormat: SupportedVideoFormat,
     SupportedUploadSize: SupportedUploadSize,
-    get eChattyNotification () { return eChattyNotification; },
-    get eChattyEvent () { return eChattyEvent; }
+    get eChattyNotification() { return eChattyNotification; },
+    get eChattyEvent() { return eChattyEvent; }
   });
 
-  function getDefaultExportFromCjs (x) {
-  	return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x['default'] : x;
+  function getDefaultExportFromCjs(x) {
+    return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x['default'] : x;
   }
 
   var axiosExports$1 = {};
   var axios$3 = {
-    get exports(){ return axiosExports$1; },
-    set exports(v){ axiosExports$1 = v; },
+    get exports() { return axiosExports$1; },
+    set exports(v) { axiosExports$1 = v; },
   };
 
   var axiosExports = {};
   var axios$2 = {
-    get exports(){ return axiosExports; },
-    set exports(v){ axiosExports = v; },
+    get exports() { return axiosExports; },
+    set exports(v) { axiosExports = v; },
   };
 
   var bind$2 = function bind(fn, thisArg) {
@@ -1404,7 +1405,7 @@
     var prototype = AxiosError.prototype;
     var descriptors = {};
     ['ERR_BAD_OPTION_VALUE', 'ERR_BAD_OPTION', 'ECONNABORTED', 'ETIMEDOUT', 'ERR_NETWORK', 'ERR_FR_TOO_MANY_REDIRECTS', 'ERR_DEPRECATED', 'ERR_BAD_RESPONSE', 'ERR_BAD_REQUEST', 'ERR_CANCELED'
-    // eslint-disable-next-line func-names
+      // eslint-disable-next-line func-names
     ].forEach(function (code) {
       descriptors[code] = {
         value: code
@@ -1532,45 +1533,45 @@
     hasRequiredCookies = 1;
     var utils = utils$9;
     cookies = utils.isStandardBrowserEnv() ?
-    // Standard browser envs support document.cookie
-    function standardBrowserEnv() {
-      return {
-        write: function write(name, value, expires, path, domain, secure) {
-          var cookie = [];
-          cookie.push(name + '=' + encodeURIComponent(value));
-          if (utils.isNumber(expires)) {
-            cookie.push('expires=' + new Date(expires).toGMTString());
+      // Standard browser envs support document.cookie
+      function standardBrowserEnv() {
+        return {
+          write: function write(name, value, expires, path, domain, secure) {
+            var cookie = [];
+            cookie.push(name + '=' + encodeURIComponent(value));
+            if (utils.isNumber(expires)) {
+              cookie.push('expires=' + new Date(expires).toGMTString());
+            }
+            if (utils.isString(path)) {
+              cookie.push('path=' + path);
+            }
+            if (utils.isString(domain)) {
+              cookie.push('domain=' + domain);
+            }
+            if (secure === true) {
+              cookie.push('secure');
+            }
+            document.cookie = cookie.join('; ');
+          },
+          read: function read(name) {
+            var match = document.cookie.match(new RegExp('(^|;\\s*)(' + name + ')=([^;]*)'));
+            return match ? decodeURIComponent(match[3]) : null;
+          },
+          remove: function remove(name) {
+            this.write(name, '', Date.now() - 86400000);
           }
-          if (utils.isString(path)) {
-            cookie.push('path=' + path);
-          }
-          if (utils.isString(domain)) {
-            cookie.push('domain=' + domain);
-          }
-          if (secure === true) {
-            cookie.push('secure');
-          }
-          document.cookie = cookie.join('; ');
-        },
-        read: function read(name) {
-          var match = document.cookie.match(new RegExp('(^|;\\s*)(' + name + ')=([^;]*)'));
-          return match ? decodeURIComponent(match[3]) : null;
-        },
-        remove: function remove(name) {
-          this.write(name, '', Date.now() - 86400000);
-        }
-      };
-    }() :
-    // Non standard browser env (web workers, react-native) lack needed support.
-    function nonStandardBrowserEnv() {
-      return {
-        write: function write() {},
-        read: function read() {
-          return null;
-        },
-        remove: function remove() {}
-      };
-    }();
+        };
+      }() :
+      // Non standard browser env (web workers, react-native) lack needed support.
+      function nonStandardBrowserEnv() {
+        return {
+          write: function write() { },
+          read: function read() {
+            return null;
+          },
+          remove: function remove() { }
+        };
+      }();
     return cookies;
   }
 
@@ -1676,59 +1677,59 @@
     hasRequiredIsURLSameOrigin = 1;
     var utils = utils$9;
     isURLSameOrigin = utils.isStandardBrowserEnv() ?
-    // Standard browser envs have full support of the APIs needed to test
-    // whether the request URL is of the same origin as current location.
-    function standardBrowserEnv() {
-      var msie = /(msie|trident)/i.test(navigator.userAgent);
-      var urlParsingNode = document.createElement('a');
-      var originURL;
+      // Standard browser envs have full support of the APIs needed to test
+      // whether the request URL is of the same origin as current location.
+      function standardBrowserEnv() {
+        var msie = /(msie|trident)/i.test(navigator.userAgent);
+        var urlParsingNode = document.createElement('a');
+        var originURL;
 
-      /**
-      * Parse a URL to discover it's components
-      *
-      * @param {String} url The URL to be parsed
-      * @returns {Object}
-      */
-      function resolveURL(url) {
-        var href = url;
-        if (msie) {
-          // IE needs attribute set twice to normalize properties
+        /**
+        * Parse a URL to discover it's components
+        *
+        * @param {String} url The URL to be parsed
+        * @returns {Object}
+        */
+        function resolveURL(url) {
+          var href = url;
+          if (msie) {
+            // IE needs attribute set twice to normalize properties
+            urlParsingNode.setAttribute('href', href);
+            href = urlParsingNode.href;
+          }
           urlParsingNode.setAttribute('href', href);
-          href = urlParsingNode.href;
+
+          // urlParsingNode provides the UrlUtils interface - http://url.spec.whatwg.org/#urlutils
+          return {
+            href: urlParsingNode.href,
+            protocol: urlParsingNode.protocol ? urlParsingNode.protocol.replace(/:$/, '') : '',
+            host: urlParsingNode.host,
+            search: urlParsingNode.search ? urlParsingNode.search.replace(/^\?/, '') : '',
+            hash: urlParsingNode.hash ? urlParsingNode.hash.replace(/^#/, '') : '',
+            hostname: urlParsingNode.hostname,
+            port: urlParsingNode.port,
+            pathname: urlParsingNode.pathname.charAt(0) === '/' ? urlParsingNode.pathname : '/' + urlParsingNode.pathname
+          };
         }
-        urlParsingNode.setAttribute('href', href);
+        originURL = resolveURL(window.location.href);
 
-        // urlParsingNode provides the UrlUtils interface - http://url.spec.whatwg.org/#urlutils
-        return {
-          href: urlParsingNode.href,
-          protocol: urlParsingNode.protocol ? urlParsingNode.protocol.replace(/:$/, '') : '',
-          host: urlParsingNode.host,
-          search: urlParsingNode.search ? urlParsingNode.search.replace(/^\?/, '') : '',
-          hash: urlParsingNode.hash ? urlParsingNode.hash.replace(/^#/, '') : '',
-          hostname: urlParsingNode.hostname,
-          port: urlParsingNode.port,
-          pathname: urlParsingNode.pathname.charAt(0) === '/' ? urlParsingNode.pathname : '/' + urlParsingNode.pathname
+        /**
+        * Determine if a URL shares the same origin as the current location
+        *
+        * @param {String} requestURL The URL to test
+        * @returns {boolean} True if URL shares the same origin, otherwise false
+        */
+        return function isURLSameOrigin(requestURL) {
+          var parsed = utils.isString(requestURL) ? resolveURL(requestURL) : requestURL;
+          return parsed.protocol === originURL.protocol && parsed.host === originURL.host;
         };
-      }
-      originURL = resolveURL(window.location.href);
-
-      /**
-      * Determine if a URL shares the same origin as the current location
-      *
-      * @param {String} requestURL The URL to test
-      * @returns {boolean} True if URL shares the same origin, otherwise false
-      */
-      return function isURLSameOrigin(requestURL) {
-        var parsed = utils.isString(requestURL) ? resolveURL(requestURL) : requestURL;
-        return parsed.protocol === originURL.protocol && parsed.host === originURL.host;
-      };
-    }() :
-    // Non standard browser envs (web workers, react-native) lack needed support.
-    function nonStandardBrowserEnv() {
-      return function isURLSameOrigin() {
-        return true;
-      };
-    }();
+      }() :
+      // Non standard browser envs (web workers, react-native) lack needed support.
+      function nonStandardBrowserEnv() {
+        return function isURLSameOrigin() {
+          return true;
+        };
+      }();
     return isURLSameOrigin;
   }
 
@@ -3259,7 +3260,7 @@
        */
     }, {
       key: "pause",
-      value: function pause(onPause) {}
+      value: function pause(onPause) { }
     }]);
     return Transport;
   }(Emitter);
@@ -3355,15 +3356,15 @@
       if ("undefined" !== typeof XMLHttpRequest && (!xdomain || hasCORS)) {
         return new XMLHttpRequest();
       }
-    } catch (e) {}
+    } catch (e) { }
     if (!xdomain) {
       try {
         return new globalThisShim[["Active"].concat("Object").join("X")]("Microsoft.XMLHTTP");
-      } catch (e) {}
+      } catch (e) { }
     }
   }
 
-  function empty() {}
+  function empty() { }
   var hasXHR2 = function () {
     var xhr = new XHR({
       xdomain: false
@@ -3665,15 +3666,15 @@
                 }
               }
             }
-          } catch (e) {}
+          } catch (e) { }
           if ("POST" === this.method) {
             try {
               xhr.setRequestHeader("Content-type", "text/plain;charset=UTF-8");
-            } catch (e) {}
+            } catch (e) { }
           }
           try {
             xhr.setRequestHeader("Accept", "*/*");
-          } catch (e) {}
+          } catch (e) { }
           // ie6 check
           if ("withCredentials" in xhr) {
             xhr.withCredentials = this.opts.withCredentials;
@@ -3734,7 +3735,7 @@
         if (fromError) {
           try {
             this.xhr.abort();
-          } catch (e) {}
+          } catch (e) { }
         }
         if (typeof document !== "undefined") {
           delete Request.requests[this.index];
@@ -3904,7 +3905,7 @@
                 // TypeError is thrown when passing the second argument on Safari
                 _this3.ws.send(data);
               }
-            } catch (e) {}
+            } catch (e) { }
             if (lastPacket) {
               // fake drain
               // defer to next tick to allow Socket to clear writeBuffer
@@ -4971,7 +4972,7 @@
         // look up attachments if type binary
         if (p.type === PacketType.BINARY_EVENT || p.type === PacketType.BINARY_ACK) {
           var start = i + 1;
-          while (str.charAt(++i) !== "-" && i != str.length) {}
+          while (str.charAt(++i) !== "-" && i != str.length) { }
           var buf = str.substring(start, i);
           if (buf != Number(buf) || str.charAt(i) !== "-") {
             throw new Error("Illegal attachments");
@@ -5027,15 +5028,15 @@
     }, {
       key: "destroy",
       value:
-      /**
-       * Deallocates a parser's resources
-       */
-      function destroy() {
-        if (this.reconstructor) {
-          this.reconstructor.finishedReconstruction();
-          this.reconstructor = null;
+        /**
+         * Deallocates a parser's resources
+         */
+        function destroy() {
+          if (this.reconstructor) {
+            this.reconstructor.finishedReconstruction();
+            this.reconstructor = null;
+          }
         }
-      }
     }], [{
       key: "isPayloadValid",
       value: function isPayloadValid(type, payload) {
@@ -5108,7 +5109,7 @@
   var parser = /*#__PURE__*/Object.freeze({
     __proto__: null,
     protocol: protocol,
-    get PacketType () { return PacketType; },
+    get PacketType() { return PacketType; },
     Encoder: Encoder,
     Decoder: Decoder
   });
@@ -5370,7 +5371,7 @@
         }
         var isTransportWritable = this.io.engine && this.io.engine.transport && this.io.engine.transport.writable;
         var discardPacket = this.flags["volatile"] && (!isTransportWritable || !this.connected);
-        if (discardPacket) ; else if (this.connected) {
+        if (discardPacket); else if (this.connected) {
           this.notifyOutgoingListeners(packet);
           this.packet(packet);
         } else {
@@ -7105,84 +7106,84 @@
     _createClass(Chatty, null, [{
       key: "init",
       value:
-      /**
-       * @description static method init is for initialize chatty client. it will initialize apiKey and chat member
-       * @param {iInitPayload} payload
-       */
-      function () {
-        var _init = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee(payload) {
-          var _a, missedCount, deviceInfo;
-          return _regeneratorRuntime().wrap(function _callee$(_context) {
-            while (1) switch (_context.prev = _context.next) {
-              case 0:
-                _context.prev = 0;
-                if (payload.apiKey) {
-                  _context.next = 3;
-                  break;
-                }
-                return _context.abrupt("return", Promise.reject({
-                  message: ":: ChattyClient init fail - apiKey is required"
-                }));
-              case 3:
-                if (!(!payload.member.id || !payload.member.name)) {
-                  _context.next = 5;
-                  break;
-                }
-                return _context.abrupt("return", Promise.reject({
-                  message: ":: ChattyClient init fail - member id and member name is required"
-                }));
-              case 5:
-                missedCount = undefined;
-                this.apiKey = payload.apiKey;
-                this.axiosInstance = configAxios(this.apiKey);
-                deviceInfo = {
-                  platform: navigator.platform,
-                  language: navigator.language,
-                  product: navigator.product,
-                  userAgent: navigator.userAgent,
-                  sdkVersion: "1.2.0"
-                };
-                _context.next = 11;
-                return this.getApp();
-              case 11:
-                this.app = _context.sent;
-                _context.next = 14;
-                return this.upsertMember(_objectSpread2(_objectSpread2({}, payload.member), {}, {
-                  device: deviceInfo,
-                  AppId: (_a = this.app) === null || _a === void 0 ? void 0 : _a.id
-                }));
-              case 14:
-                this.member = _context.sent;
-                if (!(this.app && this.member)) {
-                  _context.next = 22;
-                  break;
-                }
-                console.info(":: ChattyClient init success");
-                console.info(":: ChattyClient [App]", this.app);
-                console.info(":: ChattyClient [Member]", this.member);
-                _context.next = 21;
-                return this.getMissedCount();
-              case 21:
-                missedCount = _context.sent;
-              case 22:
-                return _context.abrupt("return", missedCount);
-              case 25:
-                _context.prev = 25;
-                _context.t0 = _context["catch"](0);
-                return _context.abrupt("return", Promise.reject({
-                  message: ":: ChattyClient init fail - " + _context.t0.message
-                }));
-              case 28:
-              case "end":
-                return _context.stop();
-            }
-          }, _callee, this, [[0, 25]]);
-        }));
-        function init(_x) {
-          return _init.apply(this, arguments);
-        }
-        return init;
-      }()
+        /**
+         * @description static method init is for initialize chatty client. it will initialize apiKey and chat member
+         * @param {iInitPayload} payload
+         */
+        function () {
+          var _init = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee(payload) {
+            var _a, missedCount, deviceInfo;
+            return _regeneratorRuntime().wrap(function _callee$(_context) {
+              while (1) switch (_context.prev = _context.next) {
+                case 0:
+                  _context.prev = 0;
+                  if (payload.apiKey) {
+                    _context.next = 3;
+                    break;
+                  }
+                  return _context.abrupt("return", Promise.reject({
+                    message: ":: ChattyClient init fail - apiKey is required"
+                  }));
+                case 3:
+                  if (!(!payload.member.id || !payload.member.name)) {
+                    _context.next = 5;
+                    break;
+                  }
+                  return _context.abrupt("return", Promise.reject({
+                    message: ":: ChattyClient init fail - member id and member name is required"
+                  }));
+                case 5:
+                  missedCount = undefined;
+                  this.apiKey = payload.apiKey;
+                  this.axiosInstance = configAxios(this.apiKey);
+                  deviceInfo = {
+                    platform: navigator.platform,
+                    language: navigator.language,
+                    product: navigator.product,
+                    userAgent: navigator.userAgent,
+                    sdkVersion: "1.2.0"
+                  };
+                  _context.next = 11;
+                  return this.getApp();
+                case 11:
+                  this.app = _context.sent;
+                  _context.next = 14;
+                  return this.upsertMember(_objectSpread2(_objectSpread2({}, payload.member), {}, {
+                    device: deviceInfo,
+                    AppId: (_a = this.app) === null || _a === void 0 ? void 0 : _a.id
+                  }));
+                case 14:
+                  this.member = _context.sent;
+                  if (!(this.app && this.member)) {
+                    _context.next = 22;
+                    break;
+                  }
+                  console.info(":: ChattyClient init success");
+                  console.info(":: ChattyClient [App]", this.app);
+                  console.info(":: ChattyClient [Member]", this.member);
+                  _context.next = 21;
+                  return this.getMissedCount();
+                case 21:
+                  missedCount = _context.sent;
+                case 22:
+                  return _context.abrupt("return", missedCount);
+                case 25:
+                  _context.prev = 25;
+                  _context.t0 = _context["catch"](0);
+                  return _context.abrupt("return", Promise.reject({
+                    message: ":: ChattyClient init fail - " + _context.t0.message
+                  }));
+                case 28:
+                case "end":
+                  return _context.stop();
+              }
+            }, _callee, this, [[0, 25]]);
+          }));
+          function init(_x) {
+            return _init.apply(this, arguments);
+          }
+          return init;
+        }()
       /**
        * @description static method exit is for terminating chatty client. it will destroy Chatty static members
        * @param {iExitPayload} payload

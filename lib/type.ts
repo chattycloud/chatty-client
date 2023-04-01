@@ -128,6 +128,9 @@ export interface iChat {
   deletedAt: Date | null;
   AppId: string;
   Members: Array<iMember>;
+  _count?: {
+    Receipts: number;
+  };
 }
 
 export interface iMember {
