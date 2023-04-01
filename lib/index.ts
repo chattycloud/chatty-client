@@ -443,6 +443,8 @@ class Chatty {
       return;
     }
 
+    console.debug(':: ChattyClient getMissedCount', this.member.id);
+
     return await this.axiosInstance
       .get(`/missed-count`, { params: { MemberId: this.member.id } })
       .then((res: any) => Promise.resolve(res.data))

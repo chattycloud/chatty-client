@@ -7783,7 +7783,8 @@
                 console.warn(":: ChattyClient was not initailized (at getMissedCount)");
                 return _context11.abrupt("return");
               case 3:
-                _context11.next = 5;
+                console.debug(':: ChattyClient getMissedCount', this.member.id);
+                _context11.next = 6;
                 return this.axiosInstance.get("/missed-count", {
                   params: {
                     MemberId: this.member.id
@@ -7795,9 +7796,9 @@
                     message: ":: ChattyClient getMissedCount error - " + errorMessage
                   });
                 });
-              case 5:
-                return _context11.abrupt("return", _context11.sent);
               case 6:
+                return _context11.abrupt("return", _context11.sent);
+              case 7:
               case "end":
                 return _context11.stop();
             }
