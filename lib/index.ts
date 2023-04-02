@@ -209,6 +209,27 @@ class Chatty {
       );
   }
 
+  static async leaveChat(ChatId: string): Promise<{ success: Boolean }> {
+    if (!this.axiosInstance || !this.app || !this.member) {
+      console.warn(":: ChattyClient was not initailized");
+      return;
+    }
+
+    return await this.axiosInstance
+      .delete<Boolean>("/chatmember", {
+        params: {
+          ChatId: ChatId,
+          MemberId: this.member.id
+        },
+      })
+      .then((res) => Promise.resolve({ success: res.data }))
+      .catch((message) =>
+        Promise.reject({
+          message: ":: ChattyClient leaveChat error - " + message,
+        })
+      );
+  }
+
   /**
    * @description Update existing chat
    * @param {iUpdateChatPayload} payload
@@ -442,8 +463,6 @@ class Chatty {
       console.warn(":: ChattyClient was not initailized (at getMissedCount)");
       return;
     }
-
-    console.debug(':: ChattyClient getMissedCount', this.member.id);
 
     return await this.axiosInstance
       .get(`/missed-count`, { params: { MemberId: this.member.id } })

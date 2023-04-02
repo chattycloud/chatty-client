@@ -412,10 +412,10 @@ export interface iMissedCount {
 
   /** missedCount by group name */
   group?: Array<{ name: string; count: number }>;
-  byGroup?: Array<{ name: string, count: number }>,
+  byGroup: Array<{ name: string, count: number }>,
 
   /** missedCount of all individual chat */
-  chat: Array<{ id: string; count: number }>;
+  chat?: Array<{ id: string; count: number }>;
   byChat: Array<{ id: string, count: number }>
 }
 
