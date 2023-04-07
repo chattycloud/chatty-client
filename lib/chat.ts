@@ -105,6 +105,8 @@ export class Chat {
     // payload checker
     Object.keys(payload).forEach((key) => !payload[key] && delete payload[key]);
 
+    console.time(":: ChattyChat connect");
+
     this.socket = io(process.env.SOCKET_URL + `/chat.${Chatty.app?.name}`, {
       // transports: ["polling", "websocket"],
       transports: ["websocket"],
@@ -373,6 +375,7 @@ export class Chat {
 
         // messages fetch 가 되었기때문에 markAsRead 호출
         this.markAsRead();
+        console.timeEnd(":: ChattyChat connect");
       }
     );
 
