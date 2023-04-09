@@ -14,7 +14,8 @@
     "prettier.fix": "prettier --write \"lib/**/*.ts\" \"support/**/*.js\"",
     "prepack": "npm run compile",
     "pack": "npm pack",
-    "postpack": "mv ./chatty-client-v1.2.0.tgz ../../freak/freak-app/chatty-client-v1.2.0.tgz"
+    "postpack": "mv ./chatty-client-v1.2.0.tgz ../../freak/freak-app/chatty-client-v1.2.0.tgz",
+    "all": "yarn compile && yarn build.dev && yarn pack"
   },
   "repository": {
     "type": "git",
@@ -33,14 +34,16 @@
   "author": "nunonam<nunonam@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "axios": "^1.3.5",
     "form-data": "^4.0.0",
     "md5": "^2.3.0",
     "socket.io-client": "^4.1.3"
   },
   "peerDependencies": {
-    "react": "^17.0.0",
-    "react-query": "^3.0.0",
-    "axios": "^1.3.0"
+    "axios": "*",
+    "react": "*",
+    "react-dom": "*",
+    "react-native": "*"
   },
   "devDependencies": {
     "@babel/core": "^7.21.3",
@@ -55,7 +58,6 @@
     "@types/md5": "^2.3.2",
     "@types/node": "^16.6.0",
     "@types/react": "^18.0.33",
-    "@types/react-query": "^1.2.9",
     "prettier": "^2.8.4",
     "rollup": "^2.79.1",
     "rollup-plugin-terser": "^7.0.2",

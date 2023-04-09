@@ -12,7 +12,7 @@ const banner = `/*!
  */`;
 
 const API_URL = `http://localhost:3300`;
-const SOCKET_URL = `wss://localhost:4400`;
+const SOCKET_URL = `http://localhost:4400`;
 // const API_URL = `https://${process.env.NODE_ENV}api.chatty-cloud.com`;
 // const SOCKET_URL = `wss://${process.env.NODE_ENV}socket.chatty-cloud.com`;
 

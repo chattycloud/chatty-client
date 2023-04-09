@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import io, { Socket } from 'socket.io-client';
-import { useQuery, useQueryClient } from 'react-query';
 import axios, { AxiosInstance } from 'axios';
 import md5 from 'md5';
 
@@ -201,6 +200,67 @@ interface iUpdateChatPayload {
   };
 }
 
+export enum eChattyEvent {
+  CONNECT = "connection",
+  CONNECT_DONE = "connect_done",
+  CONNECT_FAIL = "connect_fail",
+
+  DISCONNECT = "disconnect",
+  DISCONNECT_DONE = "disconnect_done",
+  DISCONNECT_FAIL = "disconnect_fail",
+
+  REFRESH_CHAT = "refresh_chat",
+  REFRESH_CHAT_DONE = "refresh_chat_done",
+  REFRESH_CHAT_FAIL = "refresh_chat_fail",
+
+  RECEIVE_MESSAGE = "receive_message",
+
+  FETCH_MESSAGES = "fetch_messages",
+  FETCH_MESSAGES_DONE = "fetch_messages_done",
+  FETCH_MESSAGES_FAIL = "fetch_messages_fail",
+
+  UPDATE_MESSAGES = "update_message",
+
+  FETCH_CHATS = "fetch_chats",
+  FETCH_CHATS_DONE = "fetch_chats_done",
+  FETCH_CHATS_FAIL = "fetch_chats_fail",
+
+  SEND_MESSAGE = "send_message",
+  SEND_MESSAGE_DONE = "send_message_done",
+  SEND_MESSAGE_FAIL = "send_message_fail",
+  SEND_MESSAGE_RETRY = "send_message_retry",
+
+  DELETE_MESSAGE = "delete_message",
+  DELETE_MESSAGE_DONE = "delete_message_done",
+  DELETE_MESSAGE_FAIL = "delete_message_fail",
+
+  MARK_AS_READ = "mark_as_read",
+  MARK_AS_READ_DONE = "mark_as_read_done",
+  MARK_AS_READ_FAIL = "mark_as_read_fail",
+  MARK_AS_READ_BYPASS = "mark_as_read_bypass",
+
+  // TOBE DEPRECATED
+  // 아래 내용들은 SYSTEM MESSAGE와 관련된 내용으로, 대시보드에서 사용 설정하게 되면 PUSH 메시지로 전달됩니다.
+  // 따라서, 이벤트를 받아서 처리하는 것은 권장하지 않습니다.
+  // 또한 대시보드에서 사용설정을 해제하면, 아래 이벤트들을 챗화면에서 업데이트 하지 않습니다.
+  // 따라서 사용하지 않을 예정
+  INVITE_MEMBERS = "invite_members",
+  INVITE_MEMBERS_DONE = "invite_members_done",
+  INVITE_MEMBERS_FAIL = "invite_members_fail",
+
+  EXCLUDE_MEMBERS = "exclude_members",
+  EXCLUDE_MEMBERS_DONE = "exclude_members_done",
+  EXCLUDE_MEMBERS_FAIL = "exclude_members_fail",
+
+  JOIN_CHAT = "join_chat",
+  JOIN_CHAT_DONE = "join_chat_done",
+  JOIN_CHAT_FAIL = "join_chat_fail",
+
+  LEAVE_CHAT = "leave_chat",
+  LEAVE_CHAT_DONE = "leave_chat_done",
+  LEAVE_CHAT_FAIL = "leave_chat_fail",
+}
+
 
 
 class Chatty {
@@ -209,10 +269,11 @@ class Chatty {
   static member: iMember | undefined;
   static axiosInstance: AxiosInstance;
 
-  static async init({ apiKey, member }: iInitPayload): Promise<iMissedCount | undefined> {
+  static async init({ apiKey, member }: iInitPayload) {
     try {
       if (!apiKey) return Promise.reject({ message: ":: ChattyClient init() apiKey is required." });
       this.axiosInstance = getAxiosInstance(apiKey);
+      this.apiKey = apiKey;
       this.app = await this.getApp();
       this.axiosInstance.defaults.headers.common['AppId'] = this.app.id;
       this.member = await this.upsertMember({
@@ -227,6 +288,11 @@ class Chatty {
       });
       this.axiosInstance.defaults.headers.common['MemberId'] = this.member.id;
       if (this.app && this.member) {
+        // AppEventEmitter.emit('initialized', true);
+        const event = new CustomEvent('initialized', {
+          detail: { initialized: true },
+        });
+        window.dispatchEvent(event);
         console.debug(":: ChattyClient Initialized !!");
         console.debug(":: ChattyClient App > ", this.app);
         console.debug(":: ChattyClient Member > ", this.member);
@@ -396,48 +462,93 @@ const getAxiosInstance = (ApiKey: string): AxiosInstance => {
   return instance;
 }
 
-const useMissedCount = (): iMissedCount => {
-  // const [missedCount, setMissedCount] = useState<iMissedCount>({ total: 0, byGroup: [], byChat: [] });
-  // useEffect(() => {
-  //   const promise = Chatty.getMissedCount();
-  //   promise.then((data) => setMissedCount(data));
-  // }, []);
-  // return missedCount;
-  const { data } = useQuery(['chatty', 'missed-count'], Chatty.getMissedCount, {
-    initialData: {
-      total: 0,
-      byGroup: [{ name: '', count: 0 }],
-      byChat: [{ id: '', count: 0 }]
-    }
-  });
 
-  return data;
+const useInitialized = (): boolean => {
+  const [initialized, setInitialized] = useState(Chatty.apiKey && Chatty.app && Chatty.member ? true : false);
+  useEffect(() => {
+    if (initialized) return;
+    const handleInitialized = (event: CustomEvent) => {
+      setInitialized(event.detail.initialized);
+    };
+
+    window.addEventListener('initialized', handleInitialized);
+    return () => {
+      console.debug(':: ChattyClient useInitialized - remove listener initialized')
+      window.removeEventListener('initialized', handleInitialized);
+    };
+  }, []);
+  return initialized;
 }
 
-const useSocket = ({ id, newChat }: {
+// const useSocket = ({ id, newChat }: {
+//   id?: string,
+//   newChat?: {
+//     Members: string[];
+//     distinctKey: string;
+//     name?: string;
+//     avatar?: string;
+//     group?: string;
+//     data?: any;
+//   }
+// }): Socket | null => {
+//   const [socket, setSocket] = useState<Socket | null>(null);
+
+//   useEffect(() => {
+//     const newSocket = io(process.env.SOCKET_URL!, { query: { id: id, chat: newChat && JSON.stringify(newChat) }, auth: { apikey: Chatty.apiKey } });
+//     setSocket(newSocket);
+//     return () => {
+//       newSocket.close();
+//     };
+//   }, []);
+
+//   return socket;
+// };
+
+const useChattySocket = ({ id, newChat }: {
   id?: string,
   newChat?: {
     Members: string[];
     distinctKey: string;
     name?: string;
-    avatar?: string;
+    image?: string;
     group?: string;
     data?: any;
   }
-}): Socket | null => {
-  const [socket, setSocket] = useState<Socket | null>(null);
+}): { chat: iChat, messages: Array<iMessage> } => {
+  const [chat, setChat] = useState<iChat>(null);
+  const [messages, setMessages] = useState<iMessage[]>([]);
 
   useEffect(() => {
-    const newSocket = io(process.env.SOCKET_URL!, { query: { id: id, chat: newChat && JSON.stringify(newChat) }, auth: { apikey: Chatty.apiKey } });
-    setSocket(newSocket);
+    console.debug('nuno', Chatty.apiKey, Chatty.app, Chatty.member);
+    // const socket = io(`${process.env.SOCKET_URL}/chat.${Chatty.app?.name}`, {
+    const socket = io(`${process.env.SOCKET_URL}`, {
+      // transports: ["websocket"],
+      query: { id: id, Chat: newChat && JSON.stringify(newChat) },
+      auth: { apiKey: Chatty.apiKey, MemberId: Chatty.member?.id, AppId: Chatty.app?.id },
+    });
+    // console.warn(':: ChattyClient useChattySocket - socket io', socket);
+    socket.on(eChattyEvent.CONNECT_DONE, (res: any) => {
+      console.debug(':: ChattyClient useChattySocket - connect', res);
+    });
+    socket.on(eChattyEvent.CONNECT_FAIL, (res: any) => {
+      console.warn(':: ChattyClient useChattySocket - connect error', res);
+    });
+
     return () => {
-      newSocket.close();
+      // socket.off('message');
+      console.warn(':: ChattyClient useChattySocket - socket disconnect');
+      socket.close();
     };
   }, []);
 
-  return socket;
+
+  return {
+    chat,
+    messages,
+  };
 };
 
+/*
 const useChat = ({ id, newChat }: {
   id?: string,
   newChat?: {
@@ -450,7 +561,6 @@ const useChat = ({ id, newChat }: {
   }
 }) => {
   const socket = useSocket({ id, newChat });
-  const queryClient = useQueryClient();
   // const [chat, setChat] = useState<any>(null);
   // const [messages, setMessages] = useState<string[]>([]);
 
@@ -459,20 +569,20 @@ const useChat = ({ id, newChat }: {
     return data;
   }
 
-  const { data, refetch } = useQuery(['chatty', 'chat', id], getChat, { initialData: { chat: {}, messages: [] } });
+  // const { data, refetch } = useQuery(['chatty', 'chat', id], getChat, { initialData: { chat: {}, messages: [] } });
 
   useEffect(() => {
     if (!socket) return;
     socket.on('message', (message: string) => {
-      queryClient.setQueryData<string[]>(['chatty', 'chat', id], (prevMessages) => {
-        return [...prevMessages!, message];
-      });
+      // queryClient.setQueryData<string[]>(['chatty', 'chat', id], (prevMessages) => {
+      //   return [...prevMessages!, message];
+      // });
     });
 
     return () => {
       socket.off('message');
     };
-  }, [socket, queryClient]);
+  }, [socket]);
 
   const sendMessage = (text: string) => {
     if (!socket) return;
@@ -480,8 +590,8 @@ const useChat = ({ id, newChat }: {
   };
 
   return {
-    chat: data.chat,
-    messages: data.messages,
+    // chat: data.chat,
+    // messages: data.messages,
     sendMessage
   };
 };
@@ -498,7 +608,7 @@ const useMessages = ({ id, newChat }: {
   }
 }) => {
   const socket = useSocket({ id, newChat });
-  const queryClient = useQueryClient();
+  // const queryClient = useQueryClient();
   // const [chat, setChat] = useState<any>(null);
   // const [messages, setMessages] = useState<string[]>([]);
 
@@ -507,20 +617,20 @@ const useMessages = ({ id, newChat }: {
     return data;
   }
 
-  const { data, refetch } = useQuery(['chatty', 'chat', id, 'messages'], getChat, { initialData: { chat: {}, messages: [] } });
+  // const { data, refetch } = useQuery(['chatty', 'chat', id, 'messages'], getChat, { initialData: { chat: {}, messages: [] } });
 
   useEffect(() => {
     if (!socket) return;
     socket.on('message', (message: string) => {
-      queryClient.setQueryData<string[]>(['chatty', 'chat', id, 'messages'], (prevMessages) => {
-        return [...prevMessages!, message];
-      });
+      // queryClient.setQueryData<string[]>(['chatty', 'chat', id, 'messages'], (prevMessages) => {
+      //   return [...prevMessages!, message];
+      // });
     });
 
     return () => {
       socket.off('message');
     };
-  }, [socket, queryClient]);
+  }, [socket]);
 
   const sendMessage = (text: string) => {
     if (!socket) return;
@@ -528,17 +638,17 @@ const useMessages = ({ id, newChat }: {
   };
 
   return {
-    chat: data.chat,
-    messages: data.messages,
+    // chat: data.chat,
+    // messages: data.messages,
     sendMessage
   };
 };
-
+*/
 
 export {
   Chatty,
-  useMissedCount,
-  useChat,
+  useInitialized,
+  useChattySocket,
   eMessageBy,
   eMessageType,
   eNotification,
