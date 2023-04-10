@@ -1,6 +1,6 @@
 /*!
  * ChattyClient v1.2.0
- * Build at 2023.4.9
+ * Build at 2023.4.10
  * Released under the MIT License.
  */
 (function (global, factory) {
@@ -8288,13 +8288,14 @@
       _useState6[1];
     react.useEffect(function () {
       var _b, _c;
-      console.debug('nuno', Chatty.apiKey, Chatty.app, Chatty.member);
+      // console.debug('nuno', Chatty.apiKey, Chatty.app, Chatty.member);
       // const socket = io(`${"http://localhost:4400"}/chat.${Chatty.app?.name}`, {
       var socket = lookup("".concat("http://localhost:4400"), {
         // transports: ["websocket"],
+        // query: { id: id, Chat: newChat && JSON.stringify(newChat) },
         query: {
           id: id,
-          Chat: newChat && JSON.stringify(newChat)
+          Chat: newChat
         },
         auth: {
           apiKey: Chatty.apiKey,

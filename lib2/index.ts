@@ -519,11 +519,12 @@ const useChattySocket = ({ id, newChat }: {
   const [messages, setMessages] = useState<iMessage[]>([]);
 
   useEffect(() => {
-    console.debug('nuno', Chatty.apiKey, Chatty.app, Chatty.member);
+    // console.debug('nuno', Chatty.apiKey, Chatty.app, Chatty.member);
     // const socket = io(`${process.env.SOCKET_URL}/chat.${Chatty.app?.name}`, {
     const socket = io(`${process.env.SOCKET_URL}`, {
       // transports: ["websocket"],
-      query: { id: id, Chat: newChat && JSON.stringify(newChat) },
+      // query: { id: id, Chat: newChat && JSON.stringify(newChat) },
+      query: { id: id, Chat: newChat },
       auth: { apiKey: Chatty.apiKey, MemberId: Chatty.member?.id, AppId: Chatty.app?.id },
     });
     // console.warn(':: ChattyClient useChattySocket - socket io', socket);
