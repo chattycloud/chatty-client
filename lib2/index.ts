@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React from 'react';
 import io, { Socket } from 'socket.io-client';
 import axios, { AxiosInstance } from 'axios';
 import md5 from 'md5';
@@ -288,11 +288,10 @@ class Chatty {
       });
       this.axiosInstance.defaults.headers.common['MemberId'] = this.member.id;
       if (this.app && this.member) {
-        // AppEventEmitter.emit('initialized', true);
-        const event = new CustomEvent('initialized', {
-          detail: { initialized: true },
-        });
-        window.dispatchEvent(event);
+        // const event = new CustomEvent('initialized', {
+        //   detail: { initialized: true },
+        // });
+        // window?.dispatchEvent(event);
         console.debug(":: ChattyClient Initialized !!");
         console.debug(":: ChattyClient App > ", this.app);
         console.debug(":: ChattyClient Member > ", this.member);
@@ -464,17 +463,17 @@ const getAxiosInstance = (ApiKey: string): AxiosInstance => {
 
 
 const useInitialized = (): boolean => {
-  const [initialized, setInitialized] = useState(Chatty.apiKey && Chatty.app && Chatty.member ? true : false);
-  useEffect(() => {
+  const [initialized, setInitialized] = React.useState<boolean>(Chatty.apiKey && Chatty.app && Chatty.member ? true : false);
+  React.useEffect(() => {
     if (initialized) return;
     const handleInitialized = (event: CustomEvent) => {
       setInitialized(event.detail.initialized);
     };
 
-    window.addEventListener('initialized', handleInitialized);
+    // window.addEventListener('initialized', handleInitialized);
     return () => {
       console.debug(':: ChattyClient useInitialized - remove listener initialized')
-      window.removeEventListener('initialized', handleInitialized);
+      // window?.removeEventListener('initialized', handleInitialized);
     };
   }, []);
   return initialized;
@@ -515,10 +514,10 @@ const useChattySocket = ({ id, newChat }: {
     data?: any;
   }
 }): { chat: iChat, messages: Array<iMessage> } => {
-  const [chat, setChat] = useState<iChat>(null);
-  const [messages, setMessages] = useState<iMessage[]>([]);
+  const [chat, setChat] = React.useState<iChat>(null);
+  const [messages, setMessages] = React.useState<iMessage[]>([]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     // console.debug('nuno', Chatty.apiKey, Chatty.app, Chatty.member);
     // const socket = io(`${process.env.SOCKET_URL}/chat.${Chatty.app?.name}`, {
     const socket = io(`${process.env.SOCKET_URL}`, {

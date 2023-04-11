@@ -1,13 +1,17 @@
 /*!
  * ChattyClient v1.2.0
- * Build at 2023.4.10
+ * Build at 2023.4.11
  * Released under the MIT License.
  */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('react')) :
   typeof define === 'function' && define.amd ? define(['exports', 'react'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.io = {}, global.react));
-})(this, (function (exports, react) { 'use strict';
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.io = {}, global.React));
+})(this, (function (exports, React) { 'use strict';
+
+  function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
+
+  var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 
   function _iterableToArrayLimit(arr, i) {
     var _i = null == arr ? null : "undefined" != typeof Symbol && arr[Symbol.iterator] || arr["@@iterator"];
@@ -7764,7 +7768,7 @@
       key: "init",
       value: function () {
         var _init = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee(_ref) {
-          var apiKey, member, event;
+          var apiKey, member;
           return _regeneratorRuntime().wrap(function _callee$(_context) {
             while (1) switch (_context.prev = _context.next) {
               case 0:
@@ -7799,13 +7803,11 @@
                 this.member = _context.sent;
                 this.axiosInstance.defaults.headers.common['MemberId'] = this.member.id;
                 if (this.app && this.member) {
-                  // AppEventEmitter.emit('initialized', true);
-                  event = new CustomEvent('initialized', {
+                  new CustomEvent('initialized', {
                     detail: {
                       initialized: true
                     }
-                  });
-                  window.dispatchEvent(event);
+                  }); // window?.dispatchEvent(event);
                   console.debug(":: ChattyClient Initialized !!");
                   console.debug(":: ChattyClient App > ", this.app);
                   console.debug(":: ChattyClient Member > ", this.member);
@@ -8237,19 +8239,16 @@
     return instance;
   };
   var useInitialized = function useInitialized() {
-    var _useState = react.useState(Chatty.apiKey && Chatty.app && Chatty.member ? true : false),
-      _useState2 = _slicedToArray(_useState, 2),
-      initialized = _useState2[0],
-      setInitialized = _useState2[1];
-    react.useEffect(function () {
+    var _React$useState = React__default["default"].useState(Chatty.apiKey && Chatty.app && Chatty.member ? true : false),
+      _React$useState2 = _slicedToArray(_React$useState, 2),
+      initialized = _React$useState2[0];
+      _React$useState2[1];
+    React__default["default"].useEffect(function () {
       if (initialized) return;
-      var handleInitialized = function handleInitialized(event) {
-        setInitialized(event.detail.initialized);
-      };
-      window.addEventListener('initialized', handleInitialized);
+      // window.addEventListener('initialized', handleInitialized);
       return function () {
         console.debug(':: ChattyClient useInitialized - remove listener initialized');
-        window.removeEventListener('initialized', handleInitialized);
+        // window?.removeEventListener('initialized', handleInitialized);
       };
     }, []);
     return initialized;
@@ -8278,15 +8277,15 @@
   var useChattySocket = function useChattySocket(_ref4) {
     var id = _ref4.id,
       newChat = _ref4.newChat;
-    var _useState3 = react.useState(null),
-      _useState4 = _slicedToArray(_useState3, 2),
-      chat = _useState4[0];
-      _useState4[1];
-    var _useState5 = react.useState([]),
-      _useState6 = _slicedToArray(_useState5, 2),
-      messages = _useState6[0];
-      _useState6[1];
-    react.useEffect(function () {
+    var _React$useState3 = React__default["default"].useState(null),
+      _React$useState4 = _slicedToArray(_React$useState3, 2),
+      chat = _React$useState4[0];
+      _React$useState4[1];
+    var _React$useState5 = React__default["default"].useState([]),
+      _React$useState6 = _slicedToArray(_React$useState5, 2),
+      messages = _React$useState6[0];
+      _React$useState6[1];
+    React__default["default"].useEffect(function () {
       var _b, _c;
       // console.debug('nuno', Chatty.apiKey, Chatty.app, Chatty.member);
       // const socket = io(`${"http://localhost:4400"}/chat.${Chatty.app?.name}`, {
