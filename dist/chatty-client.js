@@ -589,8 +589,17 @@
   function _slicedToArray(arr, i) {
     return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest();
   }
+  function _toConsumableArray(arr) {
+    return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread();
+  }
+  function _arrayWithoutHoles(arr) {
+    if (Array.isArray(arr)) return _arrayLikeToArray(arr);
+  }
   function _arrayWithHoles(arr) {
     if (Array.isArray(arr)) return arr;
+  }
+  function _iterableToArray(iter) {
+    if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter);
   }
   function _unsupportedIterableToArray(o, minLen) {
     if (!o) return;
@@ -604,6 +613,9 @@
     if (len == null || len > arr.length) len = arr.length;
     for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i];
     return arr2;
+  }
+  function _nonIterableSpread() {
+    throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
   }
   function _nonIterableRest() {
     throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
@@ -7803,11 +7815,10 @@
                 this.member = _context.sent;
                 this.axiosInstance.defaults.headers.common['MemberId'] = this.member.id;
                 if (this.app && this.member) {
-                  new CustomEvent('initialized', {
-                    detail: {
-                      initialized: true
-                    }
-                  }); // window?.dispatchEvent(event);
+                  // const event = new CustomEvent('initialized', {
+                  //   detail: { initialized: true },
+                  // });
+                  // window?.dispatchEvent(event);
                   console.debug(":: ChattyClient Initialized !!");
                   console.debug(":: ChattyClient App > ", this.app);
                   console.debug(":: ChattyClient Member > ", this.member);
@@ -8253,45 +8264,16 @@
     }, []);
     return initialized;
   };
-  // const useSocket = ({ id, newChat }: {
-  //   id?: string,
-  //   newChat?: {
-  //     Members: string[];
-  //     distinctKey: string;
-  //     name?: string;
-  //     avatar?: string;
-  //     group?: string;
-  //     data?: any;
-  //   }
-  // }): Socket | null => {
-  //   const [socket, setSocket] = useState<Socket | null>(null);
-  //   useEffect(() => {
-  //     const newSocket = io("http://localhost:4400"!, { query: { id: id, chat: newChat && JSON.stringify(newChat) }, auth: { apikey: Chatty.apiKey } });
-  //     setSocket(newSocket);
-  //     return () => {
-  //       newSocket.close();
-  //     };
-  //   }, []);
-  //   return socket;
-  // };
-  var useChattySocket = function useChattySocket(_ref4) {
+  var useSocket = function useSocket(_ref4) {
     var id = _ref4.id,
       newChat = _ref4.newChat;
     var _React$useState3 = React__default["default"].useState(null),
       _React$useState4 = _slicedToArray(_React$useState3, 2),
-      chat = _React$useState4[0];
-      _React$useState4[1];
-    var _React$useState5 = React__default["default"].useState([]),
-      _React$useState6 = _slicedToArray(_React$useState5, 2),
-      messages = _React$useState6[0];
-      _React$useState6[1];
+      socket = _React$useState4[0],
+      setSocket = _React$useState4[1];
     React__default["default"].useEffect(function () {
       var _b, _c;
-      // console.debug('nuno', Chatty.apiKey, Chatty.app, Chatty.member);
-      // const socket = io(`${"http://localhost:4400"}/chat.${Chatty.app?.name}`, {
-      var socket = lookup("".concat("http://localhost:4400"), {
-        // transports: ["websocket"],
-        // query: { id: id, Chat: newChat && JSON.stringify(newChat) },
+      var newSocket = lookup("http://localhost:4400", {
         query: {
           id: id,
           Chat: newChat
@@ -8302,22 +8284,76 @@
           AppId: (_c = Chatty.app) === null || _c === void 0 ? void 0 : _c.id
         }
       });
-      // console.warn(':: ChattyClient useChattySocket - socket io', socket);
-      socket.on(exports.eChattyEvent.CONNECT_DONE, function (res) {
-        console.debug(':: ChattyClient useChattySocket - connect', res);
-      });
-      socket.on(exports.eChattyEvent.CONNECT_FAIL, function (res) {
-        console.warn(':: ChattyClient useChattySocket - connect error', res);
-      });
+      setSocket(newSocket);
       return function () {
-        // socket.off('message');
-        console.warn(':: ChattyClient useChattySocket - socket disconnect');
-        socket.close();
+        newSocket.close();
+        console.debug(':: ChattyClient - socket disconnected');
       };
     }, []);
+    return socket;
+  };
+  var useChattySocket = function useChattySocket(_ref5) {
+    var id = _ref5.id,
+      newChat = _ref5.newChat;
+    var _React$useState5 = React__default["default"].useState(null),
+      _React$useState6 = _slicedToArray(_React$useState5, 2),
+      chat = _React$useState6[0],
+      setChat = _React$useState6[1];
+    var _React$useState7 = React__default["default"].useState([]),
+      _React$useState8 = _slicedToArray(_React$useState7, 2),
+      messages = _React$useState8[0],
+      setMessages = _React$useState8[1];
+    var _React$useState9 = React__default["default"].useState(false),
+      _React$useState10 = _slicedToArray(_React$useState9, 2),
+      hasNext = _React$useState10[0],
+      setHasNext = _React$useState10[1];
+    var socket = useSocket({
+      id: id,
+      newChat: newChat
+    });
+    React__default["default"].useEffect(function () {
+      if (!socket) return;
+      // CONNECT
+      socket.on(exports.eChattyEvent.CONNECT_DONE, function (data) {
+        setChat(data.chat);
+        setMessages(data.messages);
+        setHasNext(data.hasNext);
+      });
+      socket.on(exports.eChattyEvent.CONNECT_FAIL, function (error) {
+        console.warn(':: ChattyClient connection fail', error);
+      });
+      // FETCH_MESSAGES
+      socket.on(exports.eChattyEvent.FETCH_MESSAGES_DONE, function (data) {
+        if (data.refresh) {
+          setMessages(data.messages);
+          setHasNext(data.hasNext);
+        } else {
+          setMessages([].concat(_toConsumableArray(messages), _toConsumableArray(data.messages)));
+          setHasNext(data.hasNext);
+        }
+        socket.emit(exports.eChattyEvent.MARK_AS_READ);
+      });
+      socket.on(exports.eChattyEvent.FETCH_MESSAGES_FAIL, function (error) {
+        console.warn(':: ChattyClient fetch messages fail', error);
+      });
+      return function () {
+        socket.off(exports.eChattyEvent.CONNECT_DONE);
+        socket.off(exports.eChattyEvent.CONNECT_FAIL);
+        socket.off(exports.eChattyEvent.FETCH_MESSAGES_DONE);
+        socket.off(exports.eChattyEvent.FETCH_MESSAGES_FAIL);
+      };
+    }, [socket]);
+    var getMessages = function getMessages(refresh) {
+      if (hasNext) {
+        socket.emit(exports.eChattyEvent.FETCH_MESSAGES, {
+          refresh: refresh
+        });
+      }
+    };
     return {
       chat: chat,
-      messages: messages
+      messages: messages,
+      getMessages: getMessages
     };
   };
 

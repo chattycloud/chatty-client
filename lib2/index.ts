@@ -479,29 +479,35 @@ const useInitialized = (): boolean => {
   return initialized;
 }
 
-// const useSocket = ({ id, newChat }: {
-//   id?: string,
-//   newChat?: {
-//     Members: string[];
-//     distinctKey: string;
-//     name?: string;
-//     avatar?: string;
-//     group?: string;
-//     data?: any;
-//   }
-// }): Socket | null => {
-//   const [socket, setSocket] = useState<Socket | null>(null);
+const useSocket = ({ id, newChat }: {
+  id?: string,
+  newChat?: {
+    Members: string[];
+    distinctKey: string;
+    name?: string;
+    avatar?: string;
+    group?: string;
+    data?: any;
+  }
+}): Socket | null => {
+  const [socket, setSocket] = React.useState<Socket | null>(null);
 
-//   useEffect(() => {
-//     const newSocket = io(process.env.SOCKET_URL!, { query: { id: id, chat: newChat && JSON.stringify(newChat) }, auth: { apikey: Chatty.apiKey } });
-//     setSocket(newSocket);
-//     return () => {
-//       newSocket.close();
-//     };
-//   }, []);
+  React.useEffect(() => {
+    const newSocket = io(process.env.SOCKET_URL!, {
+      query: { id: id, Chat: newChat },
+      auth: { apiKey: Chatty.apiKey, MemberId: Chatty.member?.id, AppId: Chatty.app?.id },
+    });
 
-//   return socket;
-// };
+    setSocket(newSocket);
+
+    return () => {
+      newSocket.close();
+      console.debug(':: ChattyClient - socket disconnected');
+    };
+  }, []);
+
+  return socket;
+};
 
 const useChattySocket = ({ id, newChat }: {
   id?: string,
@@ -513,38 +519,62 @@ const useChattySocket = ({ id, newChat }: {
     group?: string;
     data?: any;
   }
-}): { chat: iChat, messages: Array<iMessage> } => {
+}): {
+  chat: iChat,
+  messages: Array<iMessage>,
+  getMessages: (refresh?: boolean) => void,
+} => {
   const [chat, setChat] = React.useState<iChat>(null);
   const [messages, setMessages] = React.useState<iMessage[]>([]);
+  const [hasNext, setHasNext] = React.useState<boolean>(false);
+  const socket = useSocket({ id, newChat });
 
   React.useEffect(() => {
-    // console.debug('nuno', Chatty.apiKey, Chatty.app, Chatty.member);
-    // const socket = io(`${process.env.SOCKET_URL}/chat.${Chatty.app?.name}`, {
-    const socket = io(`${process.env.SOCKET_URL}`, {
-      // transports: ["websocket"],
-      // query: { id: id, Chat: newChat && JSON.stringify(newChat) },
-      query: { id: id, Chat: newChat },
-      auth: { apiKey: Chatty.apiKey, MemberId: Chatty.member?.id, AppId: Chatty.app?.id },
+    if (!socket) return;
+
+    // CONNECT
+    socket.on(eChattyEvent.CONNECT_DONE, (data: any) => {
+      setChat(data.chat);
+      setMessages(data.messages!);
+      setHasNext(data.hasNext!);
     });
-    // console.warn(':: ChattyClient useChattySocket - socket io', socket);
-    socket.on(eChattyEvent.CONNECT_DONE, (res: any) => {
-      console.debug(':: ChattyClient useChattySocket - connect', res);
+    socket.on(eChattyEvent.CONNECT_FAIL, (error: any) => {
+      console.warn(':: ChattyClient connection fail', error);
     });
-    socket.on(eChattyEvent.CONNECT_FAIL, (res: any) => {
-      console.warn(':: ChattyClient useChattySocket - connect error', res);
+
+    // FETCH_MESSAGES
+    socket.on(eChattyEvent.FETCH_MESSAGES_DONE, (data: any) => {
+      if (data.refresh) {
+        setMessages(data.messages!);
+        setHasNext(data.hasNext!);
+      } else {
+        setMessages([...messages, ...data.messages!]);
+        setHasNext(data.hasNext!);
+      }
+      socket.emit(eChattyEvent.MARK_AS_READ);
+    });
+    socket.on(eChattyEvent.FETCH_MESSAGES_FAIL, (error: any) => {
+      console.warn(':: ChattyClient fetch messages fail', error);
     });
 
     return () => {
-      // socket.off('message');
-      console.warn(':: ChattyClient useChattySocket - socket disconnect');
-      socket.close();
+      socket.off(eChattyEvent.CONNECT_DONE);
+      socket.off(eChattyEvent.CONNECT_FAIL);
+      socket.off(eChattyEvent.FETCH_MESSAGES_DONE);
+      socket.off(eChattyEvent.FETCH_MESSAGES_FAIL);
     };
-  }, []);
+  }, [socket]);
 
+  const getMessages = (refresh: boolean) => {
+    if (hasNext) {
+      socket.emit(eChattyEvent.FETCH_MESSAGES, { refresh: refresh });
+    }
+  }
 
   return {
     chat,
     messages,
+    getMessages,
   };
 };
 
