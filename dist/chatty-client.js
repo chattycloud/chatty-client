@@ -1,6 +1,6 @@
 /*!
  * ChattyClient v1.2.0
- * Build at 2023.4.11
+ * Build at 2023.4.13
  * Released under the MIT License.
  */
 (function (global, factory) {
@@ -7740,9 +7740,6 @@
     eChattyEvent["FETCH_MESSAGES_DONE"] = "fetch_messages_done";
     eChattyEvent["FETCH_MESSAGES_FAIL"] = "fetch_messages_fail";
     eChattyEvent["UPDATE_MESSAGES"] = "update_message";
-    eChattyEvent["FETCH_CHATS"] = "fetch_chats";
-    eChattyEvent["FETCH_CHATS_DONE"] = "fetch_chats_done";
-    eChattyEvent["FETCH_CHATS_FAIL"] = "fetch_chats_fail";
     eChattyEvent["SEND_MESSAGE"] = "send_message";
     eChattyEvent["SEND_MESSAGE_DONE"] = "send_message_done";
     eChattyEvent["SEND_MESSAGE_FAIL"] = "send_message_fail";
@@ -7753,7 +7750,10 @@
     eChattyEvent["MARK_AS_READ"] = "mark_as_read";
     eChattyEvent["MARK_AS_READ_DONE"] = "mark_as_read_done";
     eChattyEvent["MARK_AS_READ_FAIL"] = "mark_as_read_fail";
-    eChattyEvent["MARK_AS_READ_BYPASS"] = "mark_as_read_bypass";
+    // TOBE DEPRECATED
+    eChattyEvent["FETCH_CHATS"] = "fetch_chats";
+    eChattyEvent["FETCH_CHATS_DONE"] = "fetch_chats_done";
+    eChattyEvent["FETCH_CHATS_FAIL"] = "fetch_chats_fail";
     // TOBE DEPRECATED
     // 아래 내용들은 SYSTEM MESSAGE와 관련된 내용으로, 대시보드에서 사용 설정하게 되면 PUSH 메시지로 전달됩니다.
     // 따라서, 이벤트를 받아서 처리하는 것은 권장하지 않습니다.
@@ -8228,9 +8228,107 @@
       }
     }, _callee12);
   }));
+  Chatty.upload = /*#__PURE__*/function () {
+    var _ref4 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee15(files) {
+      return _regeneratorRuntime().wrap(function _callee15$(_context15) {
+        while (1) switch (_context15.prev = _context15.next) {
+          case 0:
+            return _context15.abrupt("return", new Promise( /*#__PURE__*/function () {
+              var _ref5 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee14(resolve, reject) {
+                var result;
+                return _regeneratorRuntime().wrap(function _callee14$(_context14) {
+                  while (1) switch (_context14.prev = _context14.next) {
+                    case 0:
+                      _context14.prev = 0;
+                      if (!(!_a.app || !_a.member)) {
+                        _context14.next = 3;
+                        break;
+                      }
+                      return _context14.abrupt("return", reject({
+                        message: ":: ChattyClient upload fail - Chatty was not initialized"
+                      }));
+                    case 3:
+                      _context14.next = 5;
+                      return Promise.all(files.map( /*#__PURE__*/function () {
+                        var _ref6 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee13(file) {
+                          var _b, _c, _d, form, uploadUrl, uploaded, baseurl;
+                          return _regeneratorRuntime().wrap(function _callee13$(_context13) {
+                            while (1) switch (_context13.prev = _context13.next) {
+                              case 0:
+                                form = new FormData();
+                                form.append("file", file);
+                                _context13.next = 4;
+                                return (_b = _a.axiosInstance) === null || _b === void 0 ? void 0 : _b.get("/uploadurl");
+                              case 4:
+                                uploadUrl = _context13.sent;
+                                if (!(uploadUrl === null || uploadUrl === void 0 ? void 0 : uploadUrl.data)) {
+                                  reject({
+                                    message: ":: ChattyClient upload - Getting uploadUrl failed"
+                                  });
+                                }
+                                _context13.next = 8;
+                                return axios$1.post(uploadUrl === null || uploadUrl === void 0 ? void 0 : uploadUrl.data, form, {
+                                  headers: {
+                                    "Content-Type": "multipart/form-data",
+                                    Accept: "application/json"
+                                  }
+                                });
+                              case 8:
+                                uploaded = _context13.sent;
+                                if (!((_c = uploaded === null || uploaded === void 0 ? void 0 : uploaded.data) === null || _c === void 0 ? void 0 : _c.result)) {
+                                  _context13.next = 14;
+                                  break;
+                                }
+                                baseurl = uploaded.data.result.variants[0].split(uploaded.data.result.id)[0];
+                                return _context13.abrupt("return", {
+                                  uri: baseurl + uploaded.data.result.id + "/" + ((_d = _a.app) === null || _d === void 0 ? void 0 : _d.thumbnailSize)
+                                });
+                              case 14:
+                                return _context13.abrupt("return", {
+                                  uri: ""
+                                });
+                              case 15:
+                              case "end":
+                                return _context13.stop();
+                            }
+                          }, _callee13);
+                        }));
+                        return function (_x14) {
+                          return _ref6.apply(this, arguments);
+                        };
+                      }()));
+                    case 5:
+                      result = _context14.sent;
+                      resolve(result);
+                      _context14.next = 12;
+                      break;
+                    case 9:
+                      _context14.prev = 9;
+                      _context14.t0 = _context14["catch"](0);
+                      reject(_context14.t0);
+                    case 12:
+                    case "end":
+                      return _context14.stop();
+                  }
+                }, _callee14, null, [[0, 9]]);
+              }));
+              return function (_x12, _x13) {
+                return _ref5.apply(this, arguments);
+              };
+            }()));
+          case 1:
+          case "end":
+            return _context15.stop();
+        }
+      }, _callee15);
+    }));
+    return function (_x11) {
+      return _ref4.apply(this, arguments);
+    };
+  }();
   var getAxiosInstance = function getAxiosInstance(ApiKey) {
     var instance = axios$1.create();
-    instance.defaults.baseURL = "http://localhost:3300";
+    instance.defaults.baseURL = "https://devapi.chatty-cloud.com";
     instance.defaults.headers.common['ApiKey'] = ApiKey;
     instance.defaults.headers.common["Content-Type"] = "application/json";
     instance.interceptors.request.use(function (request) {
@@ -8264,16 +8362,16 @@
     }, []);
     return initialized;
   };
-  var useSocket = function useSocket(_ref4) {
-    var id = _ref4.id,
-      newChat = _ref4.newChat;
+  var useSocket = function useSocket(_ref7) {
+    var id = _ref7.id,
+      newChat = _ref7.newChat;
     var _React$useState3 = React__default["default"].useState(null),
       _React$useState4 = _slicedToArray(_React$useState3, 2),
       socket = _React$useState4[0],
       setSocket = _React$useState4[1];
     React__default["default"].useEffect(function () {
       var _b, _c;
-      var newSocket = lookup("http://localhost:4400", {
+      var newSocket = lookup("wss://devsocket.chatty-cloud.com", {
         query: {
           id: id,
           Chat: newChat
@@ -8292,9 +8390,9 @@
     }, []);
     return socket;
   };
-  var useChattySocket = function useChattySocket(_ref5) {
-    var id = _ref5.id,
-      newChat = _ref5.newChat;
+  var useChattySocket = function useChattySocket(_ref8) {
+    var id = _ref8.id,
+      newChat = _ref8.newChat;
     var _React$useState5 = React__default["default"].useState(null),
       _React$useState6 = _slicedToArray(_React$useState5, 2),
       chat = _React$useState6[0],
@@ -8318,6 +8416,7 @@
         setChat(data.chat);
         setMessages(data.messages);
         setHasNext(data.hasNext);
+        socket.emit(exports.eChattyEvent.MARK_AS_READ);
       });
       socket.on(exports.eChattyEvent.CONNECT_FAIL, function (error) {
         console.warn(':: ChattyClient connection fail', error);
@@ -8336,24 +8435,172 @@
       socket.on(exports.eChattyEvent.FETCH_MESSAGES_FAIL, function (error) {
         console.warn(':: ChattyClient fetch messages fail', error);
       });
+      // SEND_MESSAGE
+      socket.on(exports.eChattyEvent.SEND_MESSAGE_DONE, function (data) {
+        setMessages(function (oldMessages) {
+          var oldMessagesMap = new Map(oldMessages.map(function (e) {
+            return [e['id'], e];
+          }));
+          var newMessagesMap = new Map(data.message && [[data.message['id'], data.message]]);
+          var messagesMap = new Map([].concat(_toConsumableArray(Array.from(oldMessagesMap)), _toConsumableArray(Array.from(newMessagesMap))));
+          return Array.from(messagesMap.values());
+        });
+      });
+      socket.on(exports.eChattyEvent.SEND_MESSAGE_RETRY, function (data) {
+        socket.emit(exports.eChattyEvent.SEND_MESSAGE, data);
+      });
+      socket.on(exports.eChattyEvent.SEND_MESSAGE_FAIL, function (error) {
+        console.warn(':: ChattyClient send message fail', error);
+      });
+      // RECEIVE_MESSAGE
+      socket.on(exports.eChattyEvent.RECEIVE_MESSAGE, function (data) {
+        setMessages(function (oldMessages) {
+          var oldMessagesMap = new Map(oldMessages.map(function (e) {
+            return [e['id'], e];
+          }));
+          var newMessagesMap = new Map(data.message && [[data.message['id'], data.message]]);
+          var messagesMap = new Map([].concat(_toConsumableArray(Array.from(newMessagesMap)), _toConsumableArray(Array.from(oldMessagesMap))));
+          return Array.from(messagesMap.values());
+        });
+        socket.emit(exports.eChattyEvent.MARK_AS_READ);
+      });
+      // MARK_AS_READ
+      socket.on(exports.eChattyEvent.MARK_AS_READ_DONE, function () {});
+      socket.on(exports.eChattyEvent.MARK_AS_READ_FAIL, function (error) {
+        console.debug(':: ChattyClient mark as read fail', error);
+      });
+      // UPDATE_MESSAGES
+      socket.on(exports.eChattyEvent.UPDATE_MESSAGES, function (data) {
+        // readReceipt가 변경되었거나 메세지내용이 삭제또는 변경된경우 update하기 위해 발생되는 이벤트 (서버주도로 발생)
+        setMessages(function (oldMessages) {
+          var _b;
+          var oldMessagesMap = new Map(oldMessages.map(function (e) {
+            return [e['id'], e];
+          }));
+          var newMessagesMap = new Map((_b = data.messages) === null || _b === void 0 ? void 0 : _b.map(function (e) {
+            return [e['id'], e];
+          }));
+          var messagesMap = new Map([].concat(_toConsumableArray(Array.from(oldMessagesMap)), _toConsumableArray(Array.from(newMessagesMap))));
+          return Array.from(messagesMap.values());
+        });
+      });
+      // REFRESH_CHAT
+      socket.on(exports.eChattyEvent.REFRESH_CHAT_DONE, function (data) {
+        setChat(data.chat);
+      });
       return function () {
         socket.off(exports.eChattyEvent.CONNECT_DONE);
         socket.off(exports.eChattyEvent.CONNECT_FAIL);
         socket.off(exports.eChattyEvent.FETCH_MESSAGES_DONE);
         socket.off(exports.eChattyEvent.FETCH_MESSAGES_FAIL);
+        socket.off(exports.eChattyEvent.SEND_MESSAGE_DONE);
+        socket.off(exports.eChattyEvent.SEND_MESSAGE_RETRY);
+        socket.off(exports.eChattyEvent.SEND_MESSAGE_FAIL);
+        socket.off(exports.eChattyEvent.RECEIVE_MESSAGE);
+        socket.off(exports.eChattyEvent.MARK_AS_READ_DONE);
+        socket.off(exports.eChattyEvent.MARK_AS_READ_FAIL);
+        socket.off(exports.eChattyEvent.UPDATE_MESSAGES);
+        socket.off(exports.eChattyEvent.REFRESH_CHAT_DONE);
       };
     }, [socket]);
-    var getMessages = function getMessages(refresh) {
+    var fetchMessages = function fetchMessages(refresh) {
       if (hasNext) {
         socket.emit(exports.eChattyEvent.FETCH_MESSAGES, {
           refresh: refresh
         });
       }
     };
+    var refreshChat = function refreshChat() {
+      socket.emit(exports.eChattyEvent.REFRESH_CHAT);
+    };
+    var isMessageString = function isMessageString(message) {
+      return typeof message === 'string';
+    };
+    var isMessageArray = function isMessageArray(message) {
+      return Array.isArray(message);
+    };
+    var isMessageObject = function isMessageObject(message) {
+      return _typeof(message) === 'object' && message !== null && !Array.isArray(message);
+    };
+    var sendMessage = /*#__PURE__*/function () {
+      var _ref9 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee16(message) {
+        var _b, _c, id, now, type, text;
+        return _regeneratorRuntime().wrap(function _callee16$(_context16) {
+          while (1) switch (_context16.prev = _context16.next) {
+            case 0:
+              id = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+                var r = Math.random() * 16 | 0,
+                  v = c == "x" ? r : r & 0x3 | 0x8;
+                return v.toString(16);
+              });
+              now = new Date();
+              type = isMessageString(message) ? exports.eMessageType.TEXT : isMessageObject(message) ? exports.eMessageType.JSON : exports.eMessageType.FILE;
+              text = isMessageString(message) ? message : isMessageArray(message) ? 'File message' : 'JSON message';
+              _context16.t0 = socket;
+              _context16.t1 = exports.eChattyEvent.SEND_MESSAGE;
+              _context16.t2 = id;
+              _context16.t3 = text;
+              if (!isMessageArray(message)) {
+                _context16.next = 14;
+                break;
+              }
+              _context16.next = 11;
+              return Chatty.upload(message);
+            case 11:
+              _context16.t4 = _context16.sent;
+              _context16.next = 15;
+              break;
+            case 14:
+              _context16.t4 = null;
+            case 15:
+              _context16.t5 = _context16.t4;
+              _context16.t6 = isMessageObject(message) ? message : null;
+              _context16.t7 = type;
+              _context16.t8 = exports.eMessageBy.USER;
+              _context16.t9 = now;
+              _context16.t10 = (_b = Chatty.member) === null || _b === void 0 ? void 0 : _b.id;
+              _context16.t11 = {
+                id: _context16.t2,
+                text: _context16.t3,
+                files: _context16.t5,
+                json: _context16.t6,
+                type: _context16.t7,
+                by: _context16.t8,
+                createdAt: _context16.t9,
+                SenderId: _context16.t10,
+                retry: 5
+              };
+              _context16.t0.emit.call(_context16.t0, _context16.t1, _context16.t11);
+              return _context16.abrupt("return", {
+                id: id,
+                text: text,
+                files: isMessageArray(message) ? message : null,
+                json: isMessageObject(message) ? message : null,
+                type: type,
+                by: exports.eMessageBy.USER,
+                translation: null,
+                readReceipt: 0,
+                createdAt: now,
+                updatedAt: now,
+                SenderId: (_c = Chatty.member) === null || _c === void 0 ? void 0 : _c.id,
+                Sender: Chatty.member
+              });
+            case 24:
+            case "end":
+              return _context16.stop();
+          }
+        }, _callee16);
+      }));
+      return function sendMessage(_x15) {
+        return _ref9.apply(this, arguments);
+      };
+    }();
     return {
       chat: chat,
       messages: messages,
-      getMessages: getMessages
+      fetchMessages: fetchMessages,
+      sendMessage: sendMessage,
+      refreshChat: refreshChat
     };
   };
 

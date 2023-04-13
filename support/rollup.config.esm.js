@@ -10,10 +10,10 @@ const banner = `/*!
  * Released under the MIT License.
  */`;
 
-const API_URL = `http://localhost:3300`;
-const SOCKET_URL = `http://localhost:4400`;
-// const API_URL = `https://${process.env.NODE_ENV}api.chatty-cloud.com`;
-// const SOCKET_URL = `wss://${process.env.NODE_ENV}socket.chatty-cloud.com`;
+// const API_URL = `http://localhost:3300`;
+// const SOCKET_URL = `http://localhost:4400`;
+const API_URL = `https://${process.env.NODE_ENV}api.chatty-cloud.com`;
+const SOCKET_URL = `wss://${process.env.NODE_ENV}socket.chatty-cloud.com`;
 
 module.exports = {
   input: "./build/esm/index.js",

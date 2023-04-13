@@ -221,10 +221,6 @@ export enum eChattyEvent {
 
   UPDATE_MESSAGES = "update_message",
 
-  FETCH_CHATS = "fetch_chats",
-  FETCH_CHATS_DONE = "fetch_chats_done",
-  FETCH_CHATS_FAIL = "fetch_chats_fail",
-
   SEND_MESSAGE = "send_message",
   SEND_MESSAGE_DONE = "send_message_done",
   SEND_MESSAGE_FAIL = "send_message_fail",
@@ -237,7 +233,11 @@ export enum eChattyEvent {
   MARK_AS_READ = "mark_as_read",
   MARK_AS_READ_DONE = "mark_as_read_done",
   MARK_AS_READ_FAIL = "mark_as_read_fail",
-  MARK_AS_READ_BYPASS = "mark_as_read_bypass",
+
+  // TOBE DEPRECATED
+  FETCH_CHATS = "fetch_chats",
+  FETCH_CHATS_DONE = "fetch_chats_done",
+  FETCH_CHATS_FAIL = "fetch_chats_fail",
 
   // TOBE DEPRECATED
   // 아래 내용들은 SYSTEM MESSAGE와 관련된 내용으로, 대시보드에서 사용 설정하게 되면 PUSH 메시지로 전달됩니다.
@@ -449,6 +449,55 @@ class Chatty {
     return data;
   }
 
+  static upload = async (files: Array<{ uri: string, type: string }>): Promise<Array<{ uri: string }>> => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        if (!this.app || !this.member) return reject({ message: ":: ChattyClient upload fail - Chatty was not initialized" });
+
+        // if (!validateFiles(files, Chatty.app)) {
+        //   reject(":: ChattyClient uploadFiles - File validations are failed");
+        // }
+
+        const result = await Promise.all(
+          files.map(async (file: any) => {
+            const form = new FormData();
+            form.append("file", file);
+
+            const uploadUrl = await this.axiosInstance?.get("/uploadurl");
+            if (!uploadUrl?.data) {
+              reject({ message: ":: ChattyClient upload - Getting uploadUrl failed" });
+            }
+
+            const uploaded = await axios.post(uploadUrl?.data, form, {
+              headers: {
+                "Content-Type": "multipart/form-data",
+                Accept: "application/json",
+              },
+            });
+
+            if (uploaded?.data?.result) {
+              const baseurl = uploaded.data.result.variants[0].split(
+                uploaded.data.result.id
+              )[0];
+              return {
+                uri:
+                  baseurl +
+                  uploaded.data.result.id +
+                  "/" +
+                  this.app?.thumbnailSize,
+              };
+            } else {
+              return { uri: "" };
+            }
+          })
+        );
+
+        resolve(result);
+      } catch (error: any) {
+        reject(error);
+      }
+    });
+  }
 }
 
 const getAxiosInstance = (ApiKey: string): AxiosInstance => {
@@ -522,7 +571,9 @@ const useChattySocket = ({ id, newChat }: {
 }): {
   chat: iChat,
   messages: Array<iMessage>,
-  getMessages: (refresh?: boolean) => void,
+  fetchMessages: (refresh?: boolean) => void,
+  sendMessage: (message: string | object | Array<{ uri: string, type: string }>) => Promise<iMessage>,
+  refreshChat: () => void,
 } => {
   const [chat, setChat] = React.useState<iChat>(null);
   const [messages, setMessages] = React.useState<iMessage[]>([]);
@@ -537,6 +588,7 @@ const useChattySocket = ({ id, newChat }: {
       setChat(data.chat);
       setMessages(data.messages!);
       setHasNext(data.hasNext!);
+      socket.emit(eChattyEvent.MARK_AS_READ);
     });
     socket.on(eChattyEvent.CONNECT_FAIL, (error: any) => {
       console.warn(':: ChattyClient connection fail', error);
@@ -557,123 +609,141 @@ const useChattySocket = ({ id, newChat }: {
       console.warn(':: ChattyClient fetch messages fail', error);
     });
 
+    // SEND_MESSAGE
+    socket.on(eChattyEvent.SEND_MESSAGE_DONE, (data: any) => {
+      setMessages((oldMessages) => {
+        const oldMessagesMap = new Map(oldMessages.map((e) => [e['id'], e]));
+        const newMessagesMap = new Map(data.message && [[data.message['id'], data.message]]);
+        const messagesMap = new Map([...Array.from(oldMessagesMap), ...Array.from(newMessagesMap)]);
+        return Array.from(messagesMap.values());
+      });
+    });
+    socket.on(eChattyEvent.SEND_MESSAGE_RETRY, (data: { retry: number }) => {
+      socket.emit(eChattyEvent.SEND_MESSAGE, data);
+    });
+    socket.on(eChattyEvent.SEND_MESSAGE_FAIL, (error: any) => {
+      console.warn(':: ChattyClient send message fail', error);
+    });
+
+    // RECEIVE_MESSAGE
+    socket.on(eChattyEvent.RECEIVE_MESSAGE, (data: any) => {
+      setMessages((oldMessages) => {
+        const oldMessagesMap = new Map(oldMessages.map((e) => [e['id'], e]));
+        const newMessagesMap = new Map(data.message && [[data.message['id'], data.message]]);
+        const messagesMap = new Map([...Array.from(newMessagesMap), ...Array.from(oldMessagesMap)]);
+        return Array.from(messagesMap.values());
+      });
+      socket.emit(eChattyEvent.MARK_AS_READ);
+    });
+
+    // MARK_AS_READ
+    socket.on(eChattyEvent.MARK_AS_READ_DONE, () => { });
+    socket.on(eChattyEvent.MARK_AS_READ_FAIL, (error: any) => {
+      console.debug(':: ChattyClient mark as read fail', error);
+    });
+
+    // UPDATE_MESSAGES
+    socket.on(eChattyEvent.UPDATE_MESSAGES, (data: { messages: Array<iMessage> }) => {
+      // readReceipt가 변경되었거나 메세지내용이 삭제또는 변경된경우 update하기 위해 발생되는 이벤트 (서버주도로 발생)
+      setMessages((oldMessages) => {
+        const oldMessagesMap = new Map(oldMessages.map((e) => [e['id'], e]));
+        const newMessagesMap = new Map(data.messages?.map((e) => [e['id'], e]));
+        const messagesMap = new Map([...Array.from(oldMessagesMap), ...Array.from(newMessagesMap)]);
+        return Array.from(messagesMap.values());
+      });
+    });
+
+    // REFRESH_CHAT
+    socket.on(eChattyEvent.REFRESH_CHAT_DONE, (data: { chat: iChat }) => {
+      setChat(data.chat);
+    });
+
+
     return () => {
       socket.off(eChattyEvent.CONNECT_DONE);
       socket.off(eChattyEvent.CONNECT_FAIL);
       socket.off(eChattyEvent.FETCH_MESSAGES_DONE);
       socket.off(eChattyEvent.FETCH_MESSAGES_FAIL);
+      socket.off(eChattyEvent.SEND_MESSAGE_DONE);
+      socket.off(eChattyEvent.SEND_MESSAGE_RETRY);
+      socket.off(eChattyEvent.SEND_MESSAGE_FAIL);
+      socket.off(eChattyEvent.RECEIVE_MESSAGE);
+      socket.off(eChattyEvent.MARK_AS_READ_DONE);
+      socket.off(eChattyEvent.MARK_AS_READ_FAIL);
+      socket.off(eChattyEvent.UPDATE_MESSAGES);
+      socket.off(eChattyEvent.REFRESH_CHAT_DONE);
     };
   }, [socket]);
 
-  const getMessages = (refresh: boolean) => {
+  const fetchMessages = (refresh: boolean) => {
     if (hasNext) {
-      socket.emit(eChattyEvent.FETCH_MESSAGES, { refresh: refresh });
+      socket.emit(eChattyEvent.FETCH_MESSAGES, { refresh });
     }
   }
+
+  const refreshChat = () => {
+    socket.emit(eChattyEvent.REFRESH_CHAT);
+  }
+
+  const isMessageString = (message: string | object | Array<{ uri: string, type: string }>): message is string => {
+    return typeof message === 'string';
+  }
+  const isMessageArray = (message: string | object | Array<{ uri: string, type: string }>): message is Array<{ uri: string, type: string }> => {
+    return Array.isArray(message);
+  }
+  const isMessageObject = (message: string | object | Array<{ uri: string, type: string }>): message is object => {
+    return typeof message === 'object' && message !== null && !Array.isArray(message);
+  }
+
+  const sendMessage = async (message: string | object | Array<{ uri: string, type: string }>): Promise<iMessage> => {
+    const id = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+      var r = (Math.random() * 16) | 0,
+        v = c == "x" ? r : (r & 0x3) | 0x8;
+      return v.toString(16);
+    });
+    const now = new Date();
+    const type = isMessageString(message) ? eMessageType.TEXT : (isMessageObject(message) ? eMessageType.JSON : eMessageType.FILE);
+    const text = isMessageString(message) ? message : (isMessageArray(message) ? 'File message' : 'JSON message');
+
+    socket.emit(eChattyEvent.SEND_MESSAGE, {
+      id: id,
+      text: text,
+      files: isMessageArray(message) ? await Chatty.upload(message) : null,
+      json: isMessageObject(message) ? message : null,
+      type: type,
+      by: eMessageBy.USER,
+      createdAt: now,
+      SenderId: Chatty.member?.id!,
+      retry: 5
+    });
+
+    return {
+      id: id,
+      text: text,
+      files: isMessageArray(message) ? message : null,
+      json: isMessageObject(message) ? message : null,
+      type: type,
+      by: eMessageBy.USER,
+      translation: null,
+      readReceipt: 0,
+      createdAt: now,
+      updatedAt: now,
+      SenderId: Chatty.member?.id!,
+      Sender: Chatty.member
+    };
+  }
+
+
 
   return {
     chat,
     messages,
-    getMessages,
+    fetchMessages,
+    sendMessage,
+    refreshChat
   };
 };
 
-/*
-const useChat = ({ id, newChat }: {
-  id?: string,
-  newChat?: {
-    Members: string[];
-    distinctKey: string;
-    name?: string;
-    avatar?: string;
-    group?: string;
-    data?: any;
-  }
-}) => {
-  const socket = useSocket({ id, newChat });
-  // const [chat, setChat] = useState<any>(null);
-  // const [messages, setMessages] = useState<string[]>([]);
-
-  const getChat = async () => {
-    const { data } = await axios.get(`${process.env.API_URL}/chats/${id}`, { params: newChat });
-    return data;
-  }
-
-  // const { data, refetch } = useQuery(['chatty', 'chat', id], getChat, { initialData: { chat: {}, messages: [] } });
-
-  useEffect(() => {
-    if (!socket) return;
-    socket.on('message', (message: string) => {
-      // queryClient.setQueryData<string[]>(['chatty', 'chat', id], (prevMessages) => {
-      //   return [...prevMessages!, message];
-      // });
-    });
-
-    return () => {
-      socket.off('message');
-    };
-  }, [socket]);
-
-  const sendMessage = (text: string) => {
-    if (!socket) return;
-    socket.emit('message', text);
-  };
-
-  return {
-    // chat: data.chat,
-    // messages: data.messages,
-    sendMessage
-  };
-};
-
-const useMessages = ({ id, newChat }: {
-  id?: string,
-  newChat?: {
-    Members: string[];
-    distinctKey: string;
-    name?: string;
-    avatar?: string;
-    group?: string;
-    data?: any;
-  }
-}) => {
-  const socket = useSocket({ id, newChat });
-  // const queryClient = useQueryClient();
-  // const [chat, setChat] = useState<any>(null);
-  // const [messages, setMessages] = useState<string[]>([]);
-
-  const getChat = async () => {
-    const { data } = await axios.get(`${process.env.API_URL}/chats/${id}`, { params: newChat });
-    return data;
-  }
-
-  // const { data, refetch } = useQuery(['chatty', 'chat', id, 'messages'], getChat, { initialData: { chat: {}, messages: [] } });
-
-  useEffect(() => {
-    if (!socket) return;
-    socket.on('message', (message: string) => {
-      // queryClient.setQueryData<string[]>(['chatty', 'chat', id, 'messages'], (prevMessages) => {
-      //   return [...prevMessages!, message];
-      // });
-    });
-
-    return () => {
-      socket.off('message');
-    };
-  }, [socket]);
-
-  const sendMessage = (text: string) => {
-    if (!socket) return;
-    socket.emit('message', text);
-  };
-
-  return {
-    // chat: data.chat,
-    // messages: data.messages,
-    sendMessage
-  };
-};
-*/
 
 export {
   Chatty,
