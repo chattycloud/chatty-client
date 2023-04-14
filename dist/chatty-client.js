@@ -1,6 +1,6 @@
 /*!
  * ChattyClient v1.2.0
- * Build at 2023.4.13
+ * Build at 2023.4.14
  * Released under the MIT License.
  */
 (function (global, factory) {
@@ -7815,10 +7815,9 @@
                 this.member = _context.sent;
                 this.axiosInstance.defaults.headers.common['MemberId'] = this.member.id;
                 if (this.app && this.member) {
-                  // const event = new CustomEvent('initialized', {
-                  //   detail: { initialized: true },
-                  // });
-                  // window?.dispatchEvent(event);
+                  ChattyEventEmitter.emit('initialized', {
+                    initialized: true
+                  });
                   console.debug(":: ChattyClient Initialized !!");
                   console.debug(":: ChattyClient App > ", this.app);
                   console.debug(":: ChattyClient Member > ", this.member);
@@ -8326,6 +8325,38 @@
       return _ref4.apply(this, arguments);
     };
   }();
+  var ChattyEventEmitter = /*#__PURE__*/function () {
+    function ChattyEventEmitter() {
+      _classCallCheck(this, ChattyEventEmitter);
+    }
+    _createClass(ChattyEventEmitter, null, [{
+      key: "on",
+      value: function on(event, callback) {
+        if (!this.listeners[event]) {
+          this.listeners[event] = [];
+        }
+        this.listeners[event].push(callback);
+      }
+    }, {
+      key: "off",
+      value: function off(event, callback) {
+        if (!this.listeners[event]) return;
+        this.listeners[event] = this.listeners[event].filter(function (listener) {
+          return listener !== callback;
+        });
+      }
+    }, {
+      key: "emit",
+      value: function emit(event, data) {
+        if (!this.listeners[event]) return;
+        this.listeners[event].forEach(function (callback) {
+          return callback(data);
+        });
+      }
+    }]);
+    return ChattyEventEmitter;
+  }();
+  ChattyEventEmitter.listeners = {};
   var getAxiosInstance = function getAxiosInstance(ApiKey) {
     var instance = axios$1.create();
     instance.defaults.baseURL = "https://devapi.chatty-cloud.com";
@@ -8350,61 +8381,91 @@
   var useInitialized = function useInitialized() {
     var _React$useState = React__default["default"].useState(Chatty.apiKey && Chatty.app && Chatty.member ? true : false),
       _React$useState2 = _slicedToArray(_React$useState, 2),
-      initialized = _React$useState2[0];
-      _React$useState2[1];
+      initialized = _React$useState2[0],
+      setInitialized = _React$useState2[1];
     React__default["default"].useEffect(function () {
       if (initialized) return;
-      // window.addEventListener('initialized', handleInitialized);
+      var handleInitialized = function handleInitialized(data) {
+        setInitialized(data.initialized);
+      };
+      ChattyEventEmitter.on('initialized', handleInitialized);
       return function () {
         console.debug(':: ChattyClient useInitialized - remove listener initialized');
-        // window?.removeEventListener('initialized', handleInitialized);
+        ChattyEventEmitter.off('initialized', handleInitialized);
       };
     }, []);
     return initialized;
   };
+  var useMissedCount = function useMissedCount() {
+    var initialized = useInitialized();
+    var _React$useState3 = React__default["default"].useState({
+        total: 0,
+        byGroup: [],
+        byChat: []
+      }),
+      _React$useState4 = _slicedToArray(_React$useState3, 2),
+      missedCount = _React$useState4[0],
+      setMissedCount = _React$useState4[1];
+    React__default["default"].useEffect(function () {
+      if (initialized) {
+        Chatty.getMissedCount().then(function (missedCount) {
+          console.debug('useMissedCount', missedCount);
+          setMissedCount(missedCount);
+        });
+      }
+    }, [initialized]);
+    return missedCount;
+  };
   var useSocket = function useSocket(_ref7) {
     var id = _ref7.id,
       newChat = _ref7.newChat;
-    var _React$useState3 = React__default["default"].useState(null),
-      _React$useState4 = _slicedToArray(_React$useState3, 2),
-      socket = _React$useState4[0],
-      setSocket = _React$useState4[1];
+    var _React$useState5 = React__default["default"].useState(null),
+      _React$useState6 = _slicedToArray(_React$useState5, 2),
+      socket = _React$useState6[0],
+      setSocket = _React$useState6[1];
     React__default["default"].useEffect(function () {
-      var _b, _c;
-      var newSocket = lookup("wss://devsocket.chatty-cloud.com", {
+      var _b, _c, _d;
+      if (socket) return;
+      console.debug(':: ChattyClient - socket connecting', "wss://devsocket.chatty-cloud.com");
+      var newSocket = lookup("".concat("wss://devsocket.chatty-cloud.com", "/chat.").concat((_b = Chatty.app) === null || _b === void 0 ? void 0 : _b.name), {
         query: {
           id: id,
           Chat: newChat
         },
         auth: {
           apiKey: Chatty.apiKey,
-          MemberId: (_b = Chatty.member) === null || _b === void 0 ? void 0 : _b.id,
-          AppId: (_c = Chatty.app) === null || _c === void 0 ? void 0 : _c.id
+          MemberId: (_c = Chatty.member) === null || _c === void 0 ? void 0 : _c.id,
+          AppId: (_d = Chatty.app) === null || _d === void 0 ? void 0 : _d.id
         }
       });
       setSocket(newSocket);
       return function () {
         newSocket.close();
+        setSocket(null);
         console.debug(':: ChattyClient - socket disconnected');
       };
     }, []);
     return socket;
   };
-  var useChattySocket = function useChattySocket(_ref8) {
+  var useChat = function useChat(_ref8) {
     var id = _ref8.id,
       newChat = _ref8.newChat;
-    var _React$useState5 = React__default["default"].useState(null),
-      _React$useState6 = _slicedToArray(_React$useState5, 2),
-      chat = _React$useState6[0],
-      setChat = _React$useState6[1];
-    var _React$useState7 = React__default["default"].useState([]),
+    var _React$useState7 = React__default["default"].useState(null),
       _React$useState8 = _slicedToArray(_React$useState7, 2),
-      messages = _React$useState8[0],
-      setMessages = _React$useState8[1];
-    var _React$useState9 = React__default["default"].useState(false),
+      chat = _React$useState8[0],
+      setChat = _React$useState8[1];
+    var _React$useState9 = React__default["default"].useState([]),
       _React$useState10 = _slicedToArray(_React$useState9, 2),
-      hasNext = _React$useState10[0],
-      setHasNext = _React$useState10[1];
+      messages = _React$useState10[0],
+      setMessages = _React$useState10[1];
+    var _React$useState11 = React__default["default"].useState(false),
+      _React$useState12 = _slicedToArray(_React$useState11, 2),
+      hasNext = _React$useState12[0],
+      setHasNext = _React$useState12[1];
+    var _React$useState13 = React__default["default"].useState(true),
+      _React$useState14 = _slicedToArray(_React$useState13, 2),
+      isLoading = _React$useState14[0],
+      setIsLoading = _React$useState14[1];
     var socket = useSocket({
       id: id,
       newChat: newChat
@@ -8417,8 +8478,10 @@
         setMessages(data.messages);
         setHasNext(data.hasNext);
         socket.emit(exports.eChattyEvent.MARK_AS_READ);
+        setIsLoading(false);
       });
       socket.on(exports.eChattyEvent.CONNECT_FAIL, function (error) {
+        setIsLoading(false);
         console.warn(':: ChattyClient connection fail', error);
       });
       // FETCH_MESSAGES
@@ -8598,15 +8661,18 @@
     return {
       chat: chat,
       messages: messages,
+      isLoading: isLoading,
       fetchMessages: fetchMessages,
       sendMessage: sendMessage,
       refreshChat: refreshChat
+      // error
     };
   };
 
   exports.Chatty = Chatty;
-  exports.useChattySocket = useChattySocket;
+  exports.useChat = useChat;
   exports.useInitialized = useInitialized;
+  exports.useMissedCount = useMissedCount;
 
   Object.defineProperty(exports, '__esModule', { value: true });
 
