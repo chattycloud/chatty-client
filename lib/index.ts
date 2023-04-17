@@ -138,8 +138,7 @@ interface iMessage {
   readReceipt: number;
   createdAt: Date;
   updatedAt: Date;
-  SenderId: string | null;
-  Sender: iMember | null;
+  sender: iMember | null;
 }
 
 interface iChat {
@@ -152,10 +151,8 @@ interface iChat {
   group: string;
   createdAt: Date;
   updatedAt: Date;
-  Members: Array<iMember>;
-  _count?: {
-    Receipts: number;
-  };
+  members: Array<iMember>;
+  missedCount: number;
 }
 
 interface iCreateAdminMessagePayload {
@@ -164,8 +161,8 @@ interface iCreateAdminMessagePayload {
   image?: string;
   group?: string;
   data?: any;
-  Members?: Array<string>;
-  Message?: {
+  members?: Array<string>;
+  message?: {
     text?: string;
     json?: object;
     by?: eMessageBy.ADMIN;
@@ -178,8 +175,8 @@ interface iCreateChatPayload {
   image?: string;
   group?: string;
   data?: any;
-  Members?: Array<string>;
-  Message?: {
+  members?: Array<string>;
+  message?: {
     text?: string;
     json?: object;
     by?: eMessageBy.ADMIN;
@@ -193,8 +190,8 @@ interface iUpdateChatPayload {
   image?: string;
   group?: string;
   data?: any;
-  Members?: Array<string>;
-  Message?: {
+  members?: Array<string>;
+  message?: {
     text?: string;
     json?: object;
     by?: eMessageBy.ADMIN;
@@ -333,12 +330,12 @@ class Chatty {
     const { data } = await this.axiosInstance.post("/chats", {
       ...payload,
       image: payload.image ? { uri: payload.image } : undefined,
-      Members: payload.Members?.map((MemberId: string) => ({ MemberId: MemberId, AppId: this.app?.id, })),
-      Messages: payload.Message && [
+      Members: payload.members?.map((MemberId: string) => ({ MemberId: MemberId, AppId: this.app?.id, })),
+      Messages: payload.message && [
         {
-          ...payload.Message,
+          ...payload.message,
           AppId: this.app?.id,
-          type: payload.Message.json ? eMessageType.JSON : eMessageType.TEXT
+          type: payload.message.json ? eMessageType.JSON : eMessageType.TEXT
         },
       ]
     });
@@ -355,15 +352,15 @@ class Chatty {
     const { data } = await this.axiosInstance.put(`/chats`, {
       ...payload,
       image: payload.image ? { uri: payload.image } : undefined,
-      Members: payload.Members?.map((MemberId: string) => ({
+      Members: payload.members?.map((MemberId: string) => ({
         MemberId: MemberId,
         AppId: this.app?.id,
       })),
-      Messages: payload.Message && [
+      Messages: payload.message && [
         {
-          ...payload.Message,
+          ...payload.message,
           AppId: this.app?.id,
-          type: payload.Message.json ? eMessageType.JSON : eMessageType.TEXT
+          type: payload.message.json ? eMessageType.JSON : eMessageType.TEXT
         },
       ]
     });
@@ -376,15 +373,15 @@ class Chatty {
       .post(`/messages`, {
         ...payload,
         image: payload.image ? { uri: payload.image } : undefined,
-        Members: payload.Members?.map((MemberId: string) => ({
+        Members: payload.members?.map((MemberId: string) => ({
           MemberId: MemberId,
           AppId: this.app?.id,
         })),
-        Messages: payload.Message && [
+        Messages: payload.message && [
           {
-            ...payload.Message,
+            ...payload.message,
             AppId: this.app?.id,
-            type: payload.Message.json ? eMessageType.JSON : eMessageType.TEXT,
+            type: payload.message.json ? eMessageType.JSON : eMessageType.TEXT,
             by: eMessageBy.ADMIN,
           },
         ]
@@ -613,7 +610,7 @@ const useChat = ({ id, key, payload }: {
   messages: { [date: string]: { [timeSenderIdKey: string]: iMessage[] } },
   isLoading: boolean,
   fetchMessages: (refresh?: boolean) => void,
-  sendMessage: (message: string | object | Array<{ uri: string, type: string }>) => Promise<iMessage>,
+  sendMessage: (message: string | object | Array<{ uri: string, type: string }>) => void,
   refresh: () => void,
   // error: {message: string},
 } => {
@@ -629,7 +626,7 @@ const useChat = ({ id, key, payload }: {
     messages.map((message) => {
       const dateKey = format(new Date(message.createdAt), 'PP');
       const timeKey = format(new Date(message.createdAt), 'p');
-      const SenderIdKey = message.Sender?.id!;
+      const SenderIdKey = message.sender?.id!;
       const timeSenderIdKey = `${timeKey}@${SenderIdKey}`;
 
       if (!groupedMessages) {
@@ -774,7 +771,7 @@ const useChat = ({ id, key, payload }: {
     return typeof message === 'object' && message !== null && !Array.isArray(message);
   }
 
-  const sendMessage = async (message: string | object | Array<{ uri: string, type: string }>): Promise<iMessage> => {
+  const sendMessage = async (message: string | object | Array<{ uri: string, type: string }>) => {
     const id = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
       var r = (Math.random() * 16) | 0,
         v = c == "x" ? r : (r & 0x3) | 0x8;
@@ -784,19 +781,7 @@ const useChat = ({ id, key, payload }: {
     const type = isMessageString(message) ? eMessageType.TEXT : (isMessageObject(message) ? eMessageType.JSON : eMessageType.FILE);
     const text = isMessageString(message) ? message : (isMessageArray(message) ? 'File message' : 'JSON message');
 
-    socket.emit(eChattyEvent.SEND_MESSAGE, {
-      id: id,
-      text: text,
-      files: isMessageArray(message) ? await Chatty.upload(message) : undefined,
-      json: isMessageObject(message) ? message : undefined,
-      type: type,
-      by: eMessageBy.USER,
-      createdAt: now,
-      SenderId: Chatty.member?.id!,
-      retry: 5
-    });
-
-    return {
+    const tempMessage: iMessage = {
       id: id,
       text: text,
       files: isMessageArray(message) ? message : undefined,
@@ -807,9 +792,27 @@ const useChat = ({ id, key, payload }: {
       readReceipt: 0,
       createdAt: now,
       updatedAt: now,
-      SenderId: Chatty.member?.id!,
-      Sender: Chatty.member
+      sender: Chatty.member,
     };
+
+    setMessages((oldMessages) => {
+      const oldMessagesMap = new Map(oldMessages.map((e) => [e['id'], e]));
+      const newMessagesMap = new Map([[tempMessage['id'], tempMessage]]);
+      const messagesMap = new Map([...Array.from(newMessagesMap), ...Array.from(oldMessagesMap),]);
+      return Array.from(messagesMap.values());
+    });
+
+    socket.emit(eChattyEvent.SEND_MESSAGE, {
+      id: id,
+      text: text,
+      files: isMessageArray(message) ? await Chatty.upload(message) : undefined,
+      json: isMessageObject(message) ? message : undefined,
+      type: type,
+      by: eMessageBy.USER,
+      createdAt: now,
+      retry: 5
+    });
+
   }
 
 

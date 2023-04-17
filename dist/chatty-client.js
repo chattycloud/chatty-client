@@ -1,6 +1,6 @@
 /*!
  * ChattyClient v1.2.0
- * Build at 2023.4.16
+ * Build at 2023.4.17
  * Released under the MIT License.
  */
 (function (global, factory) {
@@ -10211,16 +10211,16 @@
                   image: payload.image ? {
                     uri: payload.image
                   } : undefined,
-                  Members: (_b = payload.Members) === null || _b === void 0 ? void 0 : _b.map(function (MemberId) {
+                  Members: (_b = payload.members) === null || _b === void 0 ? void 0 : _b.map(function (MemberId) {
                     var _b;
                     return {
                       MemberId: MemberId,
                       AppId: (_b = _this.app) === null || _b === void 0 ? void 0 : _b.id
                     };
                   }),
-                  Messages: payload.Message && [_objectSpread2(_objectSpread2({}, payload.Message), {}, {
+                  Messages: payload.message && [_objectSpread2(_objectSpread2({}, payload.message), {}, {
                     AppId: (_c = this.app) === null || _c === void 0 ? void 0 : _c.id,
-                    type: payload.Message.json ? exports.eMessageType.JSON : exports.eMessageType.TEXT
+                    type: payload.message.json ? exports.eMessageType.JSON : exports.eMessageType.TEXT
                   })]
                 }));
               case 2:
@@ -10281,16 +10281,16 @@
                   image: payload.image ? {
                     uri: payload.image
                   } : undefined,
-                  Members: (_b = payload.Members) === null || _b === void 0 ? void 0 : _b.map(function (MemberId) {
+                  Members: (_b = payload.members) === null || _b === void 0 ? void 0 : _b.map(function (MemberId) {
                     var _b;
                     return {
                       MemberId: MemberId,
                       AppId: (_b = _this2.app) === null || _b === void 0 ? void 0 : _b.id
                     };
                   }),
-                  Messages: payload.Message && [_objectSpread2(_objectSpread2({}, payload.Message), {}, {
+                  Messages: payload.message && [_objectSpread2(_objectSpread2({}, payload.message), {}, {
                     AppId: (_c = this.app) === null || _c === void 0 ? void 0 : _c.id,
-                    type: payload.Message.json ? exports.eMessageType.JSON : exports.eMessageType.TEXT
+                    type: payload.message.json ? exports.eMessageType.JSON : exports.eMessageType.TEXT
                   })]
                 }));
               case 2:
@@ -10322,16 +10322,16 @@
                   image: payload.image ? {
                     uri: payload.image
                   } : undefined,
-                  Members: (_b = payload.Members) === null || _b === void 0 ? void 0 : _b.map(function (MemberId) {
+                  Members: (_b = payload.members) === null || _b === void 0 ? void 0 : _b.map(function (MemberId) {
                     var _b;
                     return {
                       MemberId: MemberId,
                       AppId: (_b = _this3.app) === null || _b === void 0 ? void 0 : _b.id
                     };
                   }),
-                  Messages: payload.Message && [_objectSpread2(_objectSpread2({}, payload.Message), {}, {
+                  Messages: payload.message && [_objectSpread2(_objectSpread2({}, payload.message), {}, {
                     AppId: (_c = this.app) === null || _c === void 0 ? void 0 : _c.id,
-                    type: payload.Message.json ? exports.eMessageType.JSON : exports.eMessageType.TEXT,
+                    type: payload.message.json ? exports.eMessageType.JSON : exports.eMessageType.TEXT,
                     by: exports.eMessageBy.ADMIN
                   })]
                 }));
@@ -10608,7 +10608,7 @@
   ChattyEventEmitter.listeners = {};
   var getAxiosInstance = function getAxiosInstance(ApiKey) {
     var instance = axios$1.create();
-    instance.defaults.baseURL = "http://localhost:3300";
+    instance.defaults.baseURL = "https://devapi.chatty-cloud.com";
     instance.defaults.headers.common['ApiKey'] = ApiKey;
     instance.defaults.headers.common["Content-Type"] = "application/json";
     instance.interceptors.request.use(function (request) {
@@ -10675,8 +10675,8 @@
     React__default["default"].useEffect(function () {
       var _b, _c, _d;
       if (socket) return;
-      console.debug(':: ChattyClient - socket connecting', "http://localhost:4400");
-      var newSocket = lookup("".concat("http://localhost:4400", "/chat.").concat((_b = Chatty.app) === null || _b === void 0 ? void 0 : _b.name), {
+      console.debug(':: ChattyClient - socket connecting', "wss://devsocket.chatty-cloud.com");
+      var newSocket = lookup("".concat("wss://devsocket.chatty-cloud.com", "/chat.").concat((_b = Chatty.app) === null || _b === void 0 ? void 0 : _b.name), {
         query: {
           id: id,
           Chat: chat
@@ -10729,7 +10729,7 @@
         var _b;
         var dateKey = format(new Date(message.createdAt), 'PP');
         var timeKey = format(new Date(message.createdAt), 'p');
-        var SenderIdKey = (_b = message.Sender) === null || _b === void 0 ? void 0 : _b.id;
+        var SenderIdKey = (_b = message.sender) === null || _b === void 0 ? void 0 : _b.id;
         var timeSenderIdKey = "".concat(timeKey, "@").concat(SenderIdKey);
         if (!groupedMessages) {
           groupedMessages = {};
@@ -10869,7 +10869,7 @@
     };
     var sendMessage = /*#__PURE__*/function () {
       var _ref9 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee16(message) {
-        var _b, _c, id, now, type, text;
+        var id, now, type, text, tempMessage;
         return _regeneratorRuntime().wrap(function _callee16$(_context16) {
           while (1) switch (_context16.prev = _context16.next) {
             case 0:
@@ -10881,42 +10881,7 @@
               now = new Date();
               type = isMessageString(message) ? exports.eMessageType.TEXT : isMessageObject(message) ? exports.eMessageType.JSON : exports.eMessageType.FILE;
               text = isMessageString(message) ? message : isMessageArray(message) ? 'File message' : 'JSON message';
-              _context16.t0 = socket;
-              _context16.t1 = exports.eChattyEvent.SEND_MESSAGE;
-              _context16.t2 = id;
-              _context16.t3 = text;
-              if (!isMessageArray(message)) {
-                _context16.next = 14;
-                break;
-              }
-              _context16.next = 11;
-              return Chatty.upload(message);
-            case 11:
-              _context16.t4 = _context16.sent;
-              _context16.next = 15;
-              break;
-            case 14:
-              _context16.t4 = undefined;
-            case 15:
-              _context16.t5 = _context16.t4;
-              _context16.t6 = isMessageObject(message) ? message : undefined;
-              _context16.t7 = type;
-              _context16.t8 = exports.eMessageBy.USER;
-              _context16.t9 = now;
-              _context16.t10 = (_b = Chatty.member) === null || _b === void 0 ? void 0 : _b.id;
-              _context16.t11 = {
-                id: _context16.t2,
-                text: _context16.t3,
-                files: _context16.t5,
-                json: _context16.t6,
-                type: _context16.t7,
-                by: _context16.t8,
-                createdAt: _context16.t9,
-                SenderId: _context16.t10,
-                retry: 5
-              };
-              _context16.t0.emit.call(_context16.t0, _context16.t1, _context16.t11);
-              return _context16.abrupt("return", {
+              tempMessage = {
                 id: id,
                 text: text,
                 files: isMessageArray(message) ? message : undefined,
@@ -10927,9 +10892,49 @@
                 readReceipt: 0,
                 createdAt: now,
                 updatedAt: now,
-                SenderId: (_c = Chatty.member) === null || _c === void 0 ? void 0 : _c.id,
-                Sender: Chatty.member
+                sender: Chatty.member
+              };
+              setMessages(function (oldMessages) {
+                var oldMessagesMap = new Map(oldMessages.map(function (e) {
+                  return [e['id'], e];
+                }));
+                var newMessagesMap = new Map([[tempMessage['id'], tempMessage]]);
+                var messagesMap = new Map([].concat(_toConsumableArray(Array.from(newMessagesMap)), _toConsumableArray(Array.from(oldMessagesMap))));
+                return Array.from(messagesMap.values());
               });
+              _context16.t0 = socket;
+              _context16.t1 = exports.eChattyEvent.SEND_MESSAGE;
+              _context16.t2 = id;
+              _context16.t3 = text;
+              if (!isMessageArray(message)) {
+                _context16.next = 16;
+                break;
+              }
+              _context16.next = 13;
+              return Chatty.upload(message);
+            case 13:
+              _context16.t4 = _context16.sent;
+              _context16.next = 17;
+              break;
+            case 16:
+              _context16.t4 = undefined;
+            case 17:
+              _context16.t5 = _context16.t4;
+              _context16.t6 = isMessageObject(message) ? message : undefined;
+              _context16.t7 = type;
+              _context16.t8 = exports.eMessageBy.USER;
+              _context16.t9 = now;
+              _context16.t10 = {
+                id: _context16.t2,
+                text: _context16.t3,
+                files: _context16.t5,
+                json: _context16.t6,
+                type: _context16.t7,
+                by: _context16.t8,
+                createdAt: _context16.t9,
+                retry: 5
+              };
+              _context16.t0.emit.call(_context16.t0, _context16.t1, _context16.t10);
             case 24:
             case "end":
               return _context16.stop();
