@@ -441,6 +441,7 @@ class Chatty {
   static getMissedCount = async (): Promise<iMissedCount> => {
     if (!this.app || !this.member) return Promise.reject({ message: ":: ChattyClient getMissedCount fail - Chatty was not initialized" });
     const { data } = await this.axiosInstance.get(`/missed-count`);
+    ChattyEventEmitter.emit('missed-count', data);
     return data;
   }
 
@@ -545,17 +546,24 @@ const useIsInitialized = (): boolean => {
   return initialized;
 }
 
-const useMissedCount = (): iMissedCount => {
+const useMissedCount = (): iMissedCount | undefined => {
   const initialized = useIsInitialized();
-  const [missedCount, setMissedCount] = React.useState<iMissedCount>({ total: 0, byGroup: [], byChat: [] });
+  const [missedCount, setMissedCount] = React.useState<iMissedCount>();
 
   React.useEffect(() => {
-    if (initialized) {
-      Chatty.getMissedCount().then((missedCount) => {
-        console.debug('useMissedCount', missedCount);
-        setMissedCount(missedCount);
-      });
-    }
+    if (!initialized || !!missedCount) return;
+    console.debug(':: ChattyClient useMissedCount - useEffect');
+    const updateMissedCount = (data: iMissedCount) => {
+      console.debug(':: ChattyClient useMissedCount - handleMarkAsRead');
+      setMissedCount(data);
+    };
+    ChattyEventEmitter.on('missed-count', updateMissedCount);
+
+    Chatty.getMissedCount();
+
+    return () => {
+      ChattyEventEmitter.off('missed-count', updateMissedCount);
+    };
   }, [initialized]);
 
   return missedCount;
@@ -710,6 +718,7 @@ const useChat = ({ id, key, payload }: {
     // MARK_AS_READ
     socket.on(eChattyEvent.MARK_AS_READ_DONE, () => {
       console.debug(':: ChattyClient mark as read done');
+      ChattyEventEmitter.emit(eChattyEvent.MARK_AS_READ_DONE);
     });
     socket.on(eChattyEvent.MARK_AS_READ_FAIL, (error: any) => {
       console.debug(':: ChattyClient mark as read fail', error);

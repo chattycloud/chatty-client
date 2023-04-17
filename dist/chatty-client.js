@@ -10469,8 +10469,9 @@
         case 4:
           _yield$_a$axiosInstan = _context12.sent;
           data = _yield$_a$axiosInstan.data;
+          ChattyEventEmitter.emit('missed-count', data);
           return _context12.abrupt("return", data);
-        case 7:
+        case 8:
         case "end":
           return _context12.stop();
       }
@@ -10647,21 +10648,22 @@
   };
   var useMissedCount = function useMissedCount() {
     var initialized = useIsInitialized();
-    var _React$useState3 = React__default["default"].useState({
-        total: 0,
-        byGroup: [],
-        byChat: []
-      }),
+    var _React$useState3 = React__default["default"].useState(),
       _React$useState4 = _slicedToArray(_React$useState3, 2),
       missedCount = _React$useState4[0],
       setMissedCount = _React$useState4[1];
     React__default["default"].useEffect(function () {
-      if (initialized) {
-        Chatty.getMissedCount().then(function (missedCount) {
-          console.debug('useMissedCount', missedCount);
-          setMissedCount(missedCount);
-        });
-      }
+      if (!initialized || !!missedCount) return;
+      console.debug(':: ChattyClient useMissedCount - useEffect');
+      var updateMissedCount = function updateMissedCount(data) {
+        console.debug(':: ChattyClient useMissedCount - handleMarkAsRead');
+        setMissedCount(data);
+      };
+      ChattyEventEmitter.on('missed-count', updateMissedCount);
+      Chatty.getMissedCount();
+      return function () {
+        ChattyEventEmitter.off('missed-count', updateMissedCount);
+      };
     }, [initialized]);
     return missedCount;
   };
@@ -10807,6 +10809,7 @@
       // MARK_AS_READ
       socket.on(exports.eChattyEvent.MARK_AS_READ_DONE, function () {
         console.debug(':: ChattyClient mark as read done');
+        ChattyEventEmitter.emit(exports.eChattyEvent.MARK_AS_READ_DONE);
       });
       socket.on(exports.eChattyEvent.MARK_AS_READ_FAIL, function (error) {
         console.debug(':: ChattyClient mark as read fail', error);
