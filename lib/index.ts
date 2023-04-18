@@ -554,7 +554,7 @@ const useMissedCount = (): iMissedCount | undefined => {
     if (!initialized || !!missedCount) return;
     console.debug(':: ChattyClient useMissedCount - useEffect');
     const updateMissedCount = (data: iMissedCount) => {
-      console.debug(':: ChattyClient useMissedCount - handleMarkAsRead');
+      console.debug(':: ChattyClient MissedCount updated !!');
       setMissedCount(data);
     };
     ChattyEventEmitter.on('missed-count', updateMissedCount);
