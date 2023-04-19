@@ -1,6 +1,6 @@
 /*!
  * ChattyClient v1.2.0
- * Build at 2023.4.17
+ * Build at 2023.4.19
  * Released under the MIT License.
  */
 (function (global, factory) {
@@ -10656,7 +10656,7 @@
       if (!initialized || !!missedCount) return;
       console.debug(':: ChattyClient useMissedCount - useEffect');
       var updateMissedCount = function updateMissedCount(data) {
-        console.debug(':: ChattyClient useMissedCount - handleMarkAsRead');
+        console.debug(':: ChattyClient MissedCount updated !!');
         setMissedCount(data);
       };
       ChattyEventEmitter.on('missed-count', updateMissedCount);
@@ -10681,7 +10681,7 @@
       var newSocket = lookup("".concat("wss://devsocket.chatty-cloud.com", "/chat.").concat((_b = Chatty.app) === null || _b === void 0 ? void 0 : _b.name), {
         query: {
           id: id,
-          Chat: chat
+          Chat: chat && JSON.stringify(chat)
         },
         auth: {
           apiKey: Chatty.apiKey,

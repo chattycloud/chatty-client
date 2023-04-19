@@ -587,7 +587,7 @@ const useSocket = ({ id, chat }: {
 
     console.debug(':: ChattyClient - socket connecting', process.env.SOCKET_URL);
     const newSocket = io(`${process.env.SOCKET_URL}/chat.${Chatty.app?.name}`, {
-      query: { id: id, Chat: chat },
+      query: { id: id, Chat: chat && JSON.stringify(chat) },
       auth: { apiKey: Chatty.apiKey, MemberId: Chatty.member?.id, AppId: Chatty.app?.id },
     });
 
