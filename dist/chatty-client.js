@@ -1,6 +1,6 @@
 /*!
  * ChattyClient v1.2.0
- * Build at 2023.4.19
+ * Build at 2023.4.20
  * Released under the MIT License.
  */
 (function (global, factory) {
@@ -10667,9 +10667,7 @@
     }, [initialized]);
     return missedCount;
   };
-  var useSocket = function useSocket(_ref7) {
-    var id = _ref7.id,
-      chat = _ref7.chat;
+  var useSocket = function useSocket(payload) {
     var _React$useState5 = React__default["default"].useState(null),
       _React$useState6 = _slicedToArray(_React$useState5, 2),
       socket = _React$useState6[0],
@@ -10679,14 +10677,11 @@
       if (socket) return;
       console.debug(':: ChattyClient - socket connecting', "wss://devsocket.chatty-cloud.com");
       var newSocket = lookup("".concat("wss://devsocket.chatty-cloud.com", "/chat.").concat((_b = Chatty.app) === null || _b === void 0 ? void 0 : _b.name), {
-        query: {
-          id: id,
-          Chat: chat && JSON.stringify(chat)
-        },
         auth: {
           apiKey: Chatty.apiKey,
           MemberId: (_c = Chatty.member) === null || _c === void 0 ? void 0 : _c.id,
-          AppId: (_d = Chatty.app) === null || _d === void 0 ? void 0 : _d.id
+          AppId: (_d = Chatty.app) === null || _d === void 0 ? void 0 : _d.id,
+          payload: payload
         }
       });
       setSocket(newSocket);
@@ -10698,10 +10693,12 @@
     }, []);
     return socket;
   };
-  var useChat = function useChat(_ref8) {
-    var id = _ref8.id,
-      key = _ref8.key,
-      payload = _ref8.payload;
+  /**
+   *
+   * @param payload iConnectionPayload
+   * @returns
+   */
+  var useChat = function useChat(payload) {
     var _React$useState7 = React__default["default"].useState(null),
       _React$useState8 = _slicedToArray(_React$useState7, 2),
       chat = _React$useState8[0],
@@ -10718,13 +10715,7 @@
       _React$useState14 = _slicedToArray(_React$useState13, 2),
       isLoading = _React$useState14[0],
       setIsLoading = _React$useState14[1];
-    var socket = useSocket({
-      id: id,
-      chat: _objectSpread2(_objectSpread2({}, payload), {}, {
-        Members: payload.members,
-        distinctKey: key
-      })
-    });
+    var socket = useSocket(payload);
     var typedMessages = React__default["default"].useMemo(function () {
       var groupedMessages;
       messages.map(function (message) {
@@ -10871,7 +10862,7 @@
       return _typeof$2(message) === 'object' && message !== null && !Array.isArray(message);
     };
     var sendMessage = /*#__PURE__*/function () {
-      var _ref9 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee16(message) {
+      var _ref7 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee16(message) {
         var id, now, type, text, tempMessage;
         return _regeneratorRuntime().wrap(function _callee16$(_context16) {
           while (1) switch (_context16.prev = _context16.next) {
@@ -10945,7 +10936,7 @@
         }, _callee16);
       }));
       return function sendMessage(_x15) {
-        return _ref9.apply(this, arguments);
+        return _ref7.apply(this, arguments);
       };
     }();
     return {
