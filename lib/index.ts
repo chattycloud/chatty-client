@@ -149,6 +149,7 @@ interface iMessage {
   createdAt: Date;
   updatedAt: Date;
   sender: iMember | null;
+  isSending: boolean | undefined;
 }
 
 interface iChat {
@@ -611,15 +612,18 @@ const useChat = (payload: iConnectionPayload): {
   chat: iChat,
   messages: { [date: string]: { [timeSenderIdKey: string]: iMessage[] } },
   isLoading: boolean,
+  isFetching: boolean,
   fetchMessages: (refresh?: boolean) => void,
   sendMessage: (message: string | object | Array<{ uri: string, type: string }>) => void,
   refresh: () => void,
-  // error: {message: string},
+  error: { message: string },
 } => {
   const [chat, setChat] = React.useState<iChat>(null);
   const [messages, setMessages] = React.useState<iMessage[]>([]);
   const [hasNext, setHasNext] = React.useState<boolean>(false);
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
+  const [isFetching, setIsFetching] = React.useState<boolean>(false);
+  const [error, setError] = React.useState<{ message: string }>(null);
   const socket = useSocket(payload);
 
   const typedMessages = React.useMemo(() => {
@@ -673,10 +677,12 @@ const useChat = (payload: iConnectionPayload): {
         setMessages([...messages, ...data.messages!]);
         setHasNext(data.hasNext!);
       }
+      setIsFetching(false);
       socket.emit(eChattyEvent.MARK_AS_READ);
     });
     socket.on(eChattyEvent.FETCH_MESSAGES_FAIL, (error: any) => {
       console.warn(':: ChattyClient fetch messages fail', error);
+      setIsFetching(false);
     });
 
     // SEND_MESSAGE
@@ -756,6 +762,7 @@ const useChat = (payload: iConnectionPayload): {
 
   const fetchMessages = (refresh: boolean) => {
     if (hasNext) {
+      setIsFetching(true);
       socket.emit(eChattyEvent.FETCH_MESSAGES, { refresh });
     }
   }
@@ -796,6 +803,7 @@ const useChat = (payload: iConnectionPayload): {
       createdAt: now,
       updatedAt: now,
       sender: Chatty.member,
+      isSending: true,
     };
 
     setMessages((oldMessages) => {
@@ -824,10 +832,11 @@ const useChat = (payload: iConnectionPayload): {
     chat,
     messages: typedMessages,
     isLoading,
+    isFetching,
     fetchMessages,
     sendMessage,
     refresh: refreshChat,
-    // error
+    error
   };
 };
 

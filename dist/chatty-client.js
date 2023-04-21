@@ -1,6 +1,6 @@
 /*!
  * ChattyClient v1.2.0
- * Build at 2023.4.20
+ * Build at 2023.4.21
  * Released under the MIT License.
  */
 (function (global, factory) {
@@ -10715,6 +10715,14 @@
       _React$useState14 = _slicedToArray(_React$useState13, 2),
       isLoading = _React$useState14[0],
       setIsLoading = _React$useState14[1];
+    var _React$useState15 = React__default["default"].useState(false),
+      _React$useState16 = _slicedToArray(_React$useState15, 2),
+      isFetching = _React$useState16[0],
+      setIsFetching = _React$useState16[1];
+    var _React$useState17 = React__default["default"].useState(null),
+      _React$useState18 = _slicedToArray(_React$useState17, 2),
+      error = _React$useState18[0];
+      _React$useState18[1];
     var socket = useSocket(payload);
     var typedMessages = React__default["default"].useMemo(function () {
       var groupedMessages;
@@ -10760,10 +10768,12 @@
           setMessages([].concat(_toConsumableArray(messages), _toConsumableArray(data.messages)));
           setHasNext(data.hasNext);
         }
+        setIsFetching(false);
         socket.emit(exports.eChattyEvent.MARK_AS_READ);
       });
       socket.on(exports.eChattyEvent.FETCH_MESSAGES_FAIL, function (error) {
         console.warn(':: ChattyClient fetch messages fail', error);
+        setIsFetching(false);
       });
       // SEND_MESSAGE
       socket.on(exports.eChattyEvent.SEND_MESSAGE_DONE, function (data) {
@@ -10844,6 +10854,7 @@
     }, [socket]);
     var fetchMessages = function fetchMessages(refresh) {
       if (hasNext) {
+        setIsFetching(true);
         socket.emit(exports.eChattyEvent.FETCH_MESSAGES, {
           refresh: refresh
         });
@@ -10886,7 +10897,8 @@
                 readReceipt: 0,
                 createdAt: now,
                 updatedAt: now,
-                sender: Chatty.member
+                sender: Chatty.member,
+                isSending: true
               };
               setMessages(function (oldMessages) {
                 var oldMessagesMap = new Map(oldMessages.map(function (e) {
@@ -10943,10 +10955,11 @@
       chat: chat,
       messages: typedMessages,
       isLoading: isLoading,
+      isFetching: isFetching,
       fetchMessages: fetchMessages,
       sendMessage: sendMessage,
-      refresh: refreshChat
-      // error
+      refresh: refreshChat,
+      error: error
     };
   };
 
