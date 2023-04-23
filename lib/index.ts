@@ -802,13 +802,13 @@ const useChat = (payload: iConnectionPayload): {
     socket.emit(eChattyEvent.REFRESH_CHAT);
   }
 
-  const isMessageString = (message: string | object | Array<{ uri: string, type: string }>): message is string => {
+  const isTextMessage = (message: string | object | Array<{ uri: string, type: string }>): message is string => {
     return typeof message === 'string';
   }
-  const isMessageArray = (message: string | object | Array<{ uri: string, type: string }>): message is Array<{ uri: string, type: string }> => {
+  const isFileMessage = (message: string | object | Array<{ uri: string, type: string }>): message is Array<{ uri: string, type: string }> => {
     return Array.isArray(message);
   }
-  const isMessageObject = (message: string | object | Array<{ uri: string, type: string }>): message is object => {
+  const isJsonMessage = (message: string | object | Array<{ uri: string, type: string }>): message is object => {
     return typeof message === 'object' && message !== null && !Array.isArray(message);
   }
 
@@ -819,14 +819,14 @@ const useChat = (payload: iConnectionPayload): {
       return v.toString(16);
     });
     const now = new Date();
-    const type = isMessageString(message) ? eMessageType.TEXT : (isMessageObject(message) ? eMessageType.JSON : eMessageType.FILE);
-    const text = isMessageString(message) ? message : (isMessageArray(message) ? 'File message' : 'JSON message');
+    const type = isTextMessage(message) ? eMessageType.TEXT : (isJsonMessage(message) ? eMessageType.JSON : eMessageType.FILE);
+    const text = isTextMessage(message) ? message : (isFileMessage(message) ? 'File message' : 'JSON message');
 
     const tempMessage: iMessage = {
       id: id,
       text: text,
-      files: isMessageArray(message) ? message : undefined,
-      json: isMessageObject(message) ? message : undefined,
+      files: isFileMessage(message) ? message : undefined,
+      json: isJsonMessage(message) ? message : undefined,
       type: type,
       by: eMessageBy.USER,
       translation: null,
@@ -847,8 +847,8 @@ const useChat = (payload: iConnectionPayload): {
     socket.emit(eChattyEvent.SEND_MESSAGE, {
       id: id,
       text: text,
-      files: isMessageArray(message) ? await Chatty.upload(message) : undefined,
-      json: isMessageObject(message) ? message : undefined,
+      files: isFileMessage(message) ? await Chatty.upload(message) : undefined,
+      json: isJsonMessage(message) ? message : undefined,
       type: type,
       by: eMessageBy.USER,
       createdAt: now,
