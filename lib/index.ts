@@ -63,8 +63,8 @@ interface iInitPayload {
 
 interface iMissedCount {
   total: number; // total missedCount
-  byGroup: Array<{ name: string, count: number }>,  // missedCount by group name
-  byChat: Array<{ id: string, count: number }>      // missedCount of all individual chat
+  group: Array<{ name: string, count: number }>,      // missedCount by group name
+  // byChat: Array<{ id: string, count: number }>     // deprecated. missedCount of all individual chat
 }
 
 interface iMembersFilter {
@@ -276,6 +276,7 @@ class Chatty {
   static apiKey: string | undefined;
   static app: iApp | undefined;
   static member: iMember | undefined;
+  static missedCount: iMissedCount | undefined;
   static axiosInstance: AxiosInstance;
 
   static async init({ apiKey, member }: iInitPayload) {
@@ -449,11 +450,21 @@ class Chatty {
     return md5(inputValue);
   }
 
-  static getMissedCount = async (): Promise<iMissedCount> => {
-    if (!this.app || !this.member) return Promise.reject({ message: ":: ChattyClient getMissedCount fail - Chatty was not initialized" });
+  static fetchMissedCount = async (): Promise<iMissedCount> => {
+    if (!this.app || !this.member) return Promise.reject({ message: ":: ChattyClient fetchMissedCount fail - Chatty was not initialized" });
     const { data } = await this.axiosInstance.get(`/missed-count`);
-    ChattyEventEmitter.emit('missed-count', data);
+    console.debug(':: ChattyClient fetchMissedCount', data);
+    Chatty.setMissedCount(data);
     return data;
+  }
+
+  static getMissedCount = (): iMissedCount => {
+    return this.missedCount;
+  }
+
+  static setMissedCount = (missedCount: iMissedCount) => {
+    this.missedCount = missedCount;
+    ChattyEventEmitter.emit('missed-count', missedCount);
   }
 
   static upload = async (files: Array<{ uri: string, type: string }>): Promise<Array<{ uri: string }>> => {
@@ -557,25 +568,28 @@ const useIsInitialized = (): boolean => {
   return initialized;
 }
 
-const useMissedCount = (): iMissedCount | undefined => {
+const useMissedCount = (deps: any[]): iMissedCount | undefined => {
   const initialized = useIsInitialized();
-  const [missedCount, setMissedCount] = React.useState<iMissedCount>();
+  const [missedCount, setMissedCount] = React.useState<iMissedCount>(Chatty.getMissedCount());
 
   React.useEffect(() => {
     if (!initialized || !!missedCount) return;
-    console.debug(':: ChattyClient useMissedCount - useEffect');
+
+    Chatty.fetchMissedCount().then(() => setMissedCount(Chatty.getMissedCount()));
+
+  }, [initialized]);
+
+  React.useEffect(() => {
     const updateMissedCount = (data: iMissedCount) => {
-      console.debug(':: ChattyClient MissedCount updated !!');
+      // console.debug(':: ChattyClient MissedCount updated !!');
       setMissedCount(data);
     };
     ChattyEventEmitter.on('missed-count', updateMissedCount);
 
-    Chatty.getMissedCount();
-
     return () => {
       ChattyEventEmitter.off('missed-count', updateMissedCount);
     };
-  }, [initialized]);
+  }, [...deps]);
 
   return missedCount;
 }
@@ -586,7 +600,7 @@ const useSocket = (payload: iConnectionPayload): Socket | null => {
   React.useEffect(() => {
     if (socket) return;
 
-    console.debug(':: ChattyClient - socket connecting', process.env.SOCKET_URL);
+    console.debug(':: ChattyClient - socket connecting');
     const newSocket = io(`${process.env.SOCKET_URL}/chat.${Chatty.app?.name}`, {
       auth: { apiKey: Chatty.apiKey, MemberId: Chatty.member?.id, AppId: Chatty.app?.id, payload: payload },
     });
@@ -613,20 +627,20 @@ const useChat = (payload: iConnectionPayload): {
   messages: { [date: string]: { [timeSenderIdKey: string]: iMessage[] } },
   isLoading: boolean,
   isFetching: boolean,
-  fetchMessages: (refresh?: boolean) => void,
+  fetchMessages: () => void,
   sendMessage: (message: string | object | Array<{ uri: string, type: string }>) => void,
   refresh: () => void,
-  error: { message: string },
+  error: { message: string } | undefined,
 } => {
-  const [chat, setChat] = React.useState<iChat>(null);
+  const [chat, setChat] = React.useState<iChat>();
   const [messages, setMessages] = React.useState<iMessage[]>([]);
   const [hasNext, setHasNext] = React.useState<boolean>(false);
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
   const [isFetching, setIsFetching] = React.useState<boolean>(false);
-  const [error, setError] = React.useState<{ message: string }>(null);
+  const [error, setError] = React.useState<{ message: string }>();
   const socket = useSocket(payload);
 
-  const typedMessages = React.useMemo(() => {
+  const formattedMessages = React.useMemo(() => {
     let groupedMessages: { [date: string]: { [timeSenderIdKey: string]: iMessage[] } };
 
     messages.map((message) => {
@@ -656,42 +670,53 @@ const useChat = (payload: iConnectionPayload): {
     if (!socket) return;
 
     // CONNECT
-    socket.on(eChattyEvent.CONNECT_DONE, (data: any) => {
+    socket.on(eChattyEvent.CONNECT_DONE, (data: { chat: iChat, refresh: boolean, hasNext: boolean, messages: Array<iMessage> }) => {
       setChat(data.chat);
       setMessages(data.messages!);
       setHasNext(data.hasNext!);
       socket.emit(eChattyEvent.MARK_AS_READ);
       setIsLoading(false);
+      setError(undefined);
+      console.debug(':: ChattyClient connected');
     });
     socket.on(eChattyEvent.CONNECT_FAIL, (error: any) => {
-      setIsLoading(false);
       console.warn(':: ChattyClient connection fail', error);
+      setIsLoading(false);
+      setError(error);
     });
 
     // FETCH_MESSAGES
-    socket.on(eChattyEvent.FETCH_MESSAGES_DONE, (data: any) => {
+    socket.on(eChattyEvent.FETCH_MESSAGES_DONE, (data: { refresh: boolean, hasNext: boolean, messages: Array<iMessage> }) => {
       if (data.refresh) {
         setMessages(data.messages!);
         setHasNext(data.hasNext!);
       } else {
-        setMessages([...messages, ...data.messages!]);
+        setMessages((oldMessages) => {
+          const oldMessagesMap = new Map(oldMessages.map((e) => [e['id'], e]));
+          const newMessagesMap = new Map(data.messages?.map((e) => [e['id'], e]));
+          const messagesMap = new Map([...oldMessagesMap, ...newMessagesMap]);
+          return Array.from(messagesMap.values());
+        });
         setHasNext(data.hasNext!);
       }
       setIsFetching(false);
-      socket.emit(eChattyEvent.MARK_AS_READ);
+      setError(undefined);
+      // socket.emit(eChattyEvent.MARK_AS_READ); // deprecated.
     });
     socket.on(eChattyEvent.FETCH_MESSAGES_FAIL, (error: any) => {
       console.warn(':: ChattyClient fetch messages fail', error);
       setIsFetching(false);
+      setError(error);
     });
 
     // SEND_MESSAGE
     socket.on(eChattyEvent.SEND_MESSAGE_DONE, (data: any) => {
       console.debug(':: ChattyClient send message done', data);
+      setError(undefined);
       setMessages((oldMessages) => {
         const oldMessagesMap = new Map(oldMessages.map((e) => [e['id'], e]));
         const newMessagesMap = new Map(data.message && [[data.message['id'], data.message]]);
-        const messagesMap = new Map([...Array.from(oldMessagesMap), ...Array.from(newMessagesMap)]);
+        const messagesMap = new Map([...oldMessagesMap, ...newMessagesMap]);
         return Array.from(messagesMap.values());
       });
     });
@@ -701,6 +726,7 @@ const useChat = (payload: iConnectionPayload): {
     });
     socket.on(eChattyEvent.SEND_MESSAGE_FAIL, (error: any) => {
       console.warn(':: ChattyClient send message fail', error);
+      setError(error);
     });
 
     // RECEIVE_MESSAGE
@@ -709,19 +735,21 @@ const useChat = (payload: iConnectionPayload): {
       setMessages((oldMessages) => {
         const oldMessagesMap = new Map(oldMessages.map((e) => [e['id'], e]));
         const newMessagesMap = new Map(data.message && [[data.message['id'], data.message]]);
-        const messagesMap = new Map([...Array.from(newMessagesMap), ...Array.from(oldMessagesMap)]);
+        const messagesMap = new Map([...newMessagesMap, ...oldMessagesMap]);
         return Array.from(messagesMap.values());
       });
+      setError(undefined);
       socket.emit(eChattyEvent.MARK_AS_READ);
     });
 
     // MARK_AS_READ
     socket.on(eChattyEvent.MARK_AS_READ_DONE, () => {
       console.debug(':: ChattyClient mark as read done');
-      ChattyEventEmitter.emit(eChattyEvent.MARK_AS_READ_DONE);
+      Chatty.fetchMissedCount();
     });
     socket.on(eChattyEvent.MARK_AS_READ_FAIL, (error: any) => {
       console.debug(':: ChattyClient mark as read fail', error);
+      setError(error);
     });
 
     // UPDATE_MESSAGES
@@ -731,20 +759,21 @@ const useChat = (payload: iConnectionPayload): {
       setMessages((oldMessages) => {
         const oldMessagesMap = new Map(oldMessages.map((e) => [e['id'], e]));
         const newMessagesMap = new Map(data.messages?.map((e) => [e['id'], e]));
-        const messagesMap = new Map([...Array.from(oldMessagesMap), ...Array.from(newMessagesMap)]);
+        const messagesMap = new Map([...oldMessagesMap, ...newMessagesMap]);
         return Array.from(messagesMap.values());
       });
+      setError(undefined);
     });
 
     // REFRESH_CHAT
     socket.on(eChattyEvent.REFRESH_CHAT_DONE, (data: { chat: iChat }) => {
       console.debug(':: ChattyClient refresh chat done', data);
       setChat(data.chat);
+      setError(undefined);
     });
 
 
     return () => {
-      console.debug(':: ChattyClient disconnect');
       socket.off(eChattyEvent.CONNECT_DONE);
       socket.off(eChattyEvent.CONNECT_FAIL);
       socket.off(eChattyEvent.FETCH_MESSAGES_DONE);
@@ -757,17 +786,19 @@ const useChat = (payload: iConnectionPayload): {
       socket.off(eChattyEvent.MARK_AS_READ_FAIL);
       socket.off(eChattyEvent.UPDATE_MESSAGES);
       socket.off(eChattyEvent.REFRESH_CHAT_DONE);
+      console.debug(':: ChattyClient disconnected');
     };
   }, [socket]);
 
-  const fetchMessages = (refresh: boolean) => {
+  const fetchMessages = () => {
     if (hasNext) {
       setIsFetching(true);
-      socket.emit(eChattyEvent.FETCH_MESSAGES, { refresh });
+      socket.emit(eChattyEvent.FETCH_MESSAGES, { refresh: false });
     }
   }
 
   const refreshChat = () => {
+    setIsLoading(true);
     socket.emit(eChattyEvent.REFRESH_CHAT);
   }
 
@@ -809,7 +840,7 @@ const useChat = (payload: iConnectionPayload): {
     setMessages((oldMessages) => {
       const oldMessagesMap = new Map(oldMessages.map((e) => [e['id'], e]));
       const newMessagesMap = new Map([[tempMessage['id'], tempMessage]]);
-      const messagesMap = new Map([...Array.from(newMessagesMap), ...Array.from(oldMessagesMap),]);
+      const messagesMap = new Map([...newMessagesMap, ...oldMessagesMap]);
       return Array.from(messagesMap.values());
     });
 
@@ -830,13 +861,13 @@ const useChat = (payload: iConnectionPayload): {
 
   return {
     chat,
-    messages: typedMessages,
+    messages: formattedMessages,
+    error,
     isLoading,
     isFetching,
     fetchMessages,
     sendMessage,
     refresh: refreshChat,
-    error
   };
 };
 

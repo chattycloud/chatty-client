@@ -1,6 +1,6 @@
 /*!
  * ChattyClient v1.2.0
- * Build at 2023.4.21
+ * Build at 2023.4.23
  * Released under the MIT License.
  */
 (function (global, factory) {
@@ -10451,7 +10451,7 @@
     return Chatty;
   }();
   _a = Chatty;
-  Chatty.getMissedCount = /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee12() {
+  Chatty.fetchMissedCount = /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee12() {
     var _yield$_a$axiosInstan, data;
     return _regeneratorRuntime().wrap(function _callee12$(_context12) {
       while (1) switch (_context12.prev = _context12.next) {
@@ -10461,7 +10461,7 @@
             break;
           }
           return _context12.abrupt("return", Promise.reject({
-            message: ":: ChattyClient getMissedCount fail - Chatty was not initialized"
+            message: ":: ChattyClient fetchMissedCount fail - Chatty was not initialized"
           }));
         case 2:
           _context12.next = 4;
@@ -10469,14 +10469,22 @@
         case 4:
           _yield$_a$axiosInstan = _context12.sent;
           data = _yield$_a$axiosInstan.data;
-          ChattyEventEmitter.emit('missed-count', data);
+          console.debug(':: ChattyClient fetchMissedCount', data);
+          Chatty.setMissedCount(data);
           return _context12.abrupt("return", data);
-        case 8:
+        case 9:
         case "end":
           return _context12.stop();
       }
     }, _callee12);
   }));
+  Chatty.getMissedCount = function () {
+    return _a.missedCount;
+  };
+  Chatty.setMissedCount = function (missedCount) {
+    _a.missedCount = missedCount;
+    ChattyEventEmitter.emit('missed-count', missedCount);
+  };
   Chatty.upload = /*#__PURE__*/function () {
     var _ref4 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee15(files) {
       return _regeneratorRuntime().wrap(function _callee15$(_context15) {
@@ -10646,25 +10654,28 @@
     }, []);
     return initialized;
   };
-  var useMissedCount = function useMissedCount() {
+  var useMissedCount = function useMissedCount(deps) {
     var initialized = useIsInitialized();
-    var _React$useState3 = React__default["default"].useState(),
+    var _React$useState3 = React__default["default"].useState(Chatty.getMissedCount()),
       _React$useState4 = _slicedToArray(_React$useState3, 2),
       missedCount = _React$useState4[0],
       setMissedCount = _React$useState4[1];
     React__default["default"].useEffect(function () {
       if (!initialized || !!missedCount) return;
-      console.debug(':: ChattyClient useMissedCount - useEffect');
+      Chatty.fetchMissedCount().then(function () {
+        return setMissedCount(Chatty.getMissedCount());
+      });
+    }, [initialized]);
+    React__default["default"].useEffect(function () {
       var updateMissedCount = function updateMissedCount(data) {
-        console.debug(':: ChattyClient MissedCount updated !!');
+        // console.debug(':: ChattyClient MissedCount updated !!');
         setMissedCount(data);
       };
       ChattyEventEmitter.on('missed-count', updateMissedCount);
-      Chatty.getMissedCount();
       return function () {
         ChattyEventEmitter.off('missed-count', updateMissedCount);
       };
-    }, [initialized]);
+    }, _toConsumableArray(deps));
     return missedCount;
   };
   var useSocket = function useSocket(payload) {
@@ -10675,7 +10686,7 @@
     React__default["default"].useEffect(function () {
       var _b, _c, _d;
       if (socket) return;
-      console.debug(':: ChattyClient - socket connecting', "wss://devsocket.chatty-cloud.com");
+      console.debug(':: ChattyClient - socket connecting');
       var newSocket = lookup("".concat("wss://devsocket.chatty-cloud.com", "/chat.").concat((_b = Chatty.app) === null || _b === void 0 ? void 0 : _b.name), {
         auth: {
           apiKey: Chatty.apiKey,
@@ -10699,7 +10710,7 @@
    * @returns
    */
   var useChat = function useChat(payload) {
-    var _React$useState7 = React__default["default"].useState(null),
+    var _React$useState7 = React__default["default"].useState(),
       _React$useState8 = _slicedToArray(_React$useState7, 2),
       chat = _React$useState8[0],
       setChat = _React$useState8[1];
@@ -10719,12 +10730,12 @@
       _React$useState16 = _slicedToArray(_React$useState15, 2),
       isFetching = _React$useState16[0],
       setIsFetching = _React$useState16[1];
-    var _React$useState17 = React__default["default"].useState(null),
+    var _React$useState17 = React__default["default"].useState(),
       _React$useState18 = _slicedToArray(_React$useState17, 2),
-      error = _React$useState18[0];
-      _React$useState18[1];
+      error = _React$useState18[0],
+      setError = _React$useState18[1];
     var socket = useSocket(payload);
-    var typedMessages = React__default["default"].useMemo(function () {
+    var formattedMessages = React__default["default"].useMemo(function () {
       var groupedMessages;
       messages.map(function (message) {
         var _b;
@@ -10754,10 +10765,13 @@
         setHasNext(data.hasNext);
         socket.emit(exports.eChattyEvent.MARK_AS_READ);
         setIsLoading(false);
+        setError(undefined);
+        console.debug(':: ChattyClient connected');
       });
       socket.on(exports.eChattyEvent.CONNECT_FAIL, function (error) {
-        setIsLoading(false);
         console.warn(':: ChattyClient connection fail', error);
+        setIsLoading(false);
+        setError(error);
       });
       // FETCH_MESSAGES
       socket.on(exports.eChattyEvent.FETCH_MESSAGES_DONE, function (data) {
@@ -10765,25 +10779,39 @@
           setMessages(data.messages);
           setHasNext(data.hasNext);
         } else {
-          setMessages([].concat(_toConsumableArray(messages), _toConsumableArray(data.messages)));
+          setMessages(function (oldMessages) {
+            var _b;
+            var oldMessagesMap = new Map(oldMessages.map(function (e) {
+              return [e['id'], e];
+            }));
+            var newMessagesMap = new Map((_b = data.messages) === null || _b === void 0 ? void 0 : _b.map(function (e) {
+              return [e['id'], e];
+            }));
+            var messagesMap = new Map([].concat(_toConsumableArray(oldMessagesMap), _toConsumableArray(newMessagesMap)));
+            return Array.from(messagesMap.values());
+          });
           setHasNext(data.hasNext);
         }
         setIsFetching(false);
-        socket.emit(exports.eChattyEvent.MARK_AS_READ);
+        setError(undefined);
+        // socket.emit(eChattyEvent.MARK_AS_READ); // deprecated.
       });
+
       socket.on(exports.eChattyEvent.FETCH_MESSAGES_FAIL, function (error) {
         console.warn(':: ChattyClient fetch messages fail', error);
         setIsFetching(false);
+        setError(error);
       });
       // SEND_MESSAGE
       socket.on(exports.eChattyEvent.SEND_MESSAGE_DONE, function (data) {
         console.debug(':: ChattyClient send message done', data);
+        setError(undefined);
         setMessages(function (oldMessages) {
           var oldMessagesMap = new Map(oldMessages.map(function (e) {
             return [e['id'], e];
           }));
           var newMessagesMap = new Map(data.message && [[data.message['id'], data.message]]);
-          var messagesMap = new Map([].concat(_toConsumableArray(Array.from(oldMessagesMap)), _toConsumableArray(Array.from(newMessagesMap))));
+          var messagesMap = new Map([].concat(_toConsumableArray(oldMessagesMap), _toConsumableArray(newMessagesMap)));
           return Array.from(messagesMap.values());
         });
       });
@@ -10793,6 +10821,7 @@
       });
       socket.on(exports.eChattyEvent.SEND_MESSAGE_FAIL, function (error) {
         console.warn(':: ChattyClient send message fail', error);
+        setError(error);
       });
       // RECEIVE_MESSAGE
       socket.on(exports.eChattyEvent.RECEIVE_MESSAGE, function (data) {
@@ -10802,18 +10831,20 @@
             return [e['id'], e];
           }));
           var newMessagesMap = new Map(data.message && [[data.message['id'], data.message]]);
-          var messagesMap = new Map([].concat(_toConsumableArray(Array.from(newMessagesMap)), _toConsumableArray(Array.from(oldMessagesMap))));
+          var messagesMap = new Map([].concat(_toConsumableArray(newMessagesMap), _toConsumableArray(oldMessagesMap)));
           return Array.from(messagesMap.values());
         });
+        setError(undefined);
         socket.emit(exports.eChattyEvent.MARK_AS_READ);
       });
       // MARK_AS_READ
       socket.on(exports.eChattyEvent.MARK_AS_READ_DONE, function () {
         console.debug(':: ChattyClient mark as read done');
-        ChattyEventEmitter.emit(exports.eChattyEvent.MARK_AS_READ_DONE);
+        Chatty.fetchMissedCount();
       });
       socket.on(exports.eChattyEvent.MARK_AS_READ_FAIL, function (error) {
         console.debug(':: ChattyClient mark as read fail', error);
+        setError(error);
       });
       // UPDATE_MESSAGES
       socket.on(exports.eChattyEvent.UPDATE_MESSAGES, function (data) {
@@ -10827,17 +10858,18 @@
           var newMessagesMap = new Map((_b = data.messages) === null || _b === void 0 ? void 0 : _b.map(function (e) {
             return [e['id'], e];
           }));
-          var messagesMap = new Map([].concat(_toConsumableArray(Array.from(oldMessagesMap)), _toConsumableArray(Array.from(newMessagesMap))));
+          var messagesMap = new Map([].concat(_toConsumableArray(oldMessagesMap), _toConsumableArray(newMessagesMap)));
           return Array.from(messagesMap.values());
         });
+        setError(undefined);
       });
       // REFRESH_CHAT
       socket.on(exports.eChattyEvent.REFRESH_CHAT_DONE, function (data) {
         console.debug(':: ChattyClient refresh chat done', data);
         setChat(data.chat);
+        setError(undefined);
       });
       return function () {
-        console.debug(':: ChattyClient disconnect');
         socket.off(exports.eChattyEvent.CONNECT_DONE);
         socket.off(exports.eChattyEvent.CONNECT_FAIL);
         socket.off(exports.eChattyEvent.FETCH_MESSAGES_DONE);
@@ -10850,17 +10882,19 @@
         socket.off(exports.eChattyEvent.MARK_AS_READ_FAIL);
         socket.off(exports.eChattyEvent.UPDATE_MESSAGES);
         socket.off(exports.eChattyEvent.REFRESH_CHAT_DONE);
+        console.debug(':: ChattyClient disconnected');
       };
     }, [socket]);
-    var fetchMessages = function fetchMessages(refresh) {
+    var fetchMessages = function fetchMessages() {
       if (hasNext) {
         setIsFetching(true);
         socket.emit(exports.eChattyEvent.FETCH_MESSAGES, {
-          refresh: refresh
+          refresh: false
         });
       }
     };
     var refreshChat = function refreshChat() {
+      setIsLoading(true);
       socket.emit(exports.eChattyEvent.REFRESH_CHAT);
     };
     var isMessageString = function isMessageString(message) {
@@ -10905,7 +10939,7 @@
                   return [e['id'], e];
                 }));
                 var newMessagesMap = new Map([[tempMessage['id'], tempMessage]]);
-                var messagesMap = new Map([].concat(_toConsumableArray(Array.from(newMessagesMap)), _toConsumableArray(Array.from(oldMessagesMap))));
+                var messagesMap = new Map([].concat(_toConsumableArray(newMessagesMap), _toConsumableArray(oldMessagesMap)));
                 return Array.from(messagesMap.values());
               });
               _context16.t0 = socket;
@@ -10953,13 +10987,13 @@
     }();
     return {
       chat: chat,
-      messages: typedMessages,
+      messages: formattedMessages,
+      error: error,
       isLoading: isLoading,
       isFetching: isFetching,
       fetchMessages: fetchMessages,
       sendMessage: sendMessage,
-      refresh: refreshChat,
-      error: error
+      refresh: refreshChat
     };
   };
 
