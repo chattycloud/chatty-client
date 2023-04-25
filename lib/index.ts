@@ -321,7 +321,7 @@ class Chatty {
       this.apiKey = undefined;
       this.app = undefined;
       this.member = undefined;
-      // this.axiosInstance.defaults.headers.common = {};
+      this.axiosInstance.defaults.headers.common = {};
       console.debug(":: ChattyClient exit success");
     } catch (error: any) {
       return Promise.reject({ message: ":: ChattyClient exit fail - " + error.message });
