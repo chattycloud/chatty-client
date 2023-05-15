@@ -1,6 +1,6 @@
 /*!
  * ChattyClient v1.2.0
- * Build at 2023.4.23
+ * Build at 2023.5.15
  * Released under the MIT License.
  */
 (function (global, factory) {
@@ -10658,25 +10658,24 @@
     var initialized = useIsInitialized();
     var _React$useState3 = React__default["default"].useState(Chatty.getMissedCount()),
       _React$useState4 = _slicedToArray(_React$useState3, 2),
-      missedCount = _React$useState4[0],
-      setMissedCount = _React$useState4[1];
+      count = _React$useState4[0],
+      setCount = _React$useState4[1];
     React__default["default"].useEffect(function () {
-      if (!initialized || !!missedCount) return;
+      if (!initialized) return;
       Chatty.fetchMissedCount().then(function () {
-        return setMissedCount(Chatty.getMissedCount());
+        return setCount(Chatty.getMissedCount());
       });
-    }, [initialized]);
+    }, [initialized].concat(_toConsumableArray(deps)));
     React__default["default"].useEffect(function () {
       var updateMissedCount = function updateMissedCount(data) {
-        // console.debug(':: ChattyClient MissedCount updated !!');
-        setMissedCount(data);
+        setCount(data);
       };
       ChattyEventEmitter.on('missed-count', updateMissedCount);
       return function () {
         ChattyEventEmitter.off('missed-count', updateMissedCount);
       };
-    }, _toConsumableArray(deps));
-    return missedCount;
+    }, []);
+    return count;
   };
   var useSocket = function useSocket(payload) {
     var _React$useState5 = React__default["default"].useState(null),
@@ -10686,6 +10685,10 @@
     React__default["default"].useEffect(function () {
       var _b, _c, _d;
       if (socket) return;
+      if (!Chatty.apiKey || !Chatty.app || !Chatty.member) {
+        console.warn(':: ChattyClient - Chatty was not initialized');
+        return;
+      }
       console.debug(':: ChattyClient - socket connecting');
       var newSocket = lookup("".concat("wss://devsocket.chatty-cloud.com", "/chat.").concat((_b = Chatty.app) === null || _b === void 0 ? void 0 : _b.name), {
         auth: {
@@ -10897,13 +10900,13 @@
       setIsLoading(true);
       socket.emit(exports.eChattyEvent.REFRESH_CHAT);
     };
-    var isMessageString = function isMessageString(message) {
+    var isTextMessage = function isTextMessage(message) {
       return typeof message === 'string';
     };
-    var isMessageArray = function isMessageArray(message) {
+    var isFileMessage = function isFileMessage(message) {
       return Array.isArray(message);
     };
-    var isMessageObject = function isMessageObject(message) {
+    var isJsonMessage = function isJsonMessage(message) {
       return _typeof$2(message) === 'object' && message !== null && !Array.isArray(message);
     };
     var sendMessage = /*#__PURE__*/function () {
@@ -10918,13 +10921,13 @@
                 return v.toString(16);
               });
               now = new Date();
-              type = isMessageString(message) ? exports.eMessageType.TEXT : isMessageObject(message) ? exports.eMessageType.JSON : exports.eMessageType.FILE;
-              text = isMessageString(message) ? message : isMessageArray(message) ? 'File message' : 'JSON message';
+              type = isTextMessage(message) ? exports.eMessageType.TEXT : isJsonMessage(message) ? exports.eMessageType.JSON : exports.eMessageType.FILE;
+              text = isTextMessage(message) ? message : isFileMessage(message) ? 'File message' : 'JSON message';
               tempMessage = {
                 id: id,
                 text: text,
-                files: isMessageArray(message) ? message : undefined,
-                json: isMessageObject(message) ? message : undefined,
+                files: isFileMessage(message) ? message : undefined,
+                json: isJsonMessage(message) ? message : undefined,
                 type: type,
                 by: exports.eMessageBy.USER,
                 translation: null,
@@ -10946,7 +10949,7 @@
               _context16.t1 = exports.eChattyEvent.SEND_MESSAGE;
               _context16.t2 = id;
               _context16.t3 = text;
-              if (!isMessageArray(message)) {
+              if (!isFileMessage(message)) {
                 _context16.next = 16;
                 break;
               }
@@ -10960,7 +10963,7 @@
               _context16.t4 = undefined;
             case 17:
               _context16.t5 = _context16.t4;
-              _context16.t6 = isMessageObject(message) ? message : undefined;
+              _context16.t6 = isJsonMessage(message) ? message : undefined;
               _context16.t7 = type;
               _context16.t8 = exports.eMessageBy.USER;
               _context16.t9 = now;

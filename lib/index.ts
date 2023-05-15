@@ -570,28 +570,27 @@ const useIsInitialized = (): boolean => {
 
 const useMissedCount = (deps: any[]): iMissedCount | undefined => {
   const initialized = useIsInitialized();
-  const [missedCount, setMissedCount] = React.useState<iMissedCount>(Chatty.getMissedCount());
+  const [count, setCount] = React.useState<iMissedCount>(Chatty.getMissedCount());
 
   React.useEffect(() => {
-    if (!initialized || !!missedCount) return;
+    if (!initialized) return;
 
-    Chatty.fetchMissedCount().then(() => setMissedCount(Chatty.getMissedCount()));
+    Chatty.fetchMissedCount().then(() => setCount(Chatty.getMissedCount()));
 
-  }, [initialized]);
+  }, [initialized, ...deps]);
 
   React.useEffect(() => {
     const updateMissedCount = (data: iMissedCount) => {
-      // console.debug(':: ChattyClient MissedCount updated !!');
-      setMissedCount(data);
+      setCount(data);
     };
     ChattyEventEmitter.on('missed-count', updateMissedCount);
 
     return () => {
       ChattyEventEmitter.off('missed-count', updateMissedCount);
     };
-  }, [...deps]);
+  }, []);
 
-  return missedCount;
+  return count;
 }
 
 const useSocket = (payload: iConnectionPayload): Socket | null => {
@@ -599,6 +598,11 @@ const useSocket = (payload: iConnectionPayload): Socket | null => {
 
   React.useEffect(() => {
     if (socket) return;
+
+    if (!Chatty.apiKey || !Chatty.app || !Chatty.member) {
+      console.warn(':: ChattyClient - Chatty was not initialized')
+      return;
+    }
 
     console.debug(':: ChattyClient - socket connecting');
     const newSocket = io(`${process.env.SOCKET_URL}/chat.${Chatty.app?.name}`, {
