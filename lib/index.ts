@@ -664,7 +664,7 @@ const useChat = (payload: iConnectionPayload): {
         groupedMessages[dateKey][timeSenderIdKey] = [];
       }
 
-      groupedMessages[dateKey][timeSenderIdKey].push(message);
+      groupedMessages[dateKey][timeSenderIdKey].unshift(message); // here, use unshift instead of using reverse() at ui component
     });
 
     return groupedMessages;

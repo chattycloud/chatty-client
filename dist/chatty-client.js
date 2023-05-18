@@ -1,6 +1,6 @@
 /*!
  * ChattyClient v1.2.0
- * Build at 2023.5.15
+ * Build at 2023.5.18
  * Released under the MIT License.
  */
 (function (global, factory) {
@@ -10755,8 +10755,9 @@
         if (!groupedMessages[dateKey][timeSenderIdKey]) {
           groupedMessages[dateKey][timeSenderIdKey] = [];
         }
-        groupedMessages[dateKey][timeSenderIdKey].push(message);
+        groupedMessages[dateKey][timeSenderIdKey].unshift(message); // here, use unshift instead of using reverse() at ui component
       });
+
       return groupedMessages;
     }, [messages]);
     React__default["default"].useEffect(function () {
