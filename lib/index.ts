@@ -356,7 +356,7 @@ class Chatty {
   }
 
   static async leaveChat(ChatId: string): Promise<Boolean> {
-    const { data } = await this.axiosInstance.delete<Boolean>(`/chatmember`, { params: { ChatId: ChatId } });
+    const { data } = await this.axiosInstance.delete<Boolean>(`/chatmember`, { params: { ChatId: ChatId, MemberId: Chatty.member?.id } });
     return data;
   }
 
