@@ -1,6 +1,6 @@
 /*!
  * ChattyClient v1.2.0
- * Build at 2023.5.18
+ * Build at 2023.5.21
  * Released under the MIT License.
  */
 (function (global, factory) {
@@ -10242,14 +10242,15 @@
       key: "leaveChat",
       value: function () {
         var _leaveChat = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee6(ChatId) {
-          var _yield$this$axiosInst4, data;
+          var _b, _yield$this$axiosInst4, data;
           return _regeneratorRuntime().wrap(function _callee6$(_context6) {
             while (1) switch (_context6.prev = _context6.next) {
               case 0:
                 _context6.next = 2;
                 return this.axiosInstance["delete"]("/chatmember", {
                   params: {
-                    ChatId: ChatId
+                    ChatId: ChatId,
+                    MemberId: (_b = Chatty.member) === null || _b === void 0 ? void 0 : _b.id
                   }
                 });
               case 2:
