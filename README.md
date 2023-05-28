@@ -80,7 +80,7 @@ ChattyCloud 가 제공하는 주요 기능은 다음과 같습니다
 - `Read Receipts` - 읽음표시 기능을 별도의 코드작성없이 만들수 있습니다.
 
 
----
+
 # 1. Install and Initialize
 
 ### 1. Client SDK installation
@@ -136,7 +136,7 @@ Below code is a part of App.tsx
 ```javascript
 App.tsx
 
-import Chatty from 'chatty-client';
+import { Chatty } from 'chatty-client';
 
 ...
 
@@ -189,7 +189,7 @@ const App = () => {
 
 
 
----
+
 
 # 2. Starting Chat
 
@@ -278,7 +278,7 @@ const cachedChat = queryClient.setQueryData(['chatty', 'chat', id, distinctKey],
 
 
 
----
+
 
 # 3. Listing Chats
 
@@ -391,7 +391,7 @@ const ChatList = (props: ChatListProps) => {
 
 
 
----
+
 
 # 4. Push Notifications and Missed count badge
 
