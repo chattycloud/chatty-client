@@ -75,12 +75,12 @@ ChattyCloud 가 제공하는 주요 기능은 다음과 같습니다
 
 ### 1. Client SDK installation
 
-with npm
+#### 👉 with npm
 ```npm
 npm install chatty-client
 ```
 
-with yarn
+#### 👉 with yarn
 ```yarn
 yarn add chatty-client
 ```
@@ -88,30 +88,29 @@ yarn add chatty-client
 
 ### 2. Cloud Setup
 
-#### 1). 대시보드에서 계정 생성하기
+#### 👉 대시보드에서 계정 생성하기
 - [`대시보드 바로가기`](https://dashboard.chatty-cloud.com)
 
-#### 2). 새 앱 생성하기
+#### 👉 새 앱 생성하기
 - [`대시보드의 App 메뉴`](https://dashboard.chatty-cloud.com/apps)에서 "+ New App" 버튼을 눌러 새로운 앱을 생성
 
-#### 3). API key 생성하기
+#### 👉 API key 생성하기
 - [`대시보드의 App 메뉴`](https://dashboard.chatty-cloud.com/apps)에서 "Create New Key" 버튼을 눌러서 API key 를 생성하고 복사
 
-<img src="https://github.com/chattycloud/chatty-client/blob/main/docs/images/dashboard-apikey.png?raw=true" width="600" height="120"> 
+  <img src="https://github.com/chattycloud/chatty-client/blob/main/docs/images/dashboard-apikey.png?raw=true" width="600" height="120"> 
 
 
 
 ### 3. Initialize
 
-#### 1). 무엇을 초기화 해야하나
+#### 👉 무엇을 초기화 해야하나
 
-앱에서 정상적으로 chatty-client 를 사용하기 위해서는 init() 함수를 사용합니다. 이때 init() 함수의 parameter로 아래 두가지가 초기화 되어야 합니다.
-
+- 앱에서 정상적으로 chatty-client 를 사용하기 위해서는 init() 함수를 사용합니다
 - apiKey: 대시보드에서 생성 후 복사한 API key
 - member: 채팅을 사용할 애플리케이션의 사용자로 ChattyCloud App의 member로 등록됨, 다른사용자와 구별되는 unique한 값과 채팅시 멤버이름으로 사용될 값이 필수로 필요합니다
 
 
-#### 2). 어디에서 초기화 해야하나
+#### 👉 어디에서 초기화 해야하나
 - 앱이 starting up 하는 동안 사용자의 id가 식별이 되는 때
 - 사용자가 회원가입 또는 로그인하고 난 후
 
@@ -122,12 +121,11 @@ yarn add chatty-client
 
 
 
-Below code is a part of App.tsx
-```javascript
+```typescript
+// App.tsx
 
 import { Chatty } from 'chatty-client';
 
-...
 
 const App = () => {
   const [ready, setReady] = React.useState(false);
@@ -142,32 +140,29 @@ const App = () => {
     }
   }, []);
 
-  if (ready && user) {
-    await Chatty.init({
-      apiKey: CHATTY_API_KEY,     
-      member: {
-        id: user.id,
-        name: user.name,
-        language: 'en',
-        country: 'US',
-        avatar: user.avatar,
-        deviceToken: 'xxxxxxxxxx',
-        group: '',
-        data: {
-          extraInfo: '',
-        }
-      },
-    });
-  }
+  React.useEffect(() => {
+    if (ready && user) {
+      await Chatty.init({
+        apiKey: CHATTY_API_KEY,     
+        member: {
+          id: user.id,
+          name: user.name,
+          language: 'en',
+          country: 'US',
+          avatar: user.avatar,
+          deviceToken: 'xxxxxxxxxx',
+          group: '',
+          data: {
+            extraInfo: '',
+          }
+        },
+      });
+    }
+  }, [ready, user]);
 
   return (
-    <View>
     /* App Root Component*/
-    </View>
   );
-
-  ...
-
 }
 ```
 
@@ -189,13 +184,13 @@ const App = () => {
 
 ### 1. 채팅을 시작하는 두가지 방법
 
-#### 1). 멤버 id 를 지정하여 시작하기
-- 어떤 멤버의 id만 알고 있는경우 member id 를 통해 새로운 채팅을 시작하거나 또는 기존의 채팅을 이어 할수 있습니다.
-- 이때 connect 메소드의 "members" 라는 parameter에 MemberId를 할당해야 합니다.
+  #### 👉 멤버 id 를 지정하여 시작하기
+  - 어떤 멤버의 id만 알고 있는경우 member id 를 통해 새로운 채팅을 시작하거나 또는 기존의 채팅을 이어 할수 있습니다.
+  - 이때 connect 메소드의 "members" 라는 parameter에 MemberId를 할당해야 합니다.
 
-#### 2). 채팅 id 를 지정하여 시작하기
-- 채팅목록에서 특정 채팅을 선택하여 채팅을 이어 하는 방법이 있습니다.
-- 이때 connect 메소드의 "id" 이라는 parameter에 ChatId를 할당해야 합니다.
+  #### 👉 채팅 id 를 지정하여 시작하기
+  - 채팅목록에서 특정 채팅을 선택하여 채팅을 이어 하는 방법이 있습니다.
+  - 이때 connect 메소드의 "id" 이라는 parameter에 ChatId를 할당해야 합니다.
 
 
 
@@ -205,8 +200,8 @@ const App = () => {
 - chatty-client 에서 제공하는 useChat 을 사용하여 Chat화면을 만드는데 필요한 데이터를 가져올수 있습니다. 
 
 
-Below code is a part of Chat.tsx
 ```typescript
+// Chat.tsx
 
 import * as React from 'react';
 import { View } from 'react-native';
@@ -257,9 +252,14 @@ const cachedChat = queryClient.setQueryData(['chatty', 'chat', id, distinctKey],
 
 ### 3. 메세지 보내기
 
-- Chat 화면의 메세지 Input component에서 sendMessage를 호출하기만 하면됩니다.
-- Send text message: sendMessage("here is user typed text message");
-- Send image message: sendMessage({uri: "some uri links", type: "image/png" })
+```typescript
+
+// Send text message
+sendMessage("here is user typed text message");
+
+// Send image message
+sendMessage({uri: "some uri links", type: "image/png" });
+```
 
 
 
@@ -277,8 +277,9 @@ const cachedChat = queryClient.setQueryData(['chatty', 'chat', id, distinctKey],
 
 ### 1. 채팅화면 만들기
 
-Below code is a part of ChatList.tsx
+
 ```typescript
+// ChatList.tsx
 
 import * as React from 'react';
 import { View } from 'react-native';
@@ -392,7 +393,7 @@ const ChatList = (props: ChatListProps) => {
 - [`대시보드의 App 메뉴`](https://dashboard.chatty-cloud.com/apps) 에서 다운받은 credential 키를 등록한다. (첨부 스크린샷 참조)
 - 등록이 완료되면 코드작성없이 자동으로 새메세지에 대한 push notification을 받을수 있습니다.
 
-<img src="https://github.com/chattycloud/chatty-client/blob/main/docs/images/dashboard-fcm-credentials.png?raw=true" width="600" height="120"> 
+  <img src="https://github.com/chattycloud/chatty-client/blob/main/docs/images/dashboard-fcm-credentials.png?raw=true" width="600" height="120"> 
 
 
 >  👉 만약 push notification이 수신되지 않는다면 init 함수를 호출시에 deviceToken에 값이 있는지 확인이 필요합니다.
