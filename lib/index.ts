@@ -315,7 +315,11 @@ interface iMissedCount {
   group: Array<{ name: string, count: number }>,  // missedCount by group name
 }
 
-
+interface iNotificationData {
+  type: eNotification;
+  id: string;       // chatId or messageId
+  group: string;    // chat group
+}
 
 
 class Chatty {
