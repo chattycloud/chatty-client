@@ -5,7 +5,7 @@
 </h1>
 
 <p align="center">
-  <strong>Chatty Client SDK</strong><br>
+  <strong>Chatty Client React Native SDK</strong><br>
   To use ChattyCloud
 </p>
 
@@ -30,19 +30,20 @@
   </a>
 </p>
 
-<center>
+<p align="center">
 
-### [Install and Initialize](#1-install-and-initialize) <span> · </span> [Starting Chat](#2-starting-chat) <span> · </span> [Listing Chat](#3-listing-chats) <span> · </span> [Push Notifications and Missed count badge](#4-push-notifications-and-missed-count-badge) <span> · </span> [Dashboard](https://dashboard.chatty-cloud.com)
+### [Install and Initialize](#1-install-and-initialize) <span> · </span> [Starting Chat](#2-starting-chat) <span> · </span> [Listing Chats](#3-listing-chats) <span> · </span> [Push Notifications and Missed Count](#4-push-notifications-and-missed-count) <span> · </span> [Dashboard](https://dashboard.chatty-cloud.com)
 
-</center>
+</p>
 
 ## Overview
 
 - 애플리케이션에 Chat 서비스를 통합하기 위한 가장 쉽고 빠른 솔루션입니다
-- [`chatty-client`](https://www.npmjs.com/package/chatty-client) 를 설치하여 frontend를 빠르게 개발할수 있으며 backend 개발에 대한 고민을 하지 않아도 됩니다
+- [chatty-client](https://www.npmjs.com/package/chatty-client) 를 설치하여 frontend를 빠르게 개발할수 있으며 backend 및 socket 개발에 대한 고민을 하지 않아도 됩니다
 - chatty-client 에서 제공하는 react hooks을 통해 단순하고 직관적인 코드 작성이 가능합니다
-- javascript 또는 typescript 를 이용한 react native의 개발경험이 있는 개발자라면 몇시간 안에 개발과 테스트를 완료할수 있습니다
-- 채팅서비스에 필요한 기본적인 기능들만 갖춘 가벼운 플랫폼으로 개발과 운영을 작은 비용으로 시작할수 있기 때문에 startup에게 적합한 솔루션입니다
+- react native의 개발경험이 있는 개발자라면 몇시간 안에 개발과 테스트를 완료할수 있습니다
+- 채팅서비스에 필요한 기본적인 기능들만 갖춘 가벼운 플랫폼으로 개발과 운영을 적은 비용으로 시작할수 있기 때문에 startup에게 적합한 솔루션입니다
+
 
 
 
@@ -55,8 +56,6 @@
 ## Features
 
 ChattyCloud 가 제공하는 주요 기능은 다음과 같습니다
-
-> 아래 모든 기능들을 채팅메세지 1000개 까지 무료로 사용할 수 있습니다
 
 
 - `1-to-1 Chat` - 채팅 상대방을 지정하여 1:1 채팅을 할 수 있습니다.
@@ -89,13 +88,13 @@ yarn add chatty-client
 ### 2. Cloud Setup
 
 #### 👉 대시보드에서 계정 생성하기
-- [`대시보드 바로가기`](https://dashboard.chatty-cloud.com)
+- [대시보드 바로가기](https://dashboard.chatty-cloud.com)
 
 #### 👉 새 앱 생성하기
-- [`대시보드의 App 메뉴`](https://dashboard.chatty-cloud.com/apps)에서 "+ New App" 버튼을 눌러 새로운 앱을 생성
+- [대시보드의 App 메뉴](https://dashboard.chatty-cloud.com/apps)에서 "+ New App" 버튼을 눌러 새로운 앱을 생성
 
 #### 👉 API key 생성하기
-- [`대시보드의 App 메뉴`](https://dashboard.chatty-cloud.com/apps)에서 "Create New Key" 버튼을 눌러서 API key 를 생성하고 복사
+- [대시보드의 App 메뉴](https://dashboard.chatty-cloud.com/apps)에서 "Create New Key" 버튼을 눌러서 API key 를 생성하고 복사
 
   <img src="https://github.com/chattycloud/chatty-client/blob/main/docs/images/dashboard-apikey.png?raw=true" width="600" height="120"> 
 
@@ -105,19 +104,31 @@ yarn add chatty-client
 
 #### 👉 무엇을 초기화 해야하나
 
-- 앱에서 정상적으로 chatty-client 를 사용하기 위해서는 init() 함수를 사용합니다
-- apiKey: 대시보드에서 생성 후 복사한 API key
-- member: 채팅을 사용할 애플리케이션의 사용자로 ChattyCloud App의 member로 등록됨, 다른사용자와 구별되는 unique한 값과 채팅시 멤버이름으로 사용될 값이 필수로 필요합니다
+- 앱에서 정상적으로 chatty-client 를 사용하기 위해서는 init() 함수를 사용합니다. (반대로 사용중지 하고자 하면 exit()를 호출합니다)
+- 참고(용어정의): 사용자(user) - 애플리케이션에 로그인한 사용자(user), 멤버(member) - ChattyCloud에 채팅을 사용하고자 한 채팅멤버(member) 
+
+```typescript
+Chatty.init({
+  apiKey: CHATTY_API_KEY,
+  /** 채팅을 사용할 애플리케이션의 사용자로 ChattyCloud App의 채팅 member로 등록됨 */
+  member: {
+    id: user.id,                  // (required) string type
+    name: user.name,              // (required) string type
+    language: 'en',               // (optional) string type
+    country: 'US',                // (optional) string type
+    avatar: user.avatar,          // (optional) string type : avatar image url
+    deviceToken: 'xxxxxxxxxx',    // (optional) string type : firebase fcm token
+    group: '',                    // (optional) string type : for member grouping
+    data: {}                      // (optional) any type : your own data
+  },
+})
+```
+
 
 
 #### 👉 어디에서 초기화 해야하나
 - 앱이 starting up 하는 동안 사용자의 id가 식별이 되는 때
 - 사용자가 회원가입 또는 로그인하고 난 후
-
-
-> - 편의상, "사용자(User)" 는 여러분이 개발중인 애플리케이션에 로그인된 사용자, "멤버(member)" 는 그러한 사용자가 init 함수를 통해 ChattyCloud App에 등록된 채팅멤버로 차별하여 구분합니다.
-> - init함수가 여러번 호출이 되더라도 member가 중복으로 등록 되지 않음
-> - 사용자가 여러분의 앱에서 회원탈퇴하고 재가입시 init()을 통해 등록되는 member id는 이전의 member와 달라야 합니다. 특히 third party Oauth 인증을 사용하는 경우 provider가 제공하는 uid 값은 항상 같기 때문에 member id로 사용하기 적절하지 않습니다.
 
 
 
@@ -167,11 +178,6 @@ const App = () => {
 ```
 
 
-> API Key는 안전하게 관리하고 대시보드에서 새 API key를 주기적으로 새로 생성해서 사용하기를 권장합니다
-
-
-
-
 
 
 
@@ -186,12 +192,11 @@ const App = () => {
 
   #### 👉 멤버 id 를 지정하여 시작하기
   - 어떤 멤버의 id만 알고 있는경우 member id 를 통해 새로운 채팅을 시작하거나 또는 기존의 채팅을 이어 할수 있습니다.
-  - 이때 connect 메소드의 "members" 라는 parameter에 MemberId를 할당해야 합니다.
+  - useChat hook의 파라미터인 members 에 MemberId를 할당해야 합니다. (string array 타입으로 복수의 멤버지정이 가능)
 
   #### 👉 채팅 id 를 지정하여 시작하기
   - 채팅목록에서 특정 채팅을 선택하여 채팅을 이어 하는 방법이 있습니다.
-  - 이때 connect 메소드의 "id" 이라는 parameter에 ChatId를 할당해야 합니다.
-
+  - useChat hook의 파라미터인 id 에 ChatId를 할당해야 합니다.
 
 
 
@@ -206,10 +211,8 @@ const App = () => {
 import * as React from 'react';
 import { View } from 'react-native';
 import { eNotification, useChat } from 'chatty-client';
-import { useQueryClient } from '@tanstack/react-query';
 
 const Chat = (props: ChatProps) => {
-  const queryClient = useQueryClient();
   const notification = useNotification();
   const { id, distinctKey, members, name, image, group, data } = props.route.params;
   const {
@@ -223,9 +226,6 @@ const Chat = (props: ChatProps) => {
   } = useChat({ id, members, distinctKey, name, image, group, data });
 
 
-const cachedChat = queryClient.setQueryData(['chatty', 'chat', id, distinctKey], chat || queryClient.getQueryData(['chatty', 'chat', id, distinctKey]));
-  const cachedMessages = queryClient.setQueryData(['chatty', 'messages', id, distinctKey], messages || queryClient.getQueryData(['chatty', 'messages', id, distinctKey]));
-
   React.useEffect(() => {
     if (notification?.data?.type === eNotification.CHATTY_SYSTEM_MESSAGE) {
       refresh();
@@ -234,16 +234,22 @@ const cachedChat = queryClient.setQueryData(['chatty', 'chat', id, distinctKey],
 
   return (
     <Box flex={1}>
-      <ChatHeader chat={cachedChat} onPressChatInfo={() => props.navigation.push('Product', { marketType: data.marketType, id: data.id })} />
-      <ChatBody messages={cachedMessages} isLoading={isLoading} isFetching={isFetching} fetchMessages={fetchMessages} />
-      <ChatFooter sendMessage={sendMessage} editable={true} />
+      <ChatHeader 
+        chat={chat} 
+      />
+      <ChatBody 
+        messages={messages} 
+        isLoading={isLoading} 
+        isFetching={isFetching} 
+        fetchMessages={fetchMessages} 
+      />
+      <ChatFooter 
+        sendMessage={sendMessage} 
+      />
     </Box>
   );
 }
 ```
-
-> 채팅의 멤버는 최대 30명까지 동시에 참여할수 있습니다.
-
 
 
 
@@ -253,6 +259,17 @@ const cachedChat = queryClient.setQueryData(['chatty', 'chat', id, distinctKey],
 ### 3. 메세지 보내기
 
 ```typescript
+// useChat 을 이용하여 sendMessage 함수를 사용할수 있습니다.
+const {
+    chat,
+    messages,
+    isLoading,
+    isFetching,
+    fetchMessages,
+    sendMessage,
+    refresh
+  } = useChat({ id, members, distinctKey, name, image, group, data });
+
 
 // Send text message
 sendMessage("here is user typed text message");
@@ -272,10 +289,9 @@ sendMessage({uri: "some uri links", type: "image/png" });
 # 3. Listing Chats
 
 - chatty-client 에서 제공하는 getChats 메소드를 통해 채팅목록을 가져옵니다
-- 아래 예제의 code들은 ChatList.tsx 화면의 일부입니다. 
 
 
-### 1. 채팅화면 만들기
+### 1. 채팅목록 화면 만들기
 
 
 ```typescript
@@ -356,7 +372,7 @@ const ChatList = (props: ChatListProps) => {
 
   return (
     <Box flex={1}>
-      <CardHeader text={'채팅목록'} right={<IconButton p={5} icon={<Edit size={20} color={'black'} />} onPress={() => setEditMode(!editMode)} />} />
+      <CardHeader text={'채팅목록'} />
 
       <FlatList
         bgColor={'white'}
@@ -383,23 +399,20 @@ const ChatList = (props: ChatListProps) => {
 
 
 
-# 4. Push Notifications and Missed count badge
+# 4. Push Notifications and Missed Count
 
 
-### 1. firebase credentials 등록
+### 1. Firebase Credentials
 
 - ChattyCloud에서 새 메세지에 대한 push notification을 자동으로 발송하기 위해서는 대시보드에서 firebase credential을 등록해야합니다.
-- [`firebase console`](https://console.firebase.google.com) 에 연결 → project settings → service accounts → generate a new private key → 여기서 생성된 카를 다운로드한다.
-- [`대시보드의 App 메뉴`](https://dashboard.chatty-cloud.com/apps) 에서 다운받은 credential 키를 등록한다. (첨부 스크린샷 참조)
-- 등록이 완료되면 코드작성없이 자동으로 새메세지에 대한 push notification을 받을수 있습니다.
+- [firebase console](https://console.firebase.google.com) 에 연결 → project settings → service accounts → generate a new private key → 여기서 생성된 카를 다운로드한다.
+- [대시보드의 App 메뉴](https://dashboard.chatty-cloud.com/apps) 에서 다운받은 credential 키를 등록한다. (첨부 스크린샷 참조)
+- 등록이 완료되면 추가 코드작성없이 자동으로 새메세지에 대한 push notification을 받을수 있습니다.
 
   <img src="https://github.com/chattycloud/chatty-client/blob/main/docs/images/dashboard-fcm-credentials.png?raw=true" width="600" height="120"> 
 
+> ⚠️ 만약 push notification이 수신되지 않는다면 init 함수를 호출시에 deviceToken에 값이 있는지 확인이 필요합니다.
 
->  👉 만약 push notification이 수신되지 않는다면 init 함수를 호출시에 deviceToken에 값이 있는지 확인이 필요합니다.
-<!-- <InfoBlock type="warning">
-  만약 push notification이 수신되지 않는다면 init 함수를 호출시에 deviceToken에 값이 있는지 확인이 필요합니다.
-</InfoBlock> -->
 
 
 ### 2. Notification Data
@@ -434,18 +447,13 @@ interface iMissedCount {
 }
 
 // useMissedCount의 파라미터로 dependency 설정
-// notification수신시, inactive -> active 될때의 timestamp
+// 1. notification수신시(새로운 메세지 수신시)
+// 2. inactive -> active 될때의 timestamp
 const missedCount: iMissedCount = useMissedCount([notification?.messageId, activeTimestamp]);
 
 console.debug('missedCount total', missedCount.total);
 
 ```
-
-- 아래 3가지의 경우에 missedCount이 자동으로 업데이트 됩니다
-
-> 👉 새로운 메세지가 수신되었을때
-> 👉 AppState가 background에서 foreground 상태로 변경될때
-> 👉 채팅화면에서 나갈때 (UnRead 상태에서 Read 상태로 변경)
 
 
 
