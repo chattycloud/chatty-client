@@ -30,19 +30,11 @@
   </a>
 </p>
 
+<center>
 
-<h3 align="center">
-  <a href="https://reactnative.dev/docs/getting-started">Install and Initialize</a>
-  <span> · </span>
-  <a href="https://reactnative.dev/docs/tutorial">Starting Chat</a>
-  <span> · </span>
-  <a href="https://reactnative.dev/showcase">Listing Chats</a>
-  <span> · </span>
-  <a href="https://reactnative.dev/docs/contributing">Push Notifications and Missed count badge</a>
-  <span> · </span>
-  <a href="https://github.com/facebook/react-native/blob/HEAD/.github/SUPPORT.md">Support</a>
-</h3>
+### [Install and Initialize](#1-install-and-initialize) <span> · </span> [Starting Chat](#2-starting-chat) <span> · </span> [Listing Chat](#3-listing-chats) <span> · </span> [Push Notifications and Missed count badge](#4-push-notifications-and-missed-count-badge) <span> · </span> [Dashboard](https://dashboard.chatty-cloud.com)
 
+</center>
 
 ## Overview
 
@@ -64,9 +56,8 @@
 
 ChattyCloud 가 제공하는 주요 기능은 다음과 같습니다
 
-<InfoBlock type="note">
-  아래 모든 기능들을 채팅메세지 1000개 까지 무료로 사용할 수 있습니다
-</InfoBlock>
+> 아래 모든 기능들을 채팅메세지 1000개 까지 무료로 사용할 수 있습니다
+
 
 - `1-to-1 Chat` - 채팅 상대방을 지정하여 1:1 채팅을 할 수 있습니다.
 - `Group Chat` - 최대 30명까지 그룹채팅이 가능합니다.
@@ -78,7 +69,6 @@ ChattyCloud 가 제공하는 주요 기능은 다음과 같습니다
 - `Auto Translation` - 서로 다른 언어의 사용자가 채팅시 메세지가 자동으로 번역이 됩니다. (dashboard에서 설정가능하며 기본값은 disable)
 - `JSON message` - Text 메세지 뿐만 아니라 JSON 형식의 메세지도 가능합니다.
 - `Read Receipts` - 읽음표시 기능을 별도의 코드작성없이 만들수 있습니다.
-
 
 
 # 1. Install and Initialize
@@ -134,7 +124,6 @@ yarn add chatty-client
 
 Below code is a part of App.tsx
 ```javascript
-App.tsx
 
 import { Chatty } from 'chatty-client';
 
@@ -412,7 +401,7 @@ const ChatList = (props: ChatListProps) => {
 </InfoBlock> -->
 
 
-### 2. 수신된 Remote Message Handling
+### 2. Notification Data
 
 - 수신되는 Notification의 data는 아래와 같습니다. 
 
@@ -451,7 +440,7 @@ console.debug('missedCount total', missedCount.total);
 
 ```
 
-- 아래 4가지의 경우에 missedCount이 자동으로 업데이트 됩니다
+- 아래 3가지의 경우에 missedCount이 자동으로 업데이트 됩니다
 
 > 👉 새로운 메세지가 수신되었을때
 > 👉 AppState가 background에서 foreground 상태로 변경될때
