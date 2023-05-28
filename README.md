@@ -1,6 +1,47 @@
-# Chatty Client SDK for ChattyCloud Service
+<h1 align="center">
+  <a href="https://dashboard.chatty-cloud.com/">
+    Chatty Client
+  </a>
+</h1>
+
+<p align="center">
+  <strong>Chatty Client SDK</strong><br>
+  To use ChattyCloud
+</p>
+
+<p align="center">
+  <a href="https://github.com/chattycloud/chatty-client/blob/main/LICENSE.md">
+    <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="Chatty Client is released under the MIT license." />
+  </a>
+  <a href="https://github.com/chattycloud/chatty-client/actions/workflows/ci.yml">
+    <img src="https://img.shields.io/github/actions/workflow/status/actions/toolkit/unit-tests.yml" alt="Current workflows build status." />
+  </a>
+  <a href="https://github.com/chattycloud/chatty-client/actions/workflows/ci.yml">
+    <img src="https://img.shields.io/github/deployments/badges/shields/shields-staging" alt="Current workflows deploy status." />
+  </a>
+  <a href="https://github.com/chattycloud/chatty-client/actions/workflows/ci.yml">
+    <img src="https://img.shields.io/github/issues/badges/shields" alt="Current workflows deploy status." />
+  </a>
+  <a href="https://github.com/chattycloud/chatty-client">
+    <img src="https://img.shields.io/docker/v/_/alpine" alt="Current npm package version." />
+  </a>
+  <a href="https://reactnative.dev/docs/contributing">
+    <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs welcome!" />
+  </a>
+</p>
 
 
+<h3 align="center">
+  <a href="https://reactnative.dev/docs/getting-started">Install and Initialize</a>
+  <span> · </span>
+  <a href="https://reactnative.dev/docs/tutorial">Starting Chat</a>
+  <span> · </span>
+  <a href="https://reactnative.dev/showcase">Listing Chats</a>
+  <span> · </span>
+  <a href="https://reactnative.dev/docs/contributing">Push Notifications and Missed count badge</a>
+  <span> · </span>
+  <a href="https://github.com/facebook/react-native/blob/HEAD/.github/SUPPORT.md">Support</a>
+</h3>
 ## Overview
 
 - 애플리케이션에 Chat 서비스를 통합하기 위한 가장 쉽고 빠른 솔루션입니다
