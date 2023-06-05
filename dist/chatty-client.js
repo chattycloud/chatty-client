@@ -1,6 +1,6 @@
 /*!
  * ChattyClient v1.2.0
- * Build at 2023.5.21
+ * Build at 2023.6.3
  * Released under the MIT License.
  */
 (function (global, factory) {
@@ -9942,6 +9942,13 @@
   }
 
   var _a;
+  /**
+   *
+   *  ___ _  _ _   _ __  __ ___ ___    _ _____ ___ ___  _  _ ___
+   * | __| \| | | | |  \/  | __| _ \  /_\_   _|_ _/ _ \| \| / __|
+   * | _|| .` | |_| | |\/| | _||   / / _ \| |  | | (_) | .` \__ \
+   * |___|_|\_|\___/|_|  |_|___|_|_\/_/ \_\_| |___\___/|_|\_|___/
+   */
   var eAppPricing;
   (function (eAppPricing) {
     eAppPricing["FREE"] = "FREE";
@@ -9973,6 +9980,9 @@
     eNotification["CHATTY_ADMIN_MESSAGE"] = "CHATTY_ADMIN_MESSAGE";
     eNotification["CHATTY_SYSTEM_MESSAGE"] = "CHATTY_SYSTEM_MESSAGE";
   })(exports.eNotification || (exports.eNotification = {}));
+  var SupportedImageFormat = ['image/png', 'image/jpg', 'image/jpeg', 'image/gif', 'image/webp'];
+  var SupportedVideoFormat = ['video/mp4', 'video/webm'];
+  var SupportedUploadSize = 20000000;
   exports.eChattyEvent = void 0;
   (function (eChattyEvent) {
     eChattyEvent["CONNECT"] = "connection";
@@ -9999,24 +10009,23 @@
     eChattyEvent["MARK_AS_READ"] = "mark_as_read";
     eChattyEvent["MARK_AS_READ_DONE"] = "mark_as_read_done";
     eChattyEvent["MARK_AS_READ_FAIL"] = "mark_as_read_fail";
-    // TOBE DEPRECATED
+    /** deprecated */
     eChattyEvent["FETCH_CHATS"] = "fetch_chats";
     eChattyEvent["FETCH_CHATS_DONE"] = "fetch_chats_done";
     eChattyEvent["FETCH_CHATS_FAIL"] = "fetch_chats_fail";
-    // TOBE DEPRECATED
-    // 아래 내용들은 SYSTEM MESSAGE와 관련된 내용으로, 대시보드에서 사용 설정하게 되면 PUSH 메시지로 전달됩니다.
-    // 따라서, 이벤트를 받아서 처리하는 것은 권장하지 않습니다.
-    // 또한 대시보드에서 사용설정을 해제하면, 아래 이벤트들을 챗화면에서 업데이트 하지 않습니다.
-    // 따라서 사용하지 않을 예정
+    /** deprecated */
     eChattyEvent["INVITE_MEMBERS"] = "invite_members";
     eChattyEvent["INVITE_MEMBERS_DONE"] = "invite_members_done";
     eChattyEvent["INVITE_MEMBERS_FAIL"] = "invite_members_fail";
+    /** deprecated */
     eChattyEvent["EXCLUDE_MEMBERS"] = "exclude_members";
     eChattyEvent["EXCLUDE_MEMBERS_DONE"] = "exclude_members_done";
     eChattyEvent["EXCLUDE_MEMBERS_FAIL"] = "exclude_members_fail";
+    /** deprecated */
     eChattyEvent["JOIN_CHAT"] = "join_chat";
     eChattyEvent["JOIN_CHAT_DONE"] = "join_chat_done";
     eChattyEvent["JOIN_CHAT_FAIL"] = "join_chat_fail";
+    /** deprecated */
     eChattyEvent["LEAVE_CHAT"] = "leave_chat";
     eChattyEvent["LEAVE_CHAT_DONE"] = "leave_chat_done";
     eChattyEvent["LEAVE_CHAT_FAIL"] = "leave_chat_fail";
@@ -10506,7 +10515,15 @@
                         message: ":: ChattyClient upload fail - Chatty was not initialized"
                       }));
                     case 3:
-                      _context14.next = 5;
+                      // TODO file type checking
+                      files.map(function (file) {
+                        if (!SupportedImageFormat.includes(file.type)) {
+                          return reject({
+                            message: ":: ChattyClient Unsupported file type"
+                          });
+                        }
+                      });
+                      _context14.next = 6;
                       return Promise.all(files.map( /*#__PURE__*/function () {
                         var _ref6 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee13(file) {
                           var _b, _c, _d, form, uploadUrl, uploaded, baseurl;
@@ -10555,20 +10572,20 @@
                           return _ref6.apply(this, arguments);
                         };
                       }()));
-                    case 5:
+                    case 6:
                       result = _context14.sent;
                       resolve(result);
-                      _context14.next = 12;
+                      _context14.next = 13;
                       break;
-                    case 9:
-                      _context14.prev = 9;
+                    case 10:
+                      _context14.prev = 10;
                       _context14.t0 = _context14["catch"](0);
                       reject(_context14.t0);
-                    case 12:
+                    case 13:
                     case "end":
                       return _context14.stop();
                   }
-                }, _callee14, null, [[0, 9]]);
+                }, _callee14, null, [[0, 10]]);
               }));
               return function (_x12, _x13) {
                 return _ref5.apply(this, arguments);
@@ -10631,9 +10648,9 @@
     instance.interceptors.response.use(function (response) {
       return response;
     }, function (error) {
-      return Promise.reject(_objectSpread2(_objectSpread2({}, error), {}, {
-        message: ':: ChattyClient Response Error'
-      }));
+      return Promise.reject(error.response ? _objectSpread2(_objectSpread2({}, error.response.data), {}, {
+        code: 'chatty-api-error'
+      }) : 'Network Error');
     });
     return instance;
   };
@@ -10710,8 +10727,19 @@
   };
   /**
    *
-   * @param payload iConnectionPayload
-   * @returns
+   * @param {iConnectionPayload} payload
+   * @returns {
+   * {
+   *  chat: iChat,
+   *  messages: { [date: string]: { [timeSenderIdKey: string]: iMessage[] } },
+   *  isLoading: boolean,
+   *  isFetching: boolean,
+   *  fetchMessages: () => void,
+   *  sendMessage: (message: string | object | Array<{ uri: string, type: string }>) => void,
+   *  refresh: () => void,
+   *  error: { message: string } | undefined,
+   * }
+   * }
    */
   var useChat = function useChat(payload) {
     var _React$useState7 = React__default["default"].useState(),
@@ -11003,6 +11031,9 @@
   };
 
   exports.Chatty = Chatty;
+  exports.SupportedImageFormat = SupportedImageFormat;
+  exports.SupportedUploadSize = SupportedUploadSize;
+  exports.SupportedVideoFormat = SupportedVideoFormat;
   exports.useChat = useChat;
   exports.useIsInitialized = useIsInitialized;
   exports.useMissedCount = useMissedCount;

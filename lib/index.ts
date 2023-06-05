@@ -4,11 +4,13 @@ import axios, { AxiosInstance } from 'axios';
 import md5 from 'md5';
 import { format } from 'date-fns';
 
-
-//   ___ _  _ _   _ __  __ ___ ___    _ _____ ___ ___  _  _ ___ 
-//  | __| \| | | | |  \/  | __| _ \  /_\_   _|_ _/ _ \| \| / __|
-//  | _|| .` | |_| | |\/| | _||   / / _ \| |  | | (_) | .` \__ \
-//  |___|_|\_|\___/|_|  |_|___|_|_\/_/ \_\_| |___\___/|_|\_|___/
+/**
+ * 
+ *  ___ _  _ _   _ __  __ ___ ___    _ _____ ___ ___  _  _ ___ 
+ * | __| \| | | | |  \/  | __| _ \  /_\_   _|_ _/ _ \| \| / __|
+ * | _|| .` | |_| | |\/| | _||   / / _ \| |  | | (_) | .` \__ \
+ * |___|_|\_|\___/|_|  |_|___|_|_\/_/ \_\_| |___\___/|_|\_|___/
+ */
 
 enum eAppPricing {
   FREE = "FREE",
@@ -80,28 +82,27 @@ export enum eChattyEvent {
   MARK_AS_READ_DONE = "mark_as_read_done",
   MARK_AS_READ_FAIL = "mark_as_read_fail",
 
-  // TOBE DEPRECATED
+  /** deprecated */
   FETCH_CHATS = "fetch_chats",
   FETCH_CHATS_DONE = "fetch_chats_done",
   FETCH_CHATS_FAIL = "fetch_chats_fail",
 
-  // TOBE DEPRECATED
-  // 아래 내용들은 SYSTEM MESSAGE와 관련된 내용으로, 대시보드에서 사용 설정하게 되면 PUSH 메시지로 전달됩니다.
-  // 따라서, 이벤트를 받아서 처리하는 것은 권장하지 않습니다.
-  // 또한 대시보드에서 사용설정을 해제하면, 아래 이벤트들을 챗화면에서 업데이트 하지 않습니다.
-  // 따라서 사용하지 않을 예정
+  /** deprecated */
   INVITE_MEMBERS = "invite_members",
   INVITE_MEMBERS_DONE = "invite_members_done",
   INVITE_MEMBERS_FAIL = "invite_members_fail",
 
+  /** deprecated */
   EXCLUDE_MEMBERS = "exclude_members",
   EXCLUDE_MEMBERS_DONE = "exclude_members_done",
   EXCLUDE_MEMBERS_FAIL = "exclude_members_fail",
 
+  /** deprecated */
   JOIN_CHAT = "join_chat",
   JOIN_CHAT_DONE = "join_chat_done",
   JOIN_CHAT_FAIL = "join_chat_fail",
 
+  /** deprecated */
   LEAVE_CHAT = "leave_chat",
   LEAVE_CHAT_DONE = "leave_chat_done",
   LEAVE_CHAT_FAIL = "leave_chat_fail",
@@ -110,11 +111,13 @@ export enum eChattyEvent {
 
 
 
-
-//   ___ _  _ ___  _____  __  ___ ___ ___ _  _   _ _____ _   _ ___ ___ ___ 
-//  |_ _| \| |   \| __\ \/ / / __|_ _/ __| \| | /_\_   _| | | | _ \ __/ __|
-//   | || .` | |) | _| >  <  \__ \| | (_ | .` |/ _ \| | | |_| |   / _|\__ \
-//  |___|_|\_|___/|___/_/\_\ |___/___\___|_|\_/_/ \_\_|  \___/|_|_\___|___/
+/**
+ * 
+ *   ___ _  _ ___  _____  __  ___ ___ ___ _  _   _ _____ _   _ ___ ___ ___ 
+ *  |_ _| \| |   \| __\ \/ / / __|_ _/ __| \| | /_\_   _| | | | _ \ __/ __|
+ *   | || .` | |) | _| >  <  \__ \| | (_ | .` |/ _ \| | | |_| |   / _|\__ \
+ *  |___|_|\_|___/|___/_/\_\ |___/___\___|_|\_/_/ \_\_|  \___/|_|_\___|___/
+ */
 
 interface iTranslationIndexSignature {
   [key: string]: string;
@@ -123,11 +126,13 @@ interface iTranslationIndexSignature {
 
 
 
-
-//   ___ ___ _  _____ ___ ___   ___ _  _ _____ ___ ___ ___ _   ___ ___ ___ 
-//  | __|_ _| ||_   _| __| _ \ |_ _| \| |_   _| __| _ \ __/_\ / __| __/ __|
-//  | _| | || |__| | | _||   /  | || .` | | | | _||   / _/ _ \ (__| _|\__ \
-//  |_| |___|____|_| |___|_|_\ |___|_|\_| |_| |___|_|_\_/_/ \_\___|___|___/
+/**
+ * 
+ *   ___ ___ _  _____ ___ ___   ___ _  _ _____ ___ ___ ___ _   ___ ___ ___ 
+ *  | __|_ _| ||_   _| __| _ \ |_ _| \| |_   _| __| _ \ __/_\ / __| __/ __|
+ *  | _| | || |__| | | _||   /  | || .` | | | | _||   / _/ _ \ (__| _|\__ \
+ *  |_| |___|____|_| |___|_|_\ |___|_|\_| |_| |___|_|_\_/_/ \_\___|___|___/
+ */
 
 interface iMembersFilter {
   group?: string;
@@ -140,17 +145,19 @@ interface iChatsFilter {
   keyword?: string; // keyword for searching chat name
   MemberId?: string; // if MemberId is specified, get chats only MemberId included. if not, get all chats created
   page?: number;
-  pageLimit?: number;
+  pageLimit?: number; // default: 50 
 }
 
 
 
 
-
-//   ___  ___   ___    ___   _   ___    ___ _  _ _____ ___ ___ ___ _   ___ ___ ___ 
-//  | _ \/_\ \ / / |  / _ \ /_\ |   \  |_ _| \| |_   _| __| _ \ __/_\ / __| __/ __|
-//  |  _/ _ \ V /| |_| (_) / _ \| |) |  | || .` | | | | _||   / _/ _ \ (__| _|\__ \
-//  |_|/_/ \_\_| |____\___/_/ \_\___/  |___|_|\_| |_| |___|_|_\_/_/ \_\___|___|___/
+/**
+ * 
+ *   ___  ___   ___    ___   _   ___    ___ _  _ _____ ___ ___ ___ _   ___ ___ ___ 
+ *  | _ \/_\ \ / / |  / _ \ /_\ |   \  |_ _| \| |_   _| __| _ \ __/_\ / __| __/ __|
+ *  |  _/ _ \ V /| |_| (_) / _ \| |) |  | || .` | | | | _||   / _/ _ \ (__| _|\__ \
+ *  |_|/_/ \_\_| |____\___/_/ \_\___/  |___|_|\_| |_| |___|_|_\_/_/ \_\___|___|___/
+ */
 
 interface iInitPayload {
   apiKey: string;
@@ -234,11 +241,13 @@ interface iUpdateChatPayload {
 
 
 
-
-//   ___ ___ ___ ___  ___  _  _ ___ ___   ___ _  _ _____ ___ ___ ___ _   ___ ___ ___ 
-//  | _ \ __/ __| _ \/ _ \| \| / __| __| |_ _| \| |_   _| __| _ \ __/_\ / __| __/ __|
-//  |   / _|\__ \  _/ (_) | .` \__ \ _|   | || .` | | | | _||   / _/ _ \ (__| _|\__ \
-//  |_|_\___|___/_|  \___/|_|\_|___/___| |___|_|\_| |_| |___|_|_\_/_/ \_\___|___|___/
+/**
+ * 
+ *   ___ ___ ___ ___  ___  _  _ ___ ___   ___ _  _ _____ ___ ___ ___ _   ___ ___ ___ 
+ *  | _ \ __/ __| _ \/ _ \| \| / __| __| |_ _| \| |_   _| __| _ \ __/_\ / __| __/ __|
+ *  |   / _|\__ \  _/ (_) | .` \__ \ _|   | || .` | | | | _||   / _/ _ \ (__| _|\__ \
+ *  |_|_\___|___/_|  \___/|_|\_|___/___| |___|_|\_| |_| |___|_|_\_/_/ \_\___|___|___/
+ */
 
 interface iApp {
   id: string;
@@ -600,7 +609,7 @@ const getAxiosInstance = (ApiKey: string): AxiosInstance => {
   instance.defaults.headers.common['ApiKey'] = ApiKey;
   instance.defaults.headers.common["Content-Type"] = "application/json";
   instance.interceptors.request.use((request) => request, (error) => Promise.reject({ ...error, message: ':: ChattyClient Request Error' }));
-  instance.interceptors.response.use((response) => response, (error) => Promise.reject({ ...error, message: ':: ChattyClient Response Error' }));
+  instance.interceptors.response.use((response) => response, (error) => Promise.reject(error.response ? { message: `:: ChattyClient Error - ${error.response.data?.message}` } : 'Network Error'));
   return instance;
 }
 
@@ -676,8 +685,19 @@ const useSocket = (payload: iConnectionPayload): Socket | null => {
 
 /**
  * 
- * @param payload iConnectionPayload
- * @returns 
+ * @param {iConnectionPayload} payload
+ * @returns {
+ * {
+ *  chat: iChat,
+ *  messages: { [date: string]: { [timeSenderIdKey: string]: iMessage[] } },
+ *  isLoading: boolean,
+ *  isFetching: boolean,
+ *  fetchMessages: () => void,
+ *  sendMessage: (message: string | object | Array<{ uri: string, type: string }>) => void,
+ *  refresh: () => void,
+ *  error: { message: string } | undefined,
+ * }
+ * }
  */
 const useChat = (payload: iConnectionPayload): {
   chat: iChat,
