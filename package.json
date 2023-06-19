@@ -24,7 +24,8 @@
     "url": "https://github.com/chattycloud/chatty-client/issues",
     "email": "nunonam@gmail.com"
   },
-  "homepage": "https://www.chatty-cloud.com",
+  "homepage": "https://dashboard.chatty-cloud.com",
+  "issues": "https://github.com/chattycloud/chatty-client/issues",
   "keywords": [],
   "files": [
     "dist/",
