@@ -42,7 +42,9 @@ jobs:
         with:
           node-version: 16.x
           registry-url: https://registry.npmjs.org
-      - uses: tehpsalmist/npm-publish-status-action@v1
+      - run: yarn
+      - run: yarn compile
+      - run: yarn build
       - run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
