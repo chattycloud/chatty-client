@@ -1,7 +1,7 @@
 const { nodeResolve } = require("@rollup/plugin-node-resolve");
 const commonjs = require("@rollup/plugin-commonjs");
 const { terser } = require("rollup-plugin-terser");
-const replace = require('@rollup/plugin-replace');
+const replace = require("@rollup/plugin-replace");
 
 const version = require("../package.json").version;
 const banner = `/*!
@@ -26,16 +26,16 @@ module.exports = {
   },
   plugins: [
     nodeResolve({
-      browser: true
+      browser: true,
     }),
     commonjs(),
     replace({
       preventAssignment: true,
       values: {
-        'process.env.API_URL': JSON.stringify(API_URL),
-        'process.env.SOCKET_URL': JSON.stringify(SOCKET_URL),
-        'process.env.VERSION': JSON.stringify(version),
+        "process.env.API_URL": JSON.stringify(API_URL),
+        "process.env.SOCKET_URL": JSON.stringify(SOCKET_URL),
+        "process.env.VERSION": JSON.stringify(version),
       },
-    })
+    }),
   ],
 };

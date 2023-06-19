@@ -14,7 +14,6 @@
     "prettier.fix": "prettier --write \"lib/**/*.ts\" \"support/**/*.js\"",
     "prepack": "npm run compile",
     "pack": "npm pack",
-    "postpack": "mv ./chatty-client-v1.2.0.tgz ../../freak/freak-app/chatty-client-v1.2.0.tgz",
     "all": "yarn compile && yarn build.dev && yarn pack"
   },
   "repository": {
