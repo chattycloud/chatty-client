@@ -1,6 +1,6 @@
 /*!
  * ChattyClient v1.2.0
- * Build at 2023.6.3
+ * Build at 2023.6.19
  * Released under the MIT License.
  */
 (function (global, factory) {
@@ -10009,26 +10009,6 @@
     eChattyEvent["MARK_AS_READ"] = "mark_as_read";
     eChattyEvent["MARK_AS_READ_DONE"] = "mark_as_read_done";
     eChattyEvent["MARK_AS_READ_FAIL"] = "mark_as_read_fail";
-    /** deprecated */
-    eChattyEvent["FETCH_CHATS"] = "fetch_chats";
-    eChattyEvent["FETCH_CHATS_DONE"] = "fetch_chats_done";
-    eChattyEvent["FETCH_CHATS_FAIL"] = "fetch_chats_fail";
-    /** deprecated */
-    eChattyEvent["INVITE_MEMBERS"] = "invite_members";
-    eChattyEvent["INVITE_MEMBERS_DONE"] = "invite_members_done";
-    eChattyEvent["INVITE_MEMBERS_FAIL"] = "invite_members_fail";
-    /** deprecated */
-    eChattyEvent["EXCLUDE_MEMBERS"] = "exclude_members";
-    eChattyEvent["EXCLUDE_MEMBERS_DONE"] = "exclude_members_done";
-    eChattyEvent["EXCLUDE_MEMBERS_FAIL"] = "exclude_members_fail";
-    /** deprecated */
-    eChattyEvent["JOIN_CHAT"] = "join_chat";
-    eChattyEvent["JOIN_CHAT_DONE"] = "join_chat_done";
-    eChattyEvent["JOIN_CHAT_FAIL"] = "join_chat_fail";
-    /** deprecated */
-    eChattyEvent["LEAVE_CHAT"] = "leave_chat";
-    eChattyEvent["LEAVE_CHAT_DONE"] = "leave_chat_done";
-    eChattyEvent["LEAVE_CHAT_FAIL"] = "leave_chat_fail";
   })(exports.eChattyEvent || (exports.eChattyEvent = {}));
   var Chatty = /*#__PURE__*/function () {
     function Chatty() {
@@ -10635,7 +10615,7 @@
   ChattyEventEmitter.listeners = {};
   var getAxiosInstance = function getAxiosInstance(ApiKey) {
     var instance = axios$1.create();
-    instance.defaults.baseURL = "https://devapi.chatty-cloud.com";
+    instance.defaults.baseURL = "https://undefinedapi.chatty-cloud.com";
     instance.defaults.headers.common['ApiKey'] = ApiKey;
     instance.defaults.headers.common["Content-Type"] = "application/json";
     instance.interceptors.request.use(function (request) {
@@ -10648,9 +10628,10 @@
     instance.interceptors.response.use(function (response) {
       return response;
     }, function (error) {
-      return Promise.reject(error.response ? _objectSpread2(_objectSpread2({}, error.response.data), {}, {
-        code: 'chatty-api-error'
-      }) : 'Network Error');
+      var _b;
+      return Promise.reject(error.response ? {
+        message: ":: ChattyClient Error - ".concat((_b = error.response.data) === null || _b === void 0 ? void 0 : _b.message)
+      } : 'Network Error');
     });
     return instance;
   };
@@ -10708,7 +10689,7 @@
         return;
       }
       console.debug(':: ChattyClient - socket connecting');
-      var newSocket = lookup("".concat("wss://devsocket.chatty-cloud.com", "/chat.").concat((_b = Chatty.app) === null || _b === void 0 ? void 0 : _b.name), {
+      var newSocket = lookup("".concat("wss://undefinedsocket.chatty-cloud.com", "/chat.").concat((_b = Chatty.app) === null || _b === void 0 ? void 0 : _b.name), {
         auth: {
           apiKey: Chatty.apiKey,
           MemberId: (_c = Chatty.member) === null || _c === void 0 ? void 0 : _c.id,
@@ -10918,7 +10899,7 @@
         console.debug(':: ChattyClient disconnected');
       };
     }, [socket]);
-    var fetchMessages = function fetchMessages() {
+    var fetchNextMessages = function fetchNextMessages() {
       if (hasNext) {
         setIsFetching(true);
         socket.emit(exports.eChattyEvent.FETCH_MESSAGES, {
@@ -11024,7 +11005,7 @@
       error: error,
       isLoading: isLoading,
       isFetching: isFetching,
-      fetchMessages: fetchMessages,
+      fetchNextMessages: fetchNextMessages,
       sendMessage: sendMessage,
       refresh: refreshChat
     };
