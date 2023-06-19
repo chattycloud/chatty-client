@@ -21,9 +21,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16.x
+      - run: git config --global user.email "nunonam@gmail.com"
+      - run: git config --global user.name "nunonam"
       - run: npm version minor
       - run: git push origin main --tags
       - uses: actions/upload-artifact@v3
