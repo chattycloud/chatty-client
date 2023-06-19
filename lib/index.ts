@@ -81,31 +81,6 @@ export enum eChattyEvent {
   MARK_AS_READ = "mark_as_read",
   MARK_AS_READ_DONE = "mark_as_read_done",
   MARK_AS_READ_FAIL = "mark_as_read_fail",
-
-  /** deprecated */
-  FETCH_CHATS = "fetch_chats",
-  FETCH_CHATS_DONE = "fetch_chats_done",
-  FETCH_CHATS_FAIL = "fetch_chats_fail",
-
-  /** deprecated */
-  INVITE_MEMBERS = "invite_members",
-  INVITE_MEMBERS_DONE = "invite_members_done",
-  INVITE_MEMBERS_FAIL = "invite_members_fail",
-
-  /** deprecated */
-  EXCLUDE_MEMBERS = "exclude_members",
-  EXCLUDE_MEMBERS_DONE = "exclude_members_done",
-  EXCLUDE_MEMBERS_FAIL = "exclude_members_fail",
-
-  /** deprecated */
-  JOIN_CHAT = "join_chat",
-  JOIN_CHAT_DONE = "join_chat_done",
-  JOIN_CHAT_FAIL = "join_chat_fail",
-
-  /** deprecated */
-  LEAVE_CHAT = "leave_chat",
-  LEAVE_CHAT_DONE = "leave_chat_done",
-  LEAVE_CHAT_FAIL = "leave_chat_fail",
 }
 
 
@@ -704,7 +679,7 @@ const useChat = (payload: iConnectionPayload): {
   messages: { [date: string]: { [timeSenderIdKey: string]: iMessage[] } },
   isLoading: boolean,
   isFetching: boolean,
-  fetchMessages: () => void,
+  fetchNextMessages: () => void,
   sendMessage: (message: string | object | Array<{ uri: string, type: string }>) => void,
   refresh: () => void,
   error: { message: string } | undefined,
@@ -867,7 +842,7 @@ const useChat = (payload: iConnectionPayload): {
     };
   }, [socket]);
 
-  const fetchMessages = () => {
+  const fetchNextMessages = () => {
     if (hasNext) {
       setIsFetching(true);
       socket.emit(eChattyEvent.FETCH_MESSAGES, { refresh: false });
@@ -942,7 +917,7 @@ const useChat = (payload: iConnectionPayload): {
     error,
     isLoading,
     isFetching,
-    fetchMessages,
+    fetchNextMessages,
     sendMessage,
     refresh: refreshChat,
   };
