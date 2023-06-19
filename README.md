@@ -220,7 +220,7 @@ const Chat = (props: ChatProps) => {
     messages,
     isLoading,
     isFetching,
-    fetchMessages,
+    fetchNextMessages,
     sendMessage,
     refresh
   } = useChat({ id, members, distinctKey, name, image, group, data });
@@ -241,7 +241,7 @@ const Chat = (props: ChatProps) => {
         messages={messages} 
         isLoading={isLoading} 
         isFetching={isFetching} 
-        fetchMessages={fetchMessages} 
+        fetchNextMessages={fetchNextMessages} 
       />
       <ChatFooter 
         sendMessage={sendMessage} 
@@ -265,7 +265,7 @@ const {
     messages,
     isLoading,
     isFetching,
-    fetchMessages,
+    fetchNextMessages,
     sendMessage,
     refresh
   } = useChat({ id, members, distinctKey, name, image, group, data });

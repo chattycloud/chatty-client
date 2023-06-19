@@ -617,8 +617,8 @@ const getAxiosInstance = (ApiKey: string): AxiosInstance => {
       Promise.reject(
         error.response
           ? {
-              message: `:: ChattyClient Error - ${error.response.data?.message}`,
-            }
+            message: `:: ChattyClient Error - ${error.response.data?.message}`,
+          }
           : "Network Error"
       )
   );
@@ -713,7 +713,7 @@ const useSocket = (payload: iConnectionPayload): Socket | null => {
  *  messages: { [date: string]: { [timeSenderIdKey: string]: iMessage[] } },
  *  isLoading: boolean,
  *  isFetching: boolean,
- *  fetchMessages: () => void,
+ *  fetchNextMessages: () => void,
  *  sendMessage: (message: string | object | Array<{ uri: string, type: string }>) => void,
  *  refresh: () => void,
  *  error: { message: string } | undefined,
@@ -966,13 +966,13 @@ const useChat = (
     const type = isTextMessage(message)
       ? eMessageType.TEXT
       : isJsonMessage(message)
-      ? eMessageType.JSON
-      : eMessageType.FILE;
+        ? eMessageType.JSON
+        : eMessageType.FILE;
     const text = isTextMessage(message)
       ? message
       : isFileMessage(message)
-      ? "File message"
-      : "JSON message";
+        ? "File message"
+        : "JSON message";
 
     const tempMessage: iMessage = {
       id: id,
