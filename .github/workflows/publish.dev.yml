@@ -24,7 +24,7 @@ jobs:
       - run: git config --global user.email "nunonam@gmail.com"
       - run: git config --global user.name "nunonam"
       - run: npm version patch
-      - run: git push origin main --tags
+      - run: git push origin dev --tags
       - uses: actions/upload-artifact@v3
         with:
           name: src
