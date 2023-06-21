@@ -1,7 +1,9 @@
-name: Publish to npmjs
+name: Publish to npmjs (dev)
 
 on:  
   push:
+    branches: 
+      - dev
     tags:
       - 'v[0-9]+.[0-9]+.[0-9]+'
 
@@ -19,7 +21,7 @@ jobs:
           registry-url: https://registry.npmjs.org
       - run: yarn
       - run: yarn compile
-      - run: yarn build
+      - run: yarn build.dev
       - run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
