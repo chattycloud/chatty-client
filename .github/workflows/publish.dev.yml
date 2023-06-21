@@ -14,7 +14,7 @@ jobs:
           node-version: 16.x
       - run: yarn
       - run: yarn compile
-      - run: yarn build
+      - run: yarn build.dev
 
   version-patch:
     needs: build
@@ -44,7 +44,7 @@ jobs:
           registry-url: https://registry.npmjs.org
       - run: yarn
       - run: yarn compile
-      - run: yarn build
+      - run: yarn build.dev
       - run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
