@@ -2,8 +2,7 @@ name: ci (dev)
 
 on:  
   push:
-    tags:
-      branches: [ dev ]
+    branches: [ dev ]
 
 jobs:
   build:
