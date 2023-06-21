@@ -7,14 +7,14 @@
   "module": "./dist/chatty-client.js",
   "types": "./build/esm/index.d.ts",
   "scripts": {
+    "version.minor": "npm version minor && git push origin main --tags && git pull",
+    "version.patch": "npm version patch && git push origin dev --tags && git pull",
     "merge": "git checkout main && git merge dev && git push origin main && git checkout dev",
     "compile": "rm -rf ./build && tsc -p tsconfig.cjs.json && tsc -p tsconfig.esm.json",
     "build": "rollup -c support/rollup.config.umd.js && rollup -c support/rollup.config.esm.js",
     "build.dev": "NODE_ENV=dev rollup -c support/rollup.config.umd.js && NODE_ENV=dev rollup -c support/rollup.config.esm.js",
     "prettier": "prettier --check \"lib/**/*.ts\" \"support/**/*.js\"",
     "prettier.fix": "prettier --write \"lib/**/*.ts\" \"support/**/*.js\"",
-    "version.minor": "npm version minor && git push origin main --tags",
-    "version.patch": "npm version patch && git push origin dev --tags",
     "prepack": "npm run compile",
     "pack": "npm pack",
     "all": "yarn compile && yarn build.dev && yarn pack"
