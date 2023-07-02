@@ -195,7 +195,6 @@ interface iCreateChatPayload {
 }
 
 interface iUpdateChatPayload {
-  id: string;
   distinctKey?: string;
   name?: string;
   image?: string;
@@ -315,8 +314,12 @@ class Chatty {
       this.apiKey = apiKey;
       this.app = await this.getApp();
       this.axiosInstance.defaults.headers.common["AppId"] = this.app.id;
-      this.member = await this.upsertMember({
-        ...member,
+      this.member = await this.upsertMember(member.id, {
+        name: member.name,
+        avatar: member.avatar,
+        group: member.group,
+        data: member.data,
+        deviceToken: member.deviceToken,
         device: {
           platform: navigator.platform,
           language: navigator.language,
@@ -345,7 +348,7 @@ class Chatty {
         if (deleteMember) {
           await this.deleteMember(this.member.id);
         } else {
-          await this.upsertMember({ ...this.member, deviceToken: "" });
+          await this.upsertMember(this.member.id, { deviceToken: "" });
         }
       }
 
@@ -398,8 +401,8 @@ class Chatty {
     return data;
   }
 
-  static async updateChat(payload: iUpdateChatPayload): Promise<iChat> {
-    const { data } = await this.axiosInstance.put(`/chats`, {
+  static async updateChat(id: string, payload: iUpdateChatPayload): Promise<iChat> {
+    const { data } = await this.axiosInstance.put(`/chats/${id}`, {
       ...payload,
       image: payload.image ? { uri: payload.image } : undefined,
       Members: payload.members?.map((MemberId: string) => ({
@@ -447,16 +450,15 @@ class Chatty {
     return data;
   }
 
-  private static async upsertMember(member: {
-    id: string;
-    name: string;
+  private static async upsertMember(id: string, member: {
+    name?: string;
     avatar?: string;
     group?: string;
     data?: any;
     deviceToken?: string;
-    device: iDevicePayload;
+    device?: iDevicePayload;
   }): Promise<iMember> {
-    const { data } = await this.axiosInstance.put("/members", member);
+    const { data } = await this.axiosInstance.put(`/members/${id}`, member);
     return data;
   }
 
