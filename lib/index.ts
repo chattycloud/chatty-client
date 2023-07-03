@@ -376,8 +376,11 @@ class Chatty {
 
   static async createChat(payload: iCreateChatPayload): Promise<iChat> {
     const { data } = await this.axiosInstance.post("/chats", {
-      ...payload,
+      distinctKey: payload.distinctKey,
+      name: payload.name,
       image: payload.image ? { uri: payload.image } : undefined,
+      group: payload.group,
+      data: payload.data,
       Members: payload.members?.map((MemberId: string) => ({
         MemberId: MemberId,
         AppId: this.app?.id,
@@ -403,8 +406,11 @@ class Chatty {
 
   static async updateChat(id: string, payload: iUpdateChatPayload): Promise<iChat> {
     const { data } = await this.axiosInstance.put(`/chats/${id}`, {
-      ...payload,
+      distinctKey: payload.distinctKey,
+      name: payload.name,
       image: payload.image ? { uri: payload.image } : undefined,
+      group: payload.group,
+      data: payload.data,
       Members: payload.members?.map((MemberId: string) => ({
         MemberId: MemberId,
         AppId: this.app?.id,
@@ -423,9 +429,12 @@ class Chatty {
   static async createAdminMessage(
     payload: iCreateAdminMessagePayload
   ): Promise<iChat> {
-    const { data } = await this.axiosInstance.post(`/messages`, {
-      ...payload,
+    const { data } = await this.axiosInstance.put(`/chats`, {
+      distinctKey: payload.distinctKey,
+      name: payload.name,
       image: payload.image ? { uri: payload.image } : undefined,
+      group: payload.group,
+      data: payload.data,
       Members: payload.members?.map((MemberId: string) => ({
         MemberId: MemberId,
         AppId: this.app?.id,
