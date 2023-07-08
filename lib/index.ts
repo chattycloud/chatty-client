@@ -117,6 +117,7 @@ interface iMembersFilter {
 interface iChatsFilter {
   group?: string;
   keyword?: string; // keyword for searching chat name
+  data?: { [key: string]: any }; // data for searching chat data
   MemberId?: string; // if MemberId is specified, get chats only MemberId included. if not, get all chats created
   page?: number;
   pageLimit?: number; // default: 50
