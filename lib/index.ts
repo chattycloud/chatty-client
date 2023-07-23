@@ -319,6 +319,8 @@ class Chatty {
         name: member.name,
         avatar: member.avatar,
         group: member.group,
+        language: member.language,
+        country: member.country,
         data: member.data,
         deviceToken: member.deviceToken,
         device: {
@@ -464,6 +466,8 @@ class Chatty {
     name?: string;
     avatar?: string;
     group?: string;
+    language?: string;
+    country?: string;
     data?: any;
     deviceToken?: string;
     device?: iDevicePayload;
