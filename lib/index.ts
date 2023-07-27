@@ -875,11 +875,14 @@ const useChat = (
       console.debug(":: ChattyClient receive message", data);
       setMessages((oldMessages) => {
         const oldMessagesMap = new Map(oldMessages.map((e) => [e["id"], e]));
-        const newMessagesMap = new Map(
-          data.message && [[data.message["id"], data.message]]
-        );
+        const newMessagesMap = new Map(data.message && [[data.message["id"], data.message]]);
         const messagesMap = new Map([...newMessagesMap, ...oldMessagesMap]);
-        return Array.from(messagesMap.values());
+
+        // reorder messages by createdAt
+        return Array.from(messagesMap.values()).sort(
+          (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        );
+        // return Array.from(messagesMap.values());
       });
       setError(undefined);
       socket.emit(eChattyEvent.MARK_AS_READ);
