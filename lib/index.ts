@@ -880,7 +880,7 @@ const useChat = (
 
         // reorder messages by createdAt
         return Array.from(messagesMap.values()).sort(
-          (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         );
         // return Array.from(messagesMap.values());
       });
