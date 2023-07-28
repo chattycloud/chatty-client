@@ -854,9 +854,7 @@ const useChat = (
       setError(undefined);
       setMessages((oldMessages) => {
         const oldMessagesMap = new Map(oldMessages.map((e) => [e["id"], e]));
-        const newMessagesMap = new Map(
-          data.message && [[data.message["id"], data.message]]
-        );
+        const newMessagesMap = new Map(data.message && [[data.message["id"], data.message]]);
         const messagesMap = new Map([...oldMessagesMap, ...newMessagesMap]);
         return Array.from(messagesMap.values());
       });
@@ -877,12 +875,13 @@ const useChat = (
         const oldMessagesMap = new Map(oldMessages.map((e) => [e["id"], e]));
         const newMessagesMap = new Map(data.message && [[data.message["id"], data.message]]);
         const messagesMap = new Map([...newMessagesMap, ...oldMessagesMap]);
+        return Array.from(messagesMap.values());
 
         // reorder messages by createdAt
-        return Array.from(messagesMap.values()).sort(
-          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
-        // return Array.from(messagesMap.values());
+        // 파일 전송이 늦을경우 createdAt이 이미 많이 과거가 되어 원래위치로 끼여 들어가야 하는데... 비용이 많이드네.. 일단 보류
+        // return Array.from(messagesMap.values()).sort(
+        //   (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        // );
       });
       setError(undefined);
       socket.emit(eChattyEvent.MARK_AS_READ);
@@ -906,9 +905,7 @@ const useChat = (
         // readReceipt가 변경되었거나 메세지내용이 삭제또는 변경된경우 update하기 위해 발생되는 이벤트 (서버주도로 발생)
         setMessages((oldMessages) => {
           const oldMessagesMap = new Map(oldMessages.map((e) => [e["id"], e]));
-          const newMessagesMap = new Map(
-            data.messages?.map((e) => [e["id"], e])
-          );
+          const newMessagesMap = new Map(data.messages?.map((e) => [e["id"], e]));
           const messagesMap = new Map([...oldMessagesMap, ...newMessagesMap]);
           return Array.from(messagesMap.values());
         });
