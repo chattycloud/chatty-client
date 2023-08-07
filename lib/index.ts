@@ -407,6 +407,24 @@ class Chatty {
     return data;
   }
 
+  /** 
+   * @deprecate
+   * handle join only at sever side
+   */
+  static async joinChat(ChatId: string) { }
+
+  /** 
+   * @deprecate
+   * disable exclude
+   */
+  static async excludeChatMember(ChatId: string, MemberId: string) { }
+
+  /** 
+   * @deprecate
+   * disable invite
+   */
+  static async inviteChatMember(ChatId: string, MemberId: string) { }
+
   static async updateChat(id: string, payload: iUpdateChatPayload): Promise<iChat> {
     const { data } = await this.axiosInstance.put(`/chats/${id}`, {
       distinctKey: payload.distinctKey,
