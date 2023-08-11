@@ -303,7 +303,7 @@ class Chatty {
   static app: iApp | undefined;
   static member: iMember | undefined;
   static missedCount: iMissedCount | undefined;
-  static axiosInstance: AxiosInstance;
+  static axiosInstance: AxiosInstance | undefined;
 
   static async init({ apiKey, member }: iInitPayload) {
     try {
@@ -358,7 +358,7 @@ class Chatty {
       this.apiKey = undefined;
       this.app = undefined;
       this.member = undefined;
-      this.axiosInstance.defaults.headers.common = {};
+      this.axiosInstance = undefined;
       console.debug(":: ChattyClient exit success");
     } catch (error: any) {
       return Promise.reject({
