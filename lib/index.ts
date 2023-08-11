@@ -956,6 +956,7 @@ const useChat = (
   }, [socket]);
 
   const fetchNextMessages = () => {
+    if (!socket) return;
     if (hasNext) {
       setIsFetching(true);
       socket.emit(eChattyEvent.FETCH_MESSAGES, { refresh: false });
@@ -963,6 +964,7 @@ const useChat = (
   };
 
   const refreshChat = () => {
+    if (!socket) return;
     setIsLoading(true);
     socket.emit(eChattyEvent.REFRESH_CHAT);
   };
@@ -988,6 +990,7 @@ const useChat = (
   const sendMessage = async (
     message: string | object | Array<{ uri: string; type: string }>
   ) => {
+    if (!socket) return;
     const id = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
       /[xy]/g,
       function (c) {
