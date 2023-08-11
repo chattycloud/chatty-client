@@ -529,7 +529,7 @@ class Chatty {
   }
 
   static fetchMissedCount = async (): Promise<iMissedCount> => {
-    if (!this.app || !this.member)
+    if (!this.app || !this.member || !this.axiosInstance)
       return Promise.reject({
         message:
           ":: ChattyClient fetchMissedCount fail - Chatty was not initialized",
