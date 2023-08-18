@@ -781,11 +781,17 @@ const useChat = (
       [date: string]: { [timeSenderIdKey: string]: iMessage[] };
     };
 
-    messages.map((message) => {
+    let timeKeySequence: number = 0;
+
+    messages.map((message, index) => {
+      const previousMessage = index ? messages[index - 1] : undefined;
+      if (previousMessage?.sender?.id !== message.sender?.id) {
+        timeKeySequence++;
+      }
       const dateKey = format(new Date(message.createdAt), "PP");
       const timeKey = format(new Date(message.createdAt), "p");
       const SenderIdKey = message.sender?.id!;
-      const timeSenderIdKey = `${timeKey}@${SenderIdKey}`;
+      const timeSenderIdKey = `${timeKey}@${SenderIdKey}@${timeKeySequence}`;
 
       if (!groupedMessages) {
         groupedMessages = {};

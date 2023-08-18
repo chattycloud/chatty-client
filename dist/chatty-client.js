@@ -1,6 +1,6 @@
 /*!
- * ChattyClient v1.2.0
- * Build at 2023.6.19
+ * ChattyClient v1.2.19
+ * Build at 2023.8.18
  * Released under the MIT License.
  */
 (function (global, factory) {
@@ -9980,8 +9980,8 @@
     eNotification["CHATTY_ADMIN_MESSAGE"] = "CHATTY_ADMIN_MESSAGE";
     eNotification["CHATTY_SYSTEM_MESSAGE"] = "CHATTY_SYSTEM_MESSAGE";
   })(exports.eNotification || (exports.eNotification = {}));
-  var SupportedImageFormat = ['image/png', 'image/jpg', 'image/jpeg', 'image/gif', 'image/webp'];
-  var SupportedVideoFormat = ['video/mp4', 'video/webm'];
+  var SupportedImageFormat = ["image/png", "image/jpg", "image/jpeg", "image/gif", "image/webp"];
+  var SupportedVideoFormat = ["video/mp4", "video/webm"];
   var SupportedUploadSize = 20000000;
   exports.eChattyEvent = void 0;
   (function (eChattyEvent) {
@@ -10038,22 +10038,29 @@
                 return this.getApp();
               case 8:
                 this.app = _context.sent;
-                this.axiosInstance.defaults.headers.common['AppId'] = this.app.id;
+                this.axiosInstance.defaults.headers.common["AppId"] = this.app.id;
                 _context.next = 12;
-                return this.upsertMember(_objectSpread2(_objectSpread2({}, member), {}, {
+                return this.upsertMember(member.id, {
+                  name: member.name,
+                  avatar: member.avatar,
+                  group: member.group,
+                  language: member.language,
+                  country: member.country,
+                  data: member.data,
+                  deviceToken: member.deviceToken,
                   device: {
                     platform: navigator.platform,
                     language: navigator.language,
                     product: navigator.product,
                     userAgent: navigator.userAgent,
-                    sdkVersion: "1.2.0"
+                    sdkVersion: "1.2.19"
                   }
-                }));
+                });
               case 12:
                 this.member = _context.sent;
-                this.axiosInstance.defaults.headers.common['MemberId'] = this.member.id;
+                this.axiosInstance.defaults.headers.common["MemberId"] = this.member.id;
                 if (this.app && this.member) {
-                  ChattyEventEmitter.emit('initialized', {
+                  ChattyEventEmitter.emit("initialized", {
                     initialized: true
                   });
                   console.debug(":: ChattyClient Initialized !!");
@@ -10104,14 +10111,14 @@
                 break;
               case 8:
                 _context2.next = 10;
-                return this.upsertMember(_objectSpread2(_objectSpread2({}, this.member), {}, {
-                  deviceToken: ''
-                }));
+                return this.upsertMember(this.member.id, {
+                  deviceToken: ""
+                });
               case 10:
                 this.apiKey = undefined;
                 this.app = undefined;
                 this.member = undefined;
-                this.axiosInstance.defaults.headers.common = {};
+                this.axiosInstance = undefined;
                 console.debug(":: ChattyClient exit success");
                 _context2.next = 20;
                 break;
@@ -10168,7 +10175,7 @@
             while (1) switch (_context4.prev = _context4.next) {
               case 0:
                 _context4.next = 2;
-                return this.axiosInstance.get('/chats', {
+                return this.axiosInstance.get("/chats", {
                   params: filter
                 });
               case 2:
@@ -10196,10 +10203,14 @@
             while (1) switch (_context5.prev = _context5.next) {
               case 0:
                 _context5.next = 2;
-                return this.axiosInstance.post("/chats", _objectSpread2(_objectSpread2({}, payload), {}, {
+                return this.axiosInstance.post("/chats", {
+                  distinctKey: payload.distinctKey,
+                  name: payload.name,
                   image: payload.image ? {
                     uri: payload.image
                   } : undefined,
+                  group: payload.group,
+                  data: payload.data,
                   Members: (_b = payload.members) === null || _b === void 0 ? void 0 : _b.map(function (MemberId) {
                     var _b;
                     return {
@@ -10211,7 +10222,7 @@
                     AppId: (_c = this.app) === null || _c === void 0 ? void 0 : _c.id,
                     type: payload.message.json ? exports.eMessageType.JSON : exports.eMessageType.TEXT
                   })]
-                }));
+                });
               case 2:
                 _yield$this$axiosInst3 = _context5.sent;
                 data = _yield$this$axiosInst3.data;
@@ -10257,20 +10268,87 @@
         }
         return leaveChat;
       }()
+      /**
+       * @deprecate
+       * handle join only at sever side
+       */
     }, {
-      key: "updateChat",
+      key: "joinChat",
       value: function () {
-        var _updateChat = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee7(payload) {
-          var _this2 = this;
-          var _b, _c, _yield$this$axiosInst5, data;
+        var _joinChat = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee7(ChatId) {
           return _regeneratorRuntime().wrap(function _callee7$(_context7) {
             while (1) switch (_context7.prev = _context7.next) {
               case 0:
-                _context7.next = 2;
-                return this.axiosInstance.put("/chats", _objectSpread2(_objectSpread2({}, payload), {}, {
+              case "end":
+                return _context7.stop();
+            }
+          }, _callee7);
+        }));
+        function joinChat(_x6) {
+          return _joinChat.apply(this, arguments);
+        }
+        return joinChat;
+      }()
+      /**
+       * @deprecate
+       * disable exclude
+       */
+    }, {
+      key: "excludeChatMember",
+      value: function () {
+        var _excludeChatMember = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee8(ChatId, MemberId) {
+          return _regeneratorRuntime().wrap(function _callee8$(_context8) {
+            while (1) switch (_context8.prev = _context8.next) {
+              case 0:
+              case "end":
+                return _context8.stop();
+            }
+          }, _callee8);
+        }));
+        function excludeChatMember(_x7, _x8) {
+          return _excludeChatMember.apply(this, arguments);
+        }
+        return excludeChatMember;
+      }()
+      /**
+       * @deprecate
+       * disable invite
+       */
+    }, {
+      key: "inviteChatMember",
+      value: function () {
+        var _inviteChatMember = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee9(ChatId, MemberId) {
+          return _regeneratorRuntime().wrap(function _callee9$(_context9) {
+            while (1) switch (_context9.prev = _context9.next) {
+              case 0:
+              case "end":
+                return _context9.stop();
+            }
+          }, _callee9);
+        }));
+        function inviteChatMember(_x9, _x10) {
+          return _inviteChatMember.apply(this, arguments);
+        }
+        return inviteChatMember;
+      }()
+    }, {
+      key: "updateChat",
+      value: function () {
+        var _updateChat = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee10(id, payload) {
+          var _this2 = this;
+          var _b, _c, _yield$this$axiosInst5, data;
+          return _regeneratorRuntime().wrap(function _callee10$(_context10) {
+            while (1) switch (_context10.prev = _context10.next) {
+              case 0:
+                _context10.next = 2;
+                return this.axiosInstance.put("/chats/".concat(id), {
+                  distinctKey: payload.distinctKey,
+                  name: payload.name,
                   image: payload.image ? {
                     uri: payload.image
                   } : undefined,
+                  group: payload.group,
+                  data: payload.data,
                   Members: (_b = payload.members) === null || _b === void 0 ? void 0 : _b.map(function (MemberId) {
                     var _b;
                     return {
@@ -10282,18 +10360,18 @@
                     AppId: (_c = this.app) === null || _c === void 0 ? void 0 : _c.id,
                     type: payload.message.json ? exports.eMessageType.JSON : exports.eMessageType.TEXT
                   })]
-                }));
+                });
               case 2:
-                _yield$this$axiosInst5 = _context7.sent;
+                _yield$this$axiosInst5 = _context10.sent;
                 data = _yield$this$axiosInst5.data;
-                return _context7.abrupt("return", data);
+                return _context10.abrupt("return", data);
               case 5:
               case "end":
-                return _context7.stop();
+                return _context10.stop();
             }
-          }, _callee7, this);
+          }, _callee10, this);
         }));
-        function updateChat(_x6) {
+        function updateChat(_x11, _x12) {
           return _updateChat.apply(this, arguments);
         }
         return updateChat;
@@ -10301,17 +10379,21 @@
     }, {
       key: "createAdminMessage",
       value: function () {
-        var _createAdminMessage = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee8(payload) {
+        var _createAdminMessage = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee11(payload) {
           var _this3 = this;
           var _b, _c, _yield$this$axiosInst6, data;
-          return _regeneratorRuntime().wrap(function _callee8$(_context8) {
-            while (1) switch (_context8.prev = _context8.next) {
+          return _regeneratorRuntime().wrap(function _callee11$(_context11) {
+            while (1) switch (_context11.prev = _context11.next) {
               case 0:
-                _context8.next = 2;
-                return this.axiosInstance.post("/messages", _objectSpread2(_objectSpread2({}, payload), {}, {
+                _context11.next = 2;
+                return this.axiosInstance.put("/chats", {
+                  distinctKey: payload.distinctKey,
+                  name: payload.name,
                   image: payload.image ? {
                     uri: payload.image
                   } : undefined,
+                  group: payload.group,
+                  data: payload.data,
                   Members: (_b = payload.members) === null || _b === void 0 ? void 0 : _b.map(function (MemberId) {
                     var _b;
                     return {
@@ -10324,18 +10406,18 @@
                     type: payload.message.json ? exports.eMessageType.JSON : exports.eMessageType.TEXT,
                     by: exports.eMessageBy.ADMIN
                   })]
-                }));
+                });
               case 2:
-                _yield$this$axiosInst6 = _context8.sent;
+                _yield$this$axiosInst6 = _context11.sent;
                 data = _yield$this$axiosInst6.data;
-                return _context8.abrupt("return", data);
+                return _context11.abrupt("return", data);
               case 5:
               case "end":
-                return _context8.stop();
+                return _context11.stop();
             }
-          }, _callee8, this);
+          }, _callee11, this);
         }));
-        function createAdminMessage(_x7) {
+        function createAdminMessage(_x13) {
           return _createAdminMessage.apply(this, arguments);
         }
         return createAdminMessage;
@@ -10343,26 +10425,26 @@
     }, {
       key: "getMembers",
       value: function () {
-        var _getMembers = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee9(filter) {
+        var _getMembers = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee12(filter) {
           var _yield$this$axiosInst7, data;
-          return _regeneratorRuntime().wrap(function _callee9$(_context9) {
-            while (1) switch (_context9.prev = _context9.next) {
+          return _regeneratorRuntime().wrap(function _callee12$(_context12) {
+            while (1) switch (_context12.prev = _context12.next) {
               case 0:
-                _context9.next = 2;
+                _context12.next = 2;
                 return this.axiosInstance.get("/members", {
                   params: filter
                 });
               case 2:
-                _yield$this$axiosInst7 = _context9.sent;
+                _yield$this$axiosInst7 = _context12.sent;
                 data = _yield$this$axiosInst7.data;
-                return _context9.abrupt("return", data);
+                return _context12.abrupt("return", data);
               case 5:
               case "end":
-                return _context9.stop();
+                return _context12.stop();
             }
-          }, _callee9, this);
+          }, _callee12, this);
         }));
-        function getMembers(_x8) {
+        function getMembers(_x14) {
           return _getMembers.apply(this, arguments);
         }
         return getMembers;
@@ -10370,24 +10452,24 @@
     }, {
       key: "upsertMember",
       value: function () {
-        var _upsertMember = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee10(member) {
+        var _upsertMember = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee13(id, member) {
           var _yield$this$axiosInst8, data;
-          return _regeneratorRuntime().wrap(function _callee10$(_context10) {
-            while (1) switch (_context10.prev = _context10.next) {
+          return _regeneratorRuntime().wrap(function _callee13$(_context13) {
+            while (1) switch (_context13.prev = _context13.next) {
               case 0:
-                _context10.next = 2;
-                return this.axiosInstance.put('/members', member);
+                _context13.next = 2;
+                return this.axiosInstance.put("/members/".concat(id), member);
               case 2:
-                _yield$this$axiosInst8 = _context10.sent;
+                _yield$this$axiosInst8 = _context13.sent;
                 data = _yield$this$axiosInst8.data;
-                return _context10.abrupt("return", data);
+                return _context13.abrupt("return", data);
               case 5:
               case "end":
-                return _context10.stop();
+                return _context13.stop();
             }
-          }, _callee10, this);
+          }, _callee13, this);
         }));
-        function upsertMember(_x9) {
+        function upsertMember(_x15, _x16) {
           return _upsertMember.apply(this, arguments);
         }
         return upsertMember;
@@ -10395,21 +10477,21 @@
     }, {
       key: "deleteMember",
       value: function () {
-        var _deleteMember = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee11(id) {
-          return _regeneratorRuntime().wrap(function _callee11$(_context11) {
-            while (1) switch (_context11.prev = _context11.next) {
+        var _deleteMember = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee14(id) {
+          return _regeneratorRuntime().wrap(function _callee14$(_context14) {
+            while (1) switch (_context14.prev = _context14.next) {
               case 0:
-                _context11.next = 2;
+                _context14.next = 2;
                 return this.axiosInstance["delete"]("/members/".concat(id));
               case 2:
-                return _context11.abrupt("return", _context11.sent);
+                return _context14.abrupt("return", _context14.sent);
               case 3:
               case "end":
-                return _context11.stop();
+                return _context14.stop();
             }
-          }, _callee11, this);
+          }, _callee14, this);
         }));
-        function deleteMember(_x10) {
+        function deleteMember(_x17) {
           return _deleteMember.apply(this, arguments);
         }
         return deleteMember;
@@ -10421,11 +10503,11 @@
           payload[_key] = arguments[_key];
         }
         if (!payload || !payload.length) {
-          console.warn(':: ChattyClient generateDistinctKey error - param data is undefined');
+          console.warn(":: ChattyClient generateDistinctKey error - param data is undefined");
           return;
         }
         if (!this.app) {
-          console.warn(':: ChattyClient generateDistinctKey error - Chatty was not initialized');
+          console.warn(":: ChattyClient generateDistinctKey error - Chatty was not initialized");
           return;
         }
         // add AppId to hash elements
@@ -10441,57 +10523,57 @@
     return Chatty;
   }();
   _a = Chatty;
-  Chatty.fetchMissedCount = /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee12() {
+  Chatty.fetchMissedCount = /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee15() {
     var _yield$_a$axiosInstan, data;
-    return _regeneratorRuntime().wrap(function _callee12$(_context12) {
-      while (1) switch (_context12.prev = _context12.next) {
+    return _regeneratorRuntime().wrap(function _callee15$(_context15) {
+      while (1) switch (_context15.prev = _context15.next) {
         case 0:
-          if (!(!_a.app || !_a.member)) {
-            _context12.next = 2;
+          if (!(!_a.app || !_a.member || !_a.axiosInstance)) {
+            _context15.next = 2;
             break;
           }
-          return _context12.abrupt("return", Promise.reject({
+          return _context15.abrupt("return", Promise.reject({
             message: ":: ChattyClient fetchMissedCount fail - Chatty was not initialized"
           }));
         case 2:
-          _context12.next = 4;
+          _context15.next = 4;
           return _a.axiosInstance.get("/missed-count");
         case 4:
-          _yield$_a$axiosInstan = _context12.sent;
+          _yield$_a$axiosInstan = _context15.sent;
           data = _yield$_a$axiosInstan.data;
-          console.debug(':: ChattyClient fetchMissedCount', data);
+          console.debug(":: ChattyClient fetchMissedCount", data);
           Chatty.setMissedCount(data);
-          return _context12.abrupt("return", data);
+          return _context15.abrupt("return", data);
         case 9:
         case "end":
-          return _context12.stop();
+          return _context15.stop();
       }
-    }, _callee12);
+    }, _callee15);
   }));
   Chatty.getMissedCount = function () {
     return _a.missedCount;
   };
   Chatty.setMissedCount = function (missedCount) {
     _a.missedCount = missedCount;
-    ChattyEventEmitter.emit('missed-count', missedCount);
+    ChattyEventEmitter.emit("missed-count", missedCount);
   };
   Chatty.upload = /*#__PURE__*/function () {
-    var _ref4 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee15(files) {
-      return _regeneratorRuntime().wrap(function _callee15$(_context15) {
-        while (1) switch (_context15.prev = _context15.next) {
+    var _ref4 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee18(files) {
+      return _regeneratorRuntime().wrap(function _callee18$(_context18) {
+        while (1) switch (_context18.prev = _context18.next) {
           case 0:
-            return _context15.abrupt("return", new Promise( /*#__PURE__*/function () {
-              var _ref5 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee14(resolve, reject) {
+            return _context18.abrupt("return", new Promise( /*#__PURE__*/function () {
+              var _ref5 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee17(resolve, reject) {
                 var result;
-                return _regeneratorRuntime().wrap(function _callee14$(_context14) {
-                  while (1) switch (_context14.prev = _context14.next) {
+                return _regeneratorRuntime().wrap(function _callee17$(_context17) {
+                  while (1) switch (_context17.prev = _context17.next) {
                     case 0:
-                      _context14.prev = 0;
+                      _context17.prev = 0;
                       if (!(!_a.app || !_a.member)) {
-                        _context14.next = 3;
+                        _context17.next = 3;
                         break;
                       }
-                      return _context14.abrupt("return", reject({
+                      return _context17.abrupt("return", reject({
                         message: ":: ChattyClient upload fail - Chatty was not initialized"
                       }));
                     case 3:
@@ -10503,25 +10585,25 @@
                           });
                         }
                       });
-                      _context14.next = 6;
+                      _context17.next = 6;
                       return Promise.all(files.map( /*#__PURE__*/function () {
-                        var _ref6 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee13(file) {
+                        var _ref6 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee16(file) {
                           var _b, _c, _d, form, uploadUrl, uploaded, baseurl;
-                          return _regeneratorRuntime().wrap(function _callee13$(_context13) {
-                            while (1) switch (_context13.prev = _context13.next) {
+                          return _regeneratorRuntime().wrap(function _callee16$(_context16) {
+                            while (1) switch (_context16.prev = _context16.next) {
                               case 0:
                                 form = new FormData();
                                 form.append("file", file);
-                                _context13.next = 4;
+                                _context16.next = 4;
                                 return (_b = _a.axiosInstance) === null || _b === void 0 ? void 0 : _b.get("/uploadurl");
                               case 4:
-                                uploadUrl = _context13.sent;
+                                uploadUrl = _context16.sent;
                                 if (!(uploadUrl === null || uploadUrl === void 0 ? void 0 : uploadUrl.data)) {
                                   reject({
                                     message: ":: ChattyClient upload - Getting uploadUrl failed"
                                   });
                                 }
-                                _context13.next = 8;
+                                _context16.next = 8;
                                 return axios$1.post(uploadUrl === null || uploadUrl === void 0 ? void 0 : uploadUrl.data, form, {
                                   headers: {
                                     "Content-Type": "multipart/form-data",
@@ -10529,55 +10611,55 @@
                                   }
                                 });
                               case 8:
-                                uploaded = _context13.sent;
+                                uploaded = _context16.sent;
                                 if (!((_c = uploaded === null || uploaded === void 0 ? void 0 : uploaded.data) === null || _c === void 0 ? void 0 : _c.result)) {
-                                  _context13.next = 14;
+                                  _context16.next = 14;
                                   break;
                                 }
                                 baseurl = uploaded.data.result.variants[0].split(uploaded.data.result.id)[0];
-                                return _context13.abrupt("return", {
+                                return _context16.abrupt("return", {
                                   uri: baseurl + uploaded.data.result.id + "/" + ((_d = _a.app) === null || _d === void 0 ? void 0 : _d.thumbnailSize)
                                 });
                               case 14:
-                                return _context13.abrupt("return", {
+                                return _context16.abrupt("return", {
                                   uri: ""
                                 });
                               case 15:
                               case "end":
-                                return _context13.stop();
+                                return _context16.stop();
                             }
-                          }, _callee13);
+                          }, _callee16);
                         }));
-                        return function (_x14) {
+                        return function (_x21) {
                           return _ref6.apply(this, arguments);
                         };
                       }()));
                     case 6:
-                      result = _context14.sent;
+                      result = _context17.sent;
                       resolve(result);
-                      _context14.next = 13;
+                      _context17.next = 13;
                       break;
                     case 10:
-                      _context14.prev = 10;
-                      _context14.t0 = _context14["catch"](0);
-                      reject(_context14.t0);
+                      _context17.prev = 10;
+                      _context17.t0 = _context17["catch"](0);
+                      reject(_context17.t0);
                     case 13:
                     case "end":
-                      return _context14.stop();
+                      return _context17.stop();
                   }
-                }, _callee14, null, [[0, 10]]);
+                }, _callee17, null, [[0, 10]]);
               }));
-              return function (_x12, _x13) {
+              return function (_x19, _x20) {
                 return _ref5.apply(this, arguments);
               };
             }()));
           case 1:
           case "end":
-            return _context15.stop();
+            return _context18.stop();
         }
-      }, _callee15);
+      }, _callee18);
     }));
-    return function (_x11) {
+    return function (_x18) {
       return _ref4.apply(this, arguments);
     };
   }();
@@ -10615,14 +10697,14 @@
   ChattyEventEmitter.listeners = {};
   var getAxiosInstance = function getAxiosInstance(ApiKey) {
     var instance = axios$1.create();
-    instance.defaults.baseURL = "https://undefinedapi.chatty-cloud.com";
-    instance.defaults.headers.common['ApiKey'] = ApiKey;
+    instance.defaults.baseURL = "https://devapi.chatty-cloud.com";
+    instance.defaults.headers.common["ApiKey"] = ApiKey;
     instance.defaults.headers.common["Content-Type"] = "application/json";
     instance.interceptors.request.use(function (request) {
       return request;
     }, function (error) {
       return Promise.reject(_objectSpread2(_objectSpread2({}, error), {}, {
-        message: ':: ChattyClient Request Error'
+        message: ":: ChattyClient Request Error"
       }));
     });
     instance.interceptors.response.use(function (response) {
@@ -10631,7 +10713,7 @@
       var _b;
       return Promise.reject(error.response ? {
         message: ":: ChattyClient Error - ".concat((_b = error.response.data) === null || _b === void 0 ? void 0 : _b.message)
-      } : 'Network Error');
+      } : "Network Error");
     });
     return instance;
   };
@@ -10645,10 +10727,10 @@
       var handleInitialized = function handleInitialized(data) {
         setInitialized(data.initialized);
       };
-      ChattyEventEmitter.on('initialized', handleInitialized);
+      ChattyEventEmitter.on("initialized", handleInitialized);
       return function () {
-        console.debug(':: ChattyClient useInitialized - remove listener initialized');
-        ChattyEventEmitter.off('initialized', handleInitialized);
+        console.debug(":: ChattyClient useInitialized - remove listener initialized");
+        ChattyEventEmitter.off("initialized", handleInitialized);
       };
     }, []);
     return initialized;
@@ -10669,9 +10751,9 @@
       var updateMissedCount = function updateMissedCount(data) {
         setCount(data);
       };
-      ChattyEventEmitter.on('missed-count', updateMissedCount);
+      ChattyEventEmitter.on("missed-count", updateMissedCount);
       return function () {
-        ChattyEventEmitter.off('missed-count', updateMissedCount);
+        ChattyEventEmitter.off("missed-count", updateMissedCount);
       };
     }, []);
     return count;
@@ -10685,11 +10767,11 @@
       var _b, _c, _d;
       if (socket) return;
       if (!Chatty.apiKey || !Chatty.app || !Chatty.member) {
-        console.warn(':: ChattyClient - Chatty was not initialized');
+        console.warn(":: ChattyClient - Chatty was not initialized");
         return;
       }
-      console.debug(':: ChattyClient - socket connecting');
-      var newSocket = lookup("".concat("wss://undefinedsocket.chatty-cloud.com", "/chat.").concat((_b = Chatty.app) === null || _b === void 0 ? void 0 : _b.name), {
+      console.debug(":: ChattyClient - socket connecting");
+      var newSocket = lookup("".concat("wss://devsocket.chatty-cloud.com", "/chat.").concat((_b = Chatty.app) === null || _b === void 0 ? void 0 : _b.name), {
         auth: {
           apiKey: Chatty.apiKey,
           MemberId: (_c = Chatty.member) === null || _c === void 0 ? void 0 : _c.id,
@@ -10701,7 +10783,7 @@
       return function () {
         newSocket.close();
         setSocket(null);
-        console.debug(':: ChattyClient - socket disconnected');
+        console.debug(":: ChattyClient - socket disconnected");
       };
     }, []);
     return socket;
@@ -10715,7 +10797,7 @@
    *  messages: { [date: string]: { [timeSenderIdKey: string]: iMessage[] } },
    *  isLoading: boolean,
    *  isFetching: boolean,
-   *  fetchMessages: () => void,
+   *  fetchNextMessages: () => void,
    *  sendMessage: (message: string | object | Array<{ uri: string, type: string }>) => void,
    *  refresh: () => void,
    *  error: { message: string } | undefined,
@@ -10750,12 +10832,17 @@
     var socket = useSocket(payload);
     var formattedMessages = React__default["default"].useMemo(function () {
       var groupedMessages;
-      messages.map(function (message) {
-        var _b;
-        var dateKey = format(new Date(message.createdAt), 'PP');
-        var timeKey = format(new Date(message.createdAt), 'p');
-        var SenderIdKey = (_b = message.sender) === null || _b === void 0 ? void 0 : _b.id;
-        var timeSenderIdKey = "".concat(timeKey, "@").concat(SenderIdKey);
+      var timeKeySequence = 0;
+      messages.map(function (message, index) {
+        var _b, _c, _d;
+        var previousMessage = index ? messages[index - 1] : undefined;
+        if (((_b = previousMessage === null || previousMessage === void 0 ? void 0 : previousMessage.sender) === null || _b === void 0 ? void 0 : _b.id) !== ((_c = message.sender) === null || _c === void 0 ? void 0 : _c.id)) {
+          timeKeySequence++;
+        }
+        var dateKey = format(new Date(message.createdAt), "PP");
+        var timeKey = format(new Date(message.createdAt), "p");
+        var SenderIdKey = (_d = message.sender) === null || _d === void 0 ? void 0 : _d.id;
+        var timeSenderIdKey = "".concat(timeKey, "@").concat(SenderIdKey, "@").concat(timeKeySequence);
         if (!groupedMessages) {
           groupedMessages = {};
         }
@@ -10780,10 +10867,10 @@
         socket.emit(exports.eChattyEvent.MARK_AS_READ);
         setIsLoading(false);
         setError(undefined);
-        console.debug(':: ChattyClient connected');
+        console.debug(":: ChattyClient connected");
       });
       socket.on(exports.eChattyEvent.CONNECT_FAIL, function (error) {
-        console.warn(':: ChattyClient connection fail', error);
+        console.warn(":: ChattyClient connection fail", error);
         setIsLoading(false);
         setError(error);
       });
@@ -10796,10 +10883,10 @@
           setMessages(function (oldMessages) {
             var _b;
             var oldMessagesMap = new Map(oldMessages.map(function (e) {
-              return [e['id'], e];
+              return [e["id"], e];
             }));
             var newMessagesMap = new Map((_b = data.messages) === null || _b === void 0 ? void 0 : _b.map(function (e) {
-              return [e['id'], e];
+              return [e["id"], e];
             }));
             var messagesMap = new Map([].concat(_toConsumableArray(oldMessagesMap), _toConsumableArray(newMessagesMap)));
             return Array.from(messagesMap.values());
@@ -10812,65 +10899,71 @@
       });
 
       socket.on(exports.eChattyEvent.FETCH_MESSAGES_FAIL, function (error) {
-        console.warn(':: ChattyClient fetch messages fail', error);
+        console.warn(":: ChattyClient fetch messages fail", error);
         setIsFetching(false);
         setError(error);
       });
       // SEND_MESSAGE
       socket.on(exports.eChattyEvent.SEND_MESSAGE_DONE, function (data) {
-        console.debug(':: ChattyClient send message done', data);
+        console.debug(":: ChattyClient send message done", data);
         setError(undefined);
         setMessages(function (oldMessages) {
           var oldMessagesMap = new Map(oldMessages.map(function (e) {
-            return [e['id'], e];
+            return [e["id"], e];
           }));
-          var newMessagesMap = new Map(data.message && [[data.message['id'], data.message]]);
+          var newMessagesMap = new Map(data.message && [[data.message["id"], data.message]]);
           var messagesMap = new Map([].concat(_toConsumableArray(oldMessagesMap), _toConsumableArray(newMessagesMap)));
           return Array.from(messagesMap.values());
         });
       });
       socket.on(exports.eChattyEvent.SEND_MESSAGE_RETRY, function (data) {
-        console.debug(':: ChattyClient send message retry', data);
+        console.debug(":: ChattyClient send message retry", data);
         socket.emit(exports.eChattyEvent.SEND_MESSAGE, data);
       });
       socket.on(exports.eChattyEvent.SEND_MESSAGE_FAIL, function (error) {
-        console.warn(':: ChattyClient send message fail', error);
+        console.warn(":: ChattyClient send message fail", error);
         setError(error);
       });
       // RECEIVE_MESSAGE
       socket.on(exports.eChattyEvent.RECEIVE_MESSAGE, function (data) {
-        console.debug(':: ChattyClient receive message', data);
+        console.debug(":: ChattyClient receive message", data);
         setMessages(function (oldMessages) {
           var oldMessagesMap = new Map(oldMessages.map(function (e) {
-            return [e['id'], e];
+            return [e["id"], e];
           }));
-          var newMessagesMap = new Map(data.message && [[data.message['id'], data.message]]);
+          var newMessagesMap = new Map(data.message && [[data.message["id"], data.message]]);
           var messagesMap = new Map([].concat(_toConsumableArray(newMessagesMap), _toConsumableArray(oldMessagesMap)));
           return Array.from(messagesMap.values());
+          // reorder messages by createdAt
+          // 파일 전송이 늦을경우 createdAt이 이미 많이 과거가 되어 원래위치로 끼여 들어가야 하는데... 비용이 많이드네.. 일단 보류
+          // return Array.from(messagesMap.values()).sort(
+          //   (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          // );
         });
+
         setError(undefined);
         socket.emit(exports.eChattyEvent.MARK_AS_READ);
       });
       // MARK_AS_READ
       socket.on(exports.eChattyEvent.MARK_AS_READ_DONE, function () {
-        console.debug(':: ChattyClient mark as read done');
+        console.debug(":: ChattyClient mark as read done");
         Chatty.fetchMissedCount();
       });
       socket.on(exports.eChattyEvent.MARK_AS_READ_FAIL, function (error) {
-        console.debug(':: ChattyClient mark as read fail', error);
+        console.debug(":: ChattyClient mark as read fail", error);
         setError(error);
       });
       // UPDATE_MESSAGES
       socket.on(exports.eChattyEvent.UPDATE_MESSAGES, function (data) {
-        console.debug(':: ChattyClient update messages', data);
+        console.debug(":: ChattyClient update messages", data);
         // readReceipt가 변경되었거나 메세지내용이 삭제또는 변경된경우 update하기 위해 발생되는 이벤트 (서버주도로 발생)
         setMessages(function (oldMessages) {
           var _b;
           var oldMessagesMap = new Map(oldMessages.map(function (e) {
-            return [e['id'], e];
+            return [e["id"], e];
           }));
           var newMessagesMap = new Map((_b = data.messages) === null || _b === void 0 ? void 0 : _b.map(function (e) {
-            return [e['id'], e];
+            return [e["id"], e];
           }));
           var messagesMap = new Map([].concat(_toConsumableArray(oldMessagesMap), _toConsumableArray(newMessagesMap)));
           return Array.from(messagesMap.values());
@@ -10879,7 +10972,7 @@
       });
       // REFRESH_CHAT
       socket.on(exports.eChattyEvent.REFRESH_CHAT_DONE, function (data) {
-        console.debug(':: ChattyClient refresh chat done', data);
+        console.debug(":: ChattyClient refresh chat done", data);
         setChat(data.chat);
         setError(undefined);
       });
@@ -10896,10 +10989,11 @@
         socket.off(exports.eChattyEvent.MARK_AS_READ_FAIL);
         socket.off(exports.eChattyEvent.UPDATE_MESSAGES);
         socket.off(exports.eChattyEvent.REFRESH_CHAT_DONE);
-        console.debug(':: ChattyClient disconnected');
+        console.debug(":: ChattyClient disconnected");
       };
     }, [socket]);
     var fetchNextMessages = function fetchNextMessages() {
+      if (!socket) return;
       if (hasNext) {
         setIsFetching(true);
         socket.emit(exports.eChattyEvent.FETCH_MESSAGES, {
@@ -10908,24 +11002,31 @@
       }
     };
     var refreshChat = function refreshChat() {
+      if (!socket) return;
       setIsLoading(true);
       socket.emit(exports.eChattyEvent.REFRESH_CHAT);
     };
     var isTextMessage = function isTextMessage(message) {
-      return typeof message === 'string';
+      return typeof message === "string";
     };
     var isFileMessage = function isFileMessage(message) {
       return Array.isArray(message);
     };
     var isJsonMessage = function isJsonMessage(message) {
-      return _typeof$2(message) === 'object' && message !== null && !Array.isArray(message);
+      return _typeof$2(message) === "object" && message !== null && !Array.isArray(message);
     };
     var sendMessage = /*#__PURE__*/function () {
-      var _ref7 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee16(message) {
+      var _ref7 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee19(message) {
         var id, now, type, text, tempMessage;
-        return _regeneratorRuntime().wrap(function _callee16$(_context16) {
-          while (1) switch (_context16.prev = _context16.next) {
+        return _regeneratorRuntime().wrap(function _callee19$(_context19) {
+          while (1) switch (_context19.prev = _context19.next) {
             case 0:
+              if (socket) {
+                _context19.next = 2;
+                break;
+              }
+              return _context19.abrupt("return");
+            case 2:
               id = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
                 var r = Math.random() * 16 | 0,
                   v = c == "x" ? r : r & 0x3 | 0x8;
@@ -10933,7 +11034,7 @@
               });
               now = new Date();
               type = isTextMessage(message) ? exports.eMessageType.TEXT : isJsonMessage(message) ? exports.eMessageType.JSON : exports.eMessageType.FILE;
-              text = isTextMessage(message) ? message : isFileMessage(message) ? 'File message' : 'JSON message';
+              text = isTextMessage(message) ? message : isFileMessage(message) ? "File message" : "JSON message";
               tempMessage = {
                 id: id,
                 text: text,
@@ -10950,52 +11051,52 @@
               };
               setMessages(function (oldMessages) {
                 var oldMessagesMap = new Map(oldMessages.map(function (e) {
-                  return [e['id'], e];
+                  return [e["id"], e];
                 }));
-                var newMessagesMap = new Map([[tempMessage['id'], tempMessage]]);
+                var newMessagesMap = new Map([[tempMessage["id"], tempMessage]]);
                 var messagesMap = new Map([].concat(_toConsumableArray(newMessagesMap), _toConsumableArray(oldMessagesMap)));
                 return Array.from(messagesMap.values());
               });
-              _context16.t0 = socket;
-              _context16.t1 = exports.eChattyEvent.SEND_MESSAGE;
-              _context16.t2 = id;
-              _context16.t3 = text;
+              _context19.t0 = socket;
+              _context19.t1 = exports.eChattyEvent.SEND_MESSAGE;
+              _context19.t2 = id;
+              _context19.t3 = text;
               if (!isFileMessage(message)) {
-                _context16.next = 16;
+                _context19.next = 18;
                 break;
               }
-              _context16.next = 13;
+              _context19.next = 15;
               return Chatty.upload(message);
-            case 13:
-              _context16.t4 = _context16.sent;
-              _context16.next = 17;
+            case 15:
+              _context19.t4 = _context19.sent;
+              _context19.next = 19;
               break;
-            case 16:
-              _context16.t4 = undefined;
-            case 17:
-              _context16.t5 = _context16.t4;
-              _context16.t6 = isJsonMessage(message) ? message : undefined;
-              _context16.t7 = type;
-              _context16.t8 = exports.eMessageBy.USER;
-              _context16.t9 = now;
-              _context16.t10 = {
-                id: _context16.t2,
-                text: _context16.t3,
-                files: _context16.t5,
-                json: _context16.t6,
-                type: _context16.t7,
-                by: _context16.t8,
-                createdAt: _context16.t9,
+            case 18:
+              _context19.t4 = undefined;
+            case 19:
+              _context19.t5 = _context19.t4;
+              _context19.t6 = isJsonMessage(message) ? message : undefined;
+              _context19.t7 = type;
+              _context19.t8 = exports.eMessageBy.USER;
+              _context19.t9 = now;
+              _context19.t10 = {
+                id: _context19.t2,
+                text: _context19.t3,
+                files: _context19.t5,
+                json: _context19.t6,
+                type: _context19.t7,
+                by: _context19.t8,
+                createdAt: _context19.t9,
                 retry: 5
               };
-              _context16.t0.emit.call(_context16.t0, _context16.t1, _context16.t10);
-            case 24:
+              _context19.t0.emit.call(_context19.t0, _context19.t1, _context19.t10);
+            case 26:
             case "end":
-              return _context16.stop();
+              return _context19.stop();
           }
-        }, _callee16);
+        }, _callee19);
       }));
-      return function sendMessage(_x15) {
+      return function sendMessage(_x22) {
         return _ref7.apply(this, arguments);
       };
     }();
