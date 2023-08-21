@@ -743,8 +743,8 @@ const useSocket = (payload: iConnectionPayload): Socket | null => {
  * @param {iConnectionPayload} payload
  * @returns {
  * {
- *  chat: iChat,
- *  messages: Array<iMessage>,
+ *  chat: iChat | undefined,
+ *  messages: Array<iMessage> | undefined,
  *  isLoading: boolean,
  *  isFetching: boolean,
  *  fetchNextMessages: () => void,
@@ -758,59 +758,22 @@ const useSocket = (payload: iConnectionPayload): Socket | null => {
 const useChat = (
   payload: iConnectionPayload
 ): {
-  chat: iChat;
-  messages: Array<iMessage>;
+  chat: iChat | undefined;
+  messages: Array<iMessage> | undefined;
   isLoading: boolean;
   isFetching: boolean;
   fetchNextMessages: () => void;
-  sendMessage: (
-    message: string | object | Array<{ uri: string; type: string }>
-  ) => void;
+  sendMessage: (message: string | object | Array<{ uri: string; type: string }>) => void;
   refresh: () => void;
   error: { message: string } | undefined;
 } => {
   const [chat, setChat] = React.useState<iChat>();
-  const [messages, setMessages] = React.useState<iMessage[]>([]);
+  const [messages, setMessages] = React.useState<iMessage[]>();
   const [hasNext, setHasNext] = React.useState<boolean>(false);
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
   const [isFetching, setIsFetching] = React.useState<boolean>(false);
   const [error, setError] = React.useState<{ message: string }>();
   const socket = useSocket(payload);
-
-  // only use unformatted messages
-  // const formattedMessages = React.useMemo(() => {
-  //   let groupedMessages: {
-  //     [date: string]: { [timeSenderIdKey: string]: iMessage[] };
-  //   };
-
-  //   let timeKeySequence: number = 0;
-
-  //   messages.map((message, index) => {
-  //     const previousMessage = index ? messages[index - 1] : undefined;
-  //     if (previousMessage?.sender?.id !== message.sender?.id) {
-  //       timeKeySequence++;
-  //     }
-  //     const dateKey = format(new Date(message.createdAt), "PP");
-  //     const timeKey = format(new Date(message.createdAt), "p");
-  //     const SenderIdKey = message.sender?.id!;
-  //     const timeSenderIdKey = `${timeKey}@${SenderIdKey}@${timeKeySequence}`;
-
-  //     if (!groupedMessages) {
-  //       groupedMessages = {};
-  //     }
-
-  //     if (!groupedMessages[dateKey]) {
-  //       groupedMessages[dateKey] = {};
-  //     }
-  //     if (!groupedMessages[dateKey][timeSenderIdKey]) {
-  //       groupedMessages[dateKey][timeSenderIdKey] = [];
-  //     }
-
-  //     groupedMessages[dateKey][timeSenderIdKey].unshift(message); // here, use unshift instead of using reverse() at ui component
-  //   });
-
-  //   return groupedMessages;
-  // }, [messages]);
 
   React.useEffect(() => {
     if (!socket) return;
