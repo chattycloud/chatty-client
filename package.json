@@ -17,7 +17,7 @@
     "prettier.fix": "prettier --write \"lib/**/*.ts\" \"support/**/*.js\"",
     "prepack": "npm run compile",
     "pack": "npm pack",
-    "all": "yarn compile && yarn build.dev && yarn pack"
+    "all": "yarn compile && yarn build && yarn pack"
   },
   "repository": {
     "type": "git",
