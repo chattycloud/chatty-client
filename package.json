@@ -1,6 +1,6 @@
 {
   "name": "chatty-client",
-  "version": "1.2.20",
+  "version": "1.2.21",
   "description": "Easy application client for a chatting solution",
   "type": "commonjs",
   "main": "./dist/chatty-client.js",
