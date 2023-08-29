@@ -120,7 +120,16 @@ interface iChatsFilter {
   data?: { [key: string]: any }; // data for searching chat data
   MemberId?: string; // if MemberId is specified, get chats only MemberId included. if not, get all chats created
   page?: number;
-  pageLimit?: number; // default: 50
+  limit?: number; // default: 50
+}
+
+interface iMessagesFilter {
+  ChatId: string;
+  keyword?: string;
+  permission?: eMemberPermission;
+  joinTime?: Date;
+  page?: number;
+  limit?: number;
 }
 
 /**
@@ -496,6 +505,11 @@ class Chatty {
 
   private static async deleteMember(id: string): Promise<Boolean> {
     return await this.axiosInstance.delete(`/members/${id}`);
+  }
+
+  static async getMessages(filter: iMessagesFilter): Promise<iMessage[]> {
+    const { data } = await this.axiosInstance.get("/messages", { params: filter });
+    return data;
   }
 
   static generateDistinctKey(...payload: Array<string>): string | undefined {
