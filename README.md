@@ -203,6 +203,7 @@ const App = () => {
 ### 2. 채팅화면 만들기
 
 - chatty-client 에서 제공하는 useChat 을 사용하여 Chat화면을 만드는데 필요한 데이터를 가져올수 있습니다. 
+- chat을 고유하게 만드는 distinctKey를 생성하기 위해서는 static method인 generateDistinctKey(['MemberId1', 'MemberId2']) 를 이용하여 만들수 있습니다
 
 
 ```typescript
@@ -458,5 +459,56 @@ console.debug('missedCount total', missedCount.total);
 
 
 
+# 5. Static Methods
 
+### 1. getChats
+- chat 목록을 가져오기위한 메소드
+
+```typescript
+interface iChatsFilter {
+  group?: string;
+  keyword?: string; // keyword for searching chat name
+  data?: { [key: string]: any }; // data for searching chat data
+  MemberId?: string; // if MemberId is specified, get chats only MemberId included. if not, get all chats created
+  page?: number;
+  limit?: number; // default: 50
+}
+
+static getChats(filter: iChatsFilter): Promise<iChat[]>;
+```
+
+### 2. getMessages
+- chat 의 메세지를 가져오기위한 메소드
+```typescript
+interface iMessagesFilter {
+    ChatId: string;
+    keyword?: string;
+    permission?: eMemberPermission;
+    joinTime?: Date;
+    page?: number;
+    limit?: number;
+}
+
+static getMessages(filter: iMessagesFilter): Promise<iMessage[]>;
+```
+
+### 3. getMembers
+- chat 의 Member를 가져오기위한 메소드
+```typescript
+interface iMembersFilter {
+    group?: string;
+    keyword?: string;
+    ChatId?: string;
+}
+
+static getMembers(filter: iMembersFilter): Promise<Array<iMember>>;
+```
+
+### 4. generateDistinctKey
+- chat의 unique한 key를 만들기위한 메소드
+```typescript
+
+static generateDistinctKey(...payload: Array<string>): string | undefined;
+
+```
 
