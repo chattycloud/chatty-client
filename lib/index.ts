@@ -1050,6 +1050,7 @@ export {
   eMessageBy,
   eMessageType,
   eNotification,
+  eMemberPermission,
   iMissedCount,
   iChat,
   iMessage,
